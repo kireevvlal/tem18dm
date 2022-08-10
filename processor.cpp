@@ -5,6 +5,82 @@ Processor::Processor(QObject *parent) : QObject(parent)
 {
     //_tr_total.resize(10);
 }
+//--------------------------------------------------------------------------------
+// Load configuration from files and create objects
+bool Processor:: Load(QString startPath)
+{
+    int i;
+    if (_tree.ReadFile(startPath)) { // read start configuration file
+        Parse(_tree.Root);
+        for (i = 0; i < _files.length(); i++) {
+            _tree.Clear();
+            if (_tree.ReadFile(_files[i]))
+                ParseObjects(_tree.Root);
+            else
+                return false;
+        }
+    } else
+        return false;
+    return true;
+}
+//--------------------------------------------------------------------------------
+void Processor::Run()
+{
+    // start serial ports
+    for (int i = 0; i < SerialPorts.count(); i++) {
+        connect(SerialPorts[i], SIGNAL(DecodeSignal(ThreadSerialPort*)), this, SLOT(Unpack(ThreadSerialPort*)));
+        SerialPorts[i]->Start();
+    }
+}
+//--------------------------------------------------------------------------------
+void Processor::Unpack(ThreadSerialPort *port)
+{
+    qDebug() << "Unpack " + port->Alias;
+}
+
+//--------------------------------------------------------------------------------
+void Processor::Parse(NodeXML *node)
+{
+    while (node != nullptr) {
+        if (node->Name == "files") {
+            ParseFiles(node->Child);
+        }
+        node = node->Next;
+    }
+}
+//--------------------------------------------------------------------------------
+void Processor::ParseFiles(NodeXML *node)
+{
+    while (node != nullptr) {
+        if (node->Name == "path") {
+            _files.append(node->Text);
+        }
+        node = node->Next;
+    }
+}
+//--------------------------------------------------------------------------------
+void Processor::ParseObjects(NodeXML *node)
+{
+    while (node != nullptr) {
+        if (node->Name == "serialports") {
+            ParseSerialPorts(node->Child);
+        }
+        node = node->Next;
+    }
+}
+//--------------------------------------------------------------------------------
+void Processor::ParseSerialPorts(NodeXML *node)
+{
+    while (node != nullptr) {
+        if (node->Name == "spstream") {   // serial port stream
+            ThreadSerialPort *newPort = new ThreadSerialPort;
+            SerialPorts.append(newPort);
+            newPort->Parse(node);
+        }
+        node = node->Next;
+    }
+}
+
 //------------------------------------------------------------------------------
 // New realisation
 QJsonArray Processor::getTrevogaTotal()
@@ -97,7 +173,7 @@ QJsonArray Processor::getParamMain()
     int dsk_iSA1 = 1;   // dsk_iSA1  = dsk[0,iSA1 ];
     int dsk_iKMv0 = 1;  // dsk_iKMv0 = dsk[0,iKMv0];
     int dsk_iDizZ = 0;  // dsk_iDizZ = dsk[0,iDizZ];
-    QJsonArray rej_prt = rejPrT();
+    QJsonArray rej_prt = RejPrT();
 
     return {
         QTime::currentTime().toString("HH:mm:ss"), QDate::currentDate().toString("dd/MM/yy"), // date and time
@@ -111,7 +187,7 @@ QJsonArray Processor::getParamMain()
     };
 }
 //------------------------------------------------------------------------------
-QJsonArray Processor::rejPrT()
+QJsonArray Processor::RejPrT()
 
 {
     QJsonArray arr;

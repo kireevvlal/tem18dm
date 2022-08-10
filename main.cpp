@@ -2,6 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QObject>
+#include <QDebug>
 #include "processor.h"
 
 int main(int argc, char *argv[])
@@ -23,6 +24,11 @@ int main(int argc, char *argv[])
     }, Qt::QueuedConnection);
     engine.load(url);
     engine.rootContext()->setContextProperty("ioBf", &ioBf);
+    if (ioBf.Load("D:\\Development\\Qt\\tem18dm\\config.xml")) {
+        qDebug() << "Config readed!";
+        ioBf.Run();
+    } else
+        qDebug() << "Config read error.";
 
     return app.exec();
 }

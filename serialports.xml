@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<serialports>
+	<spstream name="BEL" exchange="slave" delay="1000" protocol = "staffing">
+		<port baudrate="9600" parity="Odd" databits="8" stopbits="2" flowcontrol="No">COM6</port>
+		<input order="reverse">
+		</input>
+		<output length="2" order="reverse">
+			<par val="12" byte="0">Команда запроса БЭЛ</par>
+		</output>
+	</spstream>
+	<spstream name="USTA" exchange="slave" delay="1000"  protocol = "staffing">
+		<port baudrate="12800" parity="Even" databits="8" stopbits="2" flowcontrol="No">COM9</port>
+		<input order="reverse">
+		</input>
+		<output length="5" order="reverse">
+			<par val="10" byte="0">Команда запроса УСТА</par>		
+		</output>
+	</spstream>
+	<!--spstream name="IT" exchange="receive" protocol = "staffing">
+		<port baudrate="9600" parity="Even" databits="8" stopbits="2" flowcontrol="No">COM10</port>
+		<input>
+			<par var="IT_TSM1" type="float" byte="5" index="0" coeff="0.25">Температура холодного спая, С</par>
+			<par var="IT_THA1" type="int" byte="7" index="0">Температура газа, С. Выход из 1 цилиндра дизеля</par>
+			<par var="IT_TSM2" type="float" byte="9" index="0" coeff="0.25">Температура топлива, С. Вход в ТНВД</par>
+			<par var="IT_THA2" type="int" byte="11" index="0">Температура газа, С. Выход из 2 цилиндра дизеля</par>
+			<par var="IT_TSM3" type="float" byte="13" index="0" coeff="0.25">Температура масла, С. Вход в дизель</par>
+			<par var="IT_THA3" type="int" byte="15" index="0">Температура газа, С. Выход из 3 цилиндра дизеля</par>
+			<par var="IT_TSM4" type="float" byte="17" index="0" coeff="0.25">Температура масла, С. Выход из дизеля</par>
+			<par var="IT_THA4" type="int" byte="19" index="0">Температура газа, С. Выход из 4 цилиндра дизеля</par>
+			<par var="IT_TSM5" type="float" byte="21" index="0" coeff="0.25">Температура воды, С. Выход из охладителя масла</par>
+			<par var="IT_THA5" type="int" byte="23" index="0">Температура газа, С. Выход из 5 цилиндра дизеля</par>
+			<par var="IT_TSM6" type="float" byte="25" index="0" coeff="0.25">Температура воды, С. Выход из дизеля</par>
+			<par var="IT_THA6" type="int" byte="27" index="0">Температура газа, С. Выход из 6 цилиндра дизеля</par>
+			<par var="IT_TSM7" type="float" byte="29" index="0" coeff="0.25">Температура воздуха, С. Окружающего</par>
+			<par var="IT_TSM8" type="float" byte="33" index="0" coeff="0.25">Температура воды, С. Вход в радиатор 2-го контура</par>
+			<par var="IT_TSM9" type="float" byte="5" index="1" coeff="0.25">Температура воды, С. Вход в охладитель масла</par>
+			<par var="IT_TSM10" type="float" byte="9" index="1" coeff="0.25">Температура воды, С. Вход в дизель</par>
+		</input>
+	</spstream-->
+	<!--spstream name="MSS" exchange="master" protocol = "staffing" delay="1000">
+		<port baudrate="19200" parity="Odd" databits="8" stopbits="2">COM6</port>
+		<input order="reverse" inclen="513">
+		</input>
+		<output length="6" order="reverse">
+		</output>
+	</spstream-->
+</serialports>

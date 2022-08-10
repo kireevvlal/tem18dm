@@ -1,20 +1,32 @@
 #ifndef PROCESSOR_H
 #define PROCESSOR_H
 #include <QObject>
-#include  "zapuso.h"
 #include <QJsonArray>
+#include  "zapuso.h"
+#include "threadserialport.h"
+#include "treexml.h"
 
 class Processor : public QObject
 {
     Q_OBJECT
 private:
     QByteArray _bytes_data;
-    QJsonArray rejPrT();
+    QString _start_path;
+    QStringList _files;
+    TreeXML _tree;
+    QJsonArray RejPrT();
+    void Parse(NodeXML*);
+    void ParseFiles(NodeXML*);
+    void ParseObjects(NodeXML*);
+    void ParseSerialPorts(NodeXML*);
 public:
+    QList<ThreadSerialPort*> SerialPorts;
     explicit Processor(QObject *parent = nullptr);
     ~ Processor() {}
-
+    bool Load(QString);
+    void Run();
     public slots:
+    void Unpack(ThreadSerialPort*);
     // New:
     QJsonArray getTrevogaTotal();
     QJsonArray getTrevogaDiesel();
