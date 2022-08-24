@@ -29,8 +29,8 @@ Window {
         onTriggered: {
             cnt ++;
             var par = ioBf.getParamMain();
-            txt_time.text = par[0]; //ioBf.tm();
-            txt_data.text = par[1]; //ioBf.dt();
+            txt_time.text = par[0][0]; //ioBf.tm();
+            txt_data.text = par[0][1]; //ioBf.dt();
 
             if (indPt.value + 0.1 > indPt.maximumValue) {
                 indPt.value = 0;
@@ -49,24 +49,24 @@ Window {
             } else
                 indFd.value  =  indFd.value + 50;
 
-            revers.value = par[2]; //ioBf.getReversor();// реверсор
-            pkm.pkms = par[3]; //ioBf.getPKM();         // позиция
-            regim.value = par[4]; //ioBf.getRegim();    // режим работы тепловоза
+            revers.value = par[1][0]; //ioBf.getReversor();// реверсор
+            pkm.pkms = par[1][1]; //ioBf.getPKM();         // позиция
+            regim.value = par[1][2]; //ioBf.getRegim();    // режим работы тепловоза
 
-            txt_RejPro.text = par[5]; //ioBf.getRejPro(); // прожиг
-            txt_RejAP.text = par[6]; //ioBf.getRejAP(); // автопрогрев
+            txt_RejPro.text = par[2][0]; //ioBf.getRejPro(); // прожиг
+            txt_RejAP.text = par[2][1]; //ioBf.getRejAP(); // автопрогрев
 
-            txt_RejPrTime.text = par[7]; //ioBf.getRejPrT("value");// --- косяк с разными значениями --че делать то?
-            if (/*ioBf.getRejPrT("tm")*/ par[8] == "2") { txt_RejPrTime.color = "yellow" ;} else  txt_RejPrTime.color = "gray";
-            if (/*ioBf.getRejPrT("ms")*/ par[9] == "1") { txt_RejPrT.opacity = 1;} else {txt_RejPrT.opacity = 0;}
+            txt_RejPrTime.text = par[3][0]; //ioBf.getRejPrT("value");// --- косяк с разными значениями --че делать то?
+            if (/*ioBf.getRejPrT("tm")*/ par[3][1] == "2") { txt_RejPrTime.color = "yellow" ;} else  txt_RejPrTime.color = "gray";
+            if (/*ioBf.getRejPrT("ms")*/ par[3][2] == "1") { txt_RejPrT.opacity = 1;} else {txt_RejPrT.opacity = 0;}
 
             // индикация регистрации
             //img_z0.visible = ! img_z0.visible;
             //img_ind_f.visible = ! img_ind_f.visible;
 
-            prBar1.value = par[10]; //ioBf.getParamDiap(100);// заглушка
+            prBar1.value = par[4][0]; //ioBf.getParamDiap(100);// заглушка
 
-            pr_Mtg1.value = par[11]; //ioBf.getParamDiap(1500);// заглушка
+            pr_Mtg1.value = par[4][1]; //ioBf.getParamDiap(1500);// заглушка
             pr_Mtg2.value = 1500;// ioBf.getParamDiap(1500); // заглушка
 
                 img_in2BX.opacity = ! img_in2BX.opacity;// заглушка
@@ -75,11 +75,11 @@ if (cnt==1 ) {  in1OM.opacity = ! in1OM.opacity}; // отключатель мо
 if (cnt==3 ) {  in1RZ.opacity = ! in1RZ.opacity}; // реле земли
 if (cnt==4 ) {  in1OT.opacity = ! in1OT.opacity}; // обрыв тормозной магистрали
 
-            indUb0.text = par[12]; //ioBf.getParamDiap(100);// заглушка
-            indUb1.text = par[13]; //ioBf.getParamDiap(100);// заглушка
+            indUb0.text = par[4][2]; //ioBf.getParamDiap(100);// заглушка
+            indUb1.text = par[4][3]; //ioBf.getParamDiap(100);// заглушка
 
-            indIz0.text = par[14]; //ioBf.getParamDiap(60);// заглушка
-            indIz1.text = par[15]; //ioBf.getParamDiap(60);// заглушка
+            indIz0.text = par[4][4]; //ioBf.getParamDiap(60);// заглушка
+            indIz1.text = par[4][5]; //ioBf.getParamDiap(60);// заглушка
 
 if  (cnt>6 ) { cnt = 0};
        }
@@ -311,12 +311,12 @@ if  (cnt>6 ) { cnt = 0};
             id: kdr_TI_TXA
             x: 128
             y: 219
-            width: 512
+            //width: 512
             height: 197
             cntPage: 3
             offset: 80
             bazaoffset: 80
-            z: 24
+            z: 77 //24
             namePage: qsTr("параметры ТИ");
         }
 
@@ -324,7 +324,7 @@ if  (cnt>6 ) { cnt = 0};
             id: kdr_TI_TCM
             x: 128
             y: 219
-            width: 512
+            //width: 512
             height: 197
             cntPage: 3
             offset: 50
@@ -337,11 +337,11 @@ if  (cnt>6 ) { cnt = 0};
             id: kdr_USTA_DskrVihodi
             x: 128
             y: 219
-            width: 512
-            height: 197
+            //width: 512
+            //height: 210//197
             cntRowTabl: 12
-            z: 26
-            namePage: qsTr("параметры УСТА: дискретные вЫходы");
+            z: 77// 26
+            namePage: qsTr("УСТА: дискретные выходы");
             offset: 48
             bazaoffset: 48
 
@@ -351,11 +351,11 @@ if  (cnt>6 ) { cnt = 0};
             id: kdr_USTA_DskrVh
             x: 128
             y: 219
-            width: 512
-            height: 197
+            //width: 512
+            //height: 197
             cntRowTabl: 12
-            z: 27
-            namePage: qsTr("параметры УСТА: дискретные входы");
+            z: 77// 27
+            namePage: qsTr("УСТА: дискретные входы");
             offset: 72
             bazaoffset: 72
 
@@ -365,46 +365,46 @@ if  (cnt>6 ) { cnt = 0};
             id: kdr_USTA_Analog
             x: 128
             y: 219
-            width: 512
+           // width: 512
             height: 197
             numPage: 1
             cntPage: 4
             offset: 0
             bazaoffset: 0
-            z:29
+            z: 77 //29
         }
 
     Kdr_Dskrt {
             id: kdr_BEL_DskrVihodi
             x: 128
             y: 219
-            width: 512
-            height: 197
+            //width: 512
+            //height: 197
             cntRowTabl: 12
             offset: 0
             bazaoffset: 0
             namePage: qsTr("БЭЛ: дискретные выходы");
-            z: 30
+            z: 77// 30
         }
 
     Kdr_Dskrt {
             id: kdr_BEL_DskrVh
             x: 128
             y: 219
-            width: 512
-            height: 197
+            //width: 512
+            //height: 197
             cntRowTabl: 12
             namePage: qsTr("БЭЛ: дискретные входы");
             offset: 24
             bazaoffset: 24
-            z: 31
+            z: 77// 31
         }
 
     Kdr_Analog {
             id: kdr_BEL_Analog
             x: 128
             y: 219
-            width: 512
+           // width: 512
             height: 197
             opacity: 1
             visible: true
@@ -412,7 +412,7 @@ if  (cnt>6 ) { cnt = 0};
             offset: 40
             bazaoffset: 40
              namePage: qsTr("параметры БЭЛ");
-            z: 32
+            z: 77 //32
     }
 
 
@@ -566,6 +566,8 @@ if  (cnt>6 ) { cnt = 0};
             width: 640
             height: 64
             opacity: 0
+            z: 37 //!!!
+
             onSwitchUso_USTA_DisVih:  { opastyNul(); kdr_USTA_DskrVihodi.opacity = 1; }
             onSwitchUso_USTA_DisVhod: { opastyNul(); kdr_USTA_DskrVh.opacity = 1;     }
             onSwitchUso_USTA_Analogi: { opastyNul(); kdr_USTA_Analog.opacity = 1;     }

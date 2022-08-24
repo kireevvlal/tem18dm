@@ -1,7 +1,7 @@
 import QtQuick 2.7
 
 Rectangle {// Экран отображения аналоговых сигналов с перелитыванием страниц стерлками вверх/вниз
-    width: 512
+    //width: 508 //512
     height: 197 //245 //246
     color: "#000000"
 
@@ -60,15 +60,15 @@ Rectangle {// Экран отображения аналоговых сигна�
     // в столбик
     Column {
         id: usoLeftDin
-        x: 6
-        y: 23
-        width: 503
+        x: 1 //6
+        y: 18 //23
+        width: 508
         height: 174
         
         ListView {
             id: viewLeftDin
             x: 0
-            width: 503
+            width: parent.width
             height: 174
             highlightRangeMode: ListView.NoHighlightRange
             model: usoModelAnalog
@@ -83,8 +83,7 @@ Rectangle {// Экран отображения аналоговых сигна�
                 Text{
                     color: "white";
                     font.pixelSize: 12
-                    text:
- "  Разъем                                  Обозн.        Наименование                               Значение        Ед.изм.";
+                    text: "  Разъем                          Обозн.        Наименование                      Значение   Ед.изм.";
                 }
 
             }
@@ -92,8 +91,8 @@ Rectangle {// Экран отображения аналоговых сигна�
             delegate: USOAnalog {
                 x:0
                 y:20
-                width: 510
-                height: 15
+               // width: 508 //510
+                height: 16
                 radius: 0
                 border.width: 1
                 edit1value: Anlg_r;
@@ -162,12 +161,14 @@ Rectangle {// Экран отображения аналоговых сигна�
         running: true // включается по usoview.opacity
         property int j:0;
         onTriggered: {
-             var i;
-             for (i=0;i<cntRowTabl;i++) {
+            var i;
+            var values = ioBf.getAnalogArray(offset);
+            var precition = values[0];
+            for (i = 0;i < cntRowTabl; i++) {
                  // значения сигналов
                  // !!!!! дописать ioBf смещение по массиву в зависимости от offset
                   //  j ++ ; отладка
-                 usoModelAnalog.setProperty(i, "Anlg_val", (offset+j).toString());
+                 usoModelAnalog.setProperty(i, "Anlg_val", precition ? values[i + 1].toFixed(precition) : values[i + 1].toString()); //(offset+j).toString());
              }
         }
     }

@@ -27,19 +27,19 @@ public:
     explicit ThreadSerialPort(QObject *parent = nullptr);
     ~ThreadSerialPort();
     QString Alias;
-    bool IsExchange() { return _isExchange; }
+    bool IsExchange() { return _is_exchange; }
     int QualityCounter() { return _qualityCounter; }
     void Parse(NodeXML*);           // разбор ветви дерава XML с параметрами объекта
     void WriteSettings(QString, int, int, int, int, int);
 private:
-    bool _isExchange;          // наличие приема данных за заданный интервал
+    bool _is_exchange;          // наличие приема данных за заданный интервал
     int _qualityCounter;
     QTimer _timer;
     //QSerialPort *_port;
     SerialPortSettings _settings;
     QThread *_thread;
-    ExchangeType _typeExchange; // тип обмена: master - ведущий, slave - ведомый, async - асинхронный
-    ProtocolType _typeProtocol; // тип протокола: Staffing - со стафинг-байтом
+    ExchangeType _type_exchange; // тип обмена: master - ведущий, slave - ведомый, async - асинхронный
+    ProtocolType _type_protocol; // тип протокола: Staffing - со стафинг-байтом
     int _delay;              // Интервал в мс между посылаемыми пакетами (для Master и Async)
     int _limit;              // Интервал в мс, после которого связь считается утерянной
     int _wait;               // Накапливаемое время ожидания между пакетами
@@ -53,7 +53,9 @@ signals:
     void LogSignal(QString);    // Сигнал лога порта
     void ReadSignal(QString);   // QByteArray data); // Сигнал получения данных
     void DecodeSignal(ThreadSerialPort*); // Success decode packet
-    void WriteSignal(QString);  // QByteArray);
+    void WriteSignal(ThreadSerialPort*);  // QByteArray);
+    void LostExchangeSignal(ThreadSerialPort*);
+    void RestoreExchangeSignal(ThreadSerialPort*);
 public slots:
     void Disconnect();  // Слот отключения порта
     void Start();       // Run threader? open port and start timer

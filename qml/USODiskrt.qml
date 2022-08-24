@@ -3,8 +3,8 @@ import QtQuick 2.0
 // строка таблицы для вывода дискретного сигнала
 Rectangle {
     id: rectangle1
-    width: 256
-    height: 15
+   // width: 256
+    height: 14//15
     color: "#00000000"
     border.color: "#00000000"
     property string edit1value: "разъем" // qsTr("разъем")
@@ -15,18 +15,18 @@ Rectangle {
 
     TInd {// значение
         id: edit5
-        x: 233
+        x: 232
         y: 0
         width: 23
-        height: parent.height
+        height: parent.height + 1 //parent.height
         value: edit5value
         gradient: Gradient {
             GradientStop {position: 0.1;  color: "gray"}
             GradientStop {position:0.9;  color: "black"}
             GradientStop {position:1;  color: "gray"}
         }
-        txtSize: 12
-        border.width: 2
+        txtSize: 10//12
+        border.width: 1
         border.color: "#808080"
     }
 
@@ -48,7 +48,7 @@ Rectangle {
             }
         }
         border.color: "#808080"
-        border.width: 2
+        border.width: 1
 
         Text {
             id: text1
@@ -58,15 +58,15 @@ Rectangle {
             color: "#ffffff"
             text:  edit1value
             horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: 12
+            font.pixelSize: 10//12
         }
     }
 
     Rectangle {// номер
         id: rectangle3
-        x: 47
+        x: 45
         y: 0
-        width: 33
+        width: 36//33
         height: 15
         Text {
             id: text2
@@ -78,7 +78,7 @@ Rectangle {
             font.pixelSize: 10
             horizontalAlignment: Text.AlignHCenter
         }
-        border.width: 2
+        border.width: 1
         border.color: "#808080"
         gradient: Gradient {
             GradientStop {
@@ -95,21 +95,21 @@ Rectangle {
 
     Rectangle { //обозначение
         id: rectangle4
-        x: 81
+        x: 80
         y: 0
-        width: 36
+        width: 38//36
         height: 15
         Text {
             id: text3
             x: 0
             y: 0
-            width: 36
+            width: 38 //36
             color: "#ffffff"
             text: edit3value
             font.pixelSize: 10
             horizontalAlignment: Text.AlignHCenter
         }
-        border.width: 2
+        border.width: 1
         border.color: "#808080"
         gradient: Gradient {
             GradientStop {
@@ -126,9 +126,9 @@ Rectangle {
 
     Rectangle {
         id: rectangle5
-        x: 117
+        x: 116
         y: 0
-        width: 115
+        width: 118 //115
         height: 15
         Text {
             id: text4
@@ -140,7 +140,7 @@ Rectangle {
             font.pixelSize: 10
             horizontalAlignment: Text.AlignLeft
         }
-        border.width: 2
+        border.width: 1
         border.color: "#808080"
 //        gradient: Gradient {
 //            GradientStop {position: 0.1;  color: "#ffffff"}

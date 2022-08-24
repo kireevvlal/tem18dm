@@ -6,6 +6,7 @@ QT += serialport
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        datastore.cpp \
         inputpacket.cpp \
         main.cpp \
         outputpacket.cpp \
@@ -67,6 +68,7 @@ DISTFILES += \
     qml/USODiskrt.qml
 
 HEADERS += \
+    datastore.h \
     extratypes.h \
     inputpacket.h \
     outputpacket.h \

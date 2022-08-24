@@ -13,19 +13,19 @@ public:
     InputPacket();
     void Parse(NodeXML*);
     //QByteArray Build();
-    ParameterList GetParameters();
-    QByteArray GetData();
+    ParameterList Parameters();
+    QByteArray Data();
     bool Decode(QByteArray);
 private:
-    bool FlagBegin;
-    char Checksum;
-    char LastByte;
-    int Counter;
-    int BytesLen;
-    int OffsetLength;
-    ParameterList Parameters;
-    QByteArray Data;
-    int Length;
+    bool _flag_begin;
+    char _checksum;
+    char _last_byte;
+    int _counter;
+    int _bytes_len;
+    int _offset;
+    ParameterList _parameters;
+    QByteArray _data;
+    int _length;
 };
 
 #endif // INPUTPACKET_H

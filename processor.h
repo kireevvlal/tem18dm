@@ -5,12 +5,15 @@
 #include  "zapuso.h"
 #include "threadserialport.h"
 #include "treexml.h"
+#include "datastore.h"
 
 class Processor : public QObject
 {
     Q_OBJECT
 private:
-    QByteArray _bytes_data;
+//    QByteArray _bytes_data;
+//    QMap<QString, qint16> _int_data;
+//    QMap<QString, float> _float_data;
     QString _start_path;
     QStringList _files;
     TreeXML _tree;
@@ -21,9 +24,10 @@ private:
     void ParseSerialPorts(NodeXML*);
 public:
     QList<ThreadSerialPort*> SerialPorts;
+    DataStore Storage;
     explicit Processor(QObject *parent = nullptr);
     ~ Processor() {}
-    bool Load(QString);
+    bool Load(QString, QString);
     void Run();
     public slots:
     void Unpack(ThreadSerialPort*);
@@ -44,6 +48,8 @@ public:
     QJsonArray getParamMain();
     QStringList getStructAnlg(int);
     QStringList getStructDiskr(int);
+    QJsonArray getDiskretArray(int);
+    QJsonArray getAnalogArray(int);
 
     // Old:
 //    int getReversor();     // реверс

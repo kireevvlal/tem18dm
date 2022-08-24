@@ -10,11 +10,11 @@ ThreadSerialPort::ThreadSerialPort(QObject *parent)
     _settings.Parity = QSerialPort::NoParity;
     _settings.StopBits = QSerialPort::OneStop;
     _settings.FlowControl = QSerialPort::NoFlowControl;
-    _typeExchange = ExchangeType::Receive;
+    _type_exchange = ExchangeType::Receive;
     _delay = 1000;
     _limit = 3000;
     _wait = _watchdog = 0;
-    _isExchange = false;
+    _is_exchange = false;
     _counter = 0;
     _qualityCounter = 0;
 }
@@ -107,7 +107,7 @@ void ThreadSerialPort::HandleError(QSerialPort::SerialPortError error)
 // Обработка сигнала таймера передачи пакетов
 void ThreadSerialPort::TimerStep()
 {
-    if (_typeExchange == ExchangeType::Master) {
+    if (_type_exchange == ExchangeType::Master) {
         if (_wait + TIMEOUT >= _delay) {
             Write();
             _qualityCounter -= ((_qualityCounter > 0) ? 1 : 0);
@@ -117,7 +117,10 @@ void ThreadSerialPort::TimerStep()
     }
     _watchdog += TIMEOUT;
     if (_watchdog > _limit) {
-        _isExchange = false;
+        if (_is_exchange) {
+            _is_exchange = false;
+            LostExchangeSignal(this);
+        }
         _watchdog = _limit; //
     }
 }
@@ -128,23 +131,26 @@ void ThreadSerialPort::Write()
     if (isOpen()){
         QByteArray out = OutData.Build();
         write(out);
-        WriteSignal("Out: " + Alias);
+        WriteSignal(this);
     }
 }
 //--------------------------------------------------------------------------------
 // Чтение данных из порта
 void ThreadSerialPort::Read()
 {
-    if (_typeProtocol != ProtocolType::Unknown) {
+    if (_type_protocol != ProtocolType::Unknown) {
         if (InData.Decode(readAll())) {
-            _isExchange = true;
+            if (!_is_exchange) {
+                _is_exchange = true;
+                RestoreExchangeSignal(this);
+            }
             _watchdog = _timer.remainingTime();
             _counter++;
             DecodeSignal(this);
-            if (_typeExchange == ExchangeType::Slave) {
+            if (_type_exchange == ExchangeType::Slave) {
                 //_thread->msleep(100);
                 Write();
-            } else if (_typeExchange == ExchangeType::Master) {
+            } else if (_type_exchange == ExchangeType::Master) {
                 _qualityCounter += ((_qualityCounter == 19) ? 1 : (_qualityCounter < 19) ? 2 : 0);
             }
         }
@@ -165,13 +171,13 @@ void ThreadSerialPort:: Parse(NodeXML* node)
             Alias = attr->Value;
         else if (attr->Name == "exchange") {
             value = attr->Value.toLower();
-            _typeExchange = (value == "master") ? ExchangeType::Master : (value == "slave") ? ExchangeType::Slave : ExchangeType::Receive;
+            _type_exchange = (value == "master") ? ExchangeType::Master : (value == "slave") ? ExchangeType::Slave : ExchangeType::Receive;
         }
         else if (attr->Name == "delay")
             _delay = attr->Value.toInt();
         else if (attr->Name == "protocol") {
             value = attr->Value.toLower();
-            _typeProtocol = (value == "staffing") ? ProtocolType::Staffing : ProtocolType::Unknown;
+            _type_protocol = (value == "staffing") ? ProtocolType::Staffing : ProtocolType::Unknown;
         }
     }
     if (node->Child != nullptr) {
@@ -187,7 +193,7 @@ void ThreadSerialPort:: Parse(NodeXML* node)
             node = node->Next;
         }
     }
-    OutData.SetProtocol(_typeProtocol);
+    OutData.SetProtocol(_type_protocol);
 }
 //--------------------------------------------------------------------------------
 void ThreadSerialPort:: ParsePort(NodeXML* node)

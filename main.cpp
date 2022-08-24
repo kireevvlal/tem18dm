@@ -11,7 +11,11 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
     QGuiApplication app(argc, argv);
-
+#ifdef Q_OS_WIN
+    qDebug() << "Windows";
+#else
+    qDebug() << "Linux";
+#endif
     Processor ioBf(&app);
     qmlRegisterType<Processor>("ConnectorModule", 1, 0, "Connector");
 
@@ -24,7 +28,7 @@ int main(int argc, char *argv[])
     }, Qt::QueuedConnection);
     engine.load(url);
     engine.rootContext()->setContextProperty("ioBf", &ioBf);
-    if (ioBf.Load("D:\\Development\\Qt\\tem18dm\\config.xml")) {
+    if (ioBf.Load(/*"D:\\Development\\Qt\\tem18dm*/qApp->applicationDirPath(), "config.xml")) {
         qDebug() << "Config readed!";
         ioBf.Run();
     } else

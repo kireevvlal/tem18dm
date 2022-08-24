@@ -1,41 +1,150 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <serialports>
-	<spstream name="BEL" exchange="slave" delay="1000" protocol = "staffing">
+	<spstream name="BEL" exchange="master" delay="1000" protocol = "staffing">
 		<port baudrate="9600" parity="Odd" databits="8" stopbits="2" flowcontrol="No">COM6</port>
 		<input order="reverse">
+			<par var="BEL_Keys_1" type="byte" byte="1">Ключи 1-й байт</par>
+			<par var="BEL_Keys_2" type="byte" byte="2">Ключи 2-й байт</par>
+			<par var="BEL_Keys_3" type="byte" byte="3">Ключи 3-й байт</par>
+			<par var="BEL_Inputs_1" type="byte" byte="4">Входы 1-й байт</par>
+			<par var="BEL_Inputs_2" type="byte" byte="5">Входы 2-й байт</par>
+			<par var="BEL_Inputs_3" type="byte" byte="6">Входы 3-й байт</par>
+			<par var="BEL_Diagn" type="byte" byte="7">Диагностические сигналы</par>
+			<par var="BEL_PKM" type="byte" byte="8">ПКМ</par>
 		</input>
 		<output length="2" order="reverse">
-			<par val="12" byte="0">Команда запроса БЭЛ</par>
+			<par var="BEL_QUERY" val="12" byte="0">Команда запроса БЭЛ</par>
 		</output>
 	</spstream>
-	<spstream name="USTA" exchange="slave" delay="1000"  protocol = "staffing">
+	<!--spstream name="IMIT_BEL" exchange="slave" delay="1000" protocol = "staffing">
+		<port baudrate="9600" parity="Odd" databits="8" stopbits="2" flowcontrol="No">COM9</port>
+		<input order="reverse">
+			<par var="BEL_COMMAND" type="byte" byte="0">Команда</par>
+		</input>
+		<output length="10" order="reverse">
+		</output>
+	</spstream-->
+	<spstream name="USTA" exchange="master" delay="1000"  protocol = "staffing">
 		<port baudrate="12800" parity="Even" databits="8" stopbits="2" flowcontrol="No">COM9</port>
 		<input order="reverse">
+			<par var="USTA_Ug" type="float" byte="0" coeff="2">Напряжение генератора, В</par>
+			<par var="USTA_Ig" type="float" byte="2" coeff="4">Ток генератора, А</par>
+			<par var="USTA_Ubuks2" type="float" byte="4" coeff="0.3">Напряжение буксования второй тележки, В</par>
+			<par var="USTA_Ubuks1" type="float" byte="6" coeff="0.3">Напряжение буксования первой тележки, В</par>
+			<par var="USTA_Ucu" type="int" byte="8">Напряжение цепи управления-корпус, В</par>
+			<par var="USTA_Ited1" type="float" byte="10" coeff="2">Ток первой группы ТЭД, А</par>
+			<par var="USTA_Ited2" type="float" byte="12" coeff="2">Ток второй группы ТЭД, А</par>
+			<par var="USTA_Ubs" type="float" byte="14" coeff="0.3">Напряжение бортовой сети, В</par>
+			<par var="USTA_Ivzb_vst" type="float" byte="16" coeff="0.06">Ток возбуждения ВСТ, А</par>
+			<par var="USTA_Pf_tnvd" type="float" byte="18" coeff="0.012">Давление топлива на входе ТНВД, кг/см2</par>
+			<par var="USTA_Pf_ftot" type="float" byte="20" coeff="0.012">Давление топлива на входе ФТОТ, кг/см2</par>
+			<par var="USTA_Iakb" type="float" byte="22" coeff="0.2">Ток заряда АКБ {фильтр}, А</par>
+			<par var="USTA_Po_diz" type="float" byte="24" coeff="0.032">Давление масла на входе в дизель, кг/см2</par>
+			<par var="USTA_Po_mn2" type="float" byte="26" coeff="0.032">Давление масла на выходе 2 МН, кг/см2</par>
+			<par var="USTA_Ivzb_gen" type="float" byte="28" coeff="0.2">Ток возбуждения генератора, А</par>
+			<par var="USTA_PKM" type="int" byte="30">Позиция контроллера машиниста</par>
+			<par var="USTA_N" type="int" byte="32">Частота вращения вала дизеля, об/м</par>
+			<par var="USTA_F" type="int" byte="34">Частота сети, Гц</par>
+			<par var="USTA_Ubs_filtr" type="float" byte="36" coeff="0.3">Напряжение бортовой сети {фильтр}, В</par>
+			<par var="USTA_Ugol_vsv" type="float" byte="38" coeff="0.035">Угол выпрямителя самовозбуждения, е.г.</par>
+			<par var="USTA_Ug_zad" type="float" byte="40" coeff="2">Напряжение генератора {задание}, В</par>
+			<par var="USTA_Ug_filtr" type="float" byte="42" coeff="2">Напряжение генератора {фильтр}, В</par>
+			<par var="USTA_Ugol_uvvg" type="float" byte="44" coeff="0.036">Угол упр. выпрямителем возб.Г, е.г.</par>
+			<par var="USTA_Ig_filtr" type="float" byte="46" coeff="4">Ток генератора {фильтр}, А</par>
+			<par var="USTA_Ited1_filtr" type="float" byte="48" coeff="2">Ток первой группы ТЭД {фильтр}, А</par>
+			<par var="USTA_Ited2_filtr" type="float" byte="50" coeff="2">Ток второй группы ТЭД {фильтр}, А</par>
+			<par var="USTA_Pg_zad" type="float" byte="52" coeff="31.2">Мощность генератора {задание}, Вт</par>
+			<par var="USTA_Pg_rasch" type="float" byte="54" coeff="31.2">Мощность генератора {рассчет}, Вт</par>
+			<par var="USTA_Pg" type="float" byte="56" coeff="31.2">Мощность генератора, Вт</par>
+			<par var="USTA_Regim_rn" type="int" byte="58">Режим регулятора напряжения</par>
+			<par var="USTA_Itorm_zad" type="float" byte="60" coeff="2">Ток торможения {задание}, А</par>
+			<par var="USTA_Ivozb_zad" type="float" byte="62" coeff="2">Ток возбуждения ЭТ {задание}, А</par>
+			<par var="USTA_Ubuks1_filtr" type="float" byte="64" coeff="0.3">U боксования первой тележки {фильтр}, В</par>
+			<par var="USTA_Ubuks2_filtr" type="float" byte="66" coeff="0.3">U боксования второй тележки {фильтр}, В</par>
+			<par var="USTA_Flag_buks" type="int" byte="68">Флаг боксования</par>
+			<par var="USTA_Rezerv1" type="int" byte="70"></par>
+			<par var="USTA_Rezerv2" type="int" byte="72"></par>
+			<par var="USTA_Rezerv3" type="int" byte="74"></par>
+			<par var="USTA_Rezerv4" type="int" byte="76"></par>
+			<par var="USTA_Rezerv5" type="int" byte="78"></par>
+			<par var="USTA_Outputs_1" type="byte" byte="80">Дискретные выходы 1-й байт</par>
+			<par var="USTA_Outputs_2" type="byte" byte="81">Дискретные выходы 2-й байт</par>
+			<par var="USTA_Outputs_4" type="byte" byte="82">Дискретные выходы 3-й байт</par>
+			<par var="USTA_Inputs_1" type="byte" byte="83">Дискретные входы 1-й байт</par>
+			<par var="USTA_Inputs_2" type="byte" byte="84">Дискретные входы 2-й байт</par>
+			<par var="USTA_Inputs_3" type="byte" byte="85">Дискретные входы 3-й байт</par>
 		</input>
 		<output length="5" order="reverse">
-			<par val="10" byte="0">Команда запроса УСТА</par>		
+			<par var="USTA_QUERY" val="10" byte="0">Команда запроса УСТА</par>		
 		</output>
 	</spstream>
-	<!--spstream name="IT" exchange="receive" protocol = "staffing">
-		<port baudrate="9600" parity="Even" databits="8" stopbits="2" flowcontrol="No">COM10</port>
-		<input>
+	<!--spstream name="IMIT_USTA" exchange="slave" delay="1000" protocol = "staffing">
+		<port baudrate="12800" parity="Even" databits="8" stopbits="2" flowcontrol="No">COM6</port>
+		<input order="reverse">
+			<par var="USTA_COMMAND" type="byte" byte="0">Команда</par>
+		</input>
+		<output length="87" order="reverse">
+		</output>
+	</spstream-->
+	<spstream name="IT" exchange="receive" protocol = "staffing">
+		<port baudrate="9600" parity="Even" databits="8" stopbits="2" flowcontrol="No">COM19</port>
+		<input index="0">
 			<par var="IT_TSM1" type="float" byte="5" index="0" coeff="0.25">Температура холодного спая, С</par>
-			<par var="IT_THA1" type="int" byte="7" index="0">Температура газа, С. Выход из 1 цилиндра дизеля</par>
 			<par var="IT_TSM2" type="float" byte="9" index="0" coeff="0.25">Температура топлива, С. Вход в ТНВД</par>
-			<par var="IT_THA2" type="int" byte="11" index="0">Температура газа, С. Выход из 2 цилиндра дизеля</par>
 			<par var="IT_TSM3" type="float" byte="13" index="0" coeff="0.25">Температура масла, С. Вход в дизель</par>
-			<par var="IT_THA3" type="int" byte="15" index="0">Температура газа, С. Выход из 3 цилиндра дизеля</par>
 			<par var="IT_TSM4" type="float" byte="17" index="0" coeff="0.25">Температура масла, С. Выход из дизеля</par>
-			<par var="IT_THA4" type="int" byte="19" index="0">Температура газа, С. Выход из 4 цилиндра дизеля</par>
-			<par var="IT_TSM5" type="float" byte="21" index="0" coeff="0.25">Температура воды, С. Выход из охладителя масла</par>
-			<par var="IT_THA5" type="int" byte="23" index="0">Температура газа, С. Выход из 5 цилиндра дизеля</par>
+			<par var="IT_TSM5" type="float" byte="21" index="0" coeff="0.25"></par>
 			<par var="IT_TSM6" type="float" byte="25" index="0" coeff="0.25">Температура воды, С. Выход из дизеля</par>
-			<par var="IT_THA6" type="int" byte="27" index="0">Температура газа, С. Выход из 6 цилиндра дизеля</par>
-			<par var="IT_TSM7" type="float" byte="29" index="0" coeff="0.25">Температура воздуха, С. Окружающего</par>
+			<par var="IT_TSM7" type="float" byte="29" index="0" coeff="0.25"></par>
 			<par var="IT_TSM8" type="float" byte="33" index="0" coeff="0.25">Температура воды, С. Вход в радиатор 2-го контура</par>
 			<par var="IT_TSM9" type="float" byte="5" index="1" coeff="0.25">Температура воды, С. Вход в охладитель масла</par>
 			<par var="IT_TSM10" type="float" byte="9" index="1" coeff="0.25">Температура воды, С. Вход в дизель</par>
+			<par var="IT_TSM11" type="float" byte="13" index="1" coeff="0.25">Температура воды, С. Вход в калорифер</par>
+			<par var="IT_TSM12" type="float" byte="17" index="1" coeff="0.25">Температура воды, С. Выход из калорифера</par>
+			<par var="IT_TSM13" type="float" byte="21" index="1" coeff="0.25">Температура окружающего воздуха, С.</par>
+			<par var="IT_TSM14" type="float" byte="25" index="1" coeff="0.25"></par>
+			<par var="IT_TSM15" type="float" byte="29" index="1" coeff="0.25"></par>
+			<par var="IT_TSM16" type="float" byte="33" index="1" coeff="0.25"></par>
+			<par var="IT_TSM17" type="float" byte="5" index="2" coeff="0.25"></par>
+			<par var="IT_TSM18" type="float" byte="9" index="2" coeff="0.25"></par>
+			<par var="IT_TSM19" type="float" byte="13" index="2" coeff="0.25"></par>
+			<par var="IT_TSM20" type="float" byte="17" index="2" coeff="0.25"></par>
+			<par var="IT_TSM21" type="float" byte="21" index="2" coeff="0.25"></par>
+			<par var="IT_TSM22" type="float" byte="25" index="2" coeff="0.25"></par>
+			<par var="IT_TSM23" type="float" byte="29" index="2" coeff="0.25"></par>
+			<par var="IT_TSM24" type="float" byte="33" index="2" coeff="0.25"></par>
+			<par var="IT_THA1" type="int" byte="7" index="0"></par>
+			<par var="IT_THA2" type="int" byte="11" index="0">Температура газа, С. Вход в ТК</par>
+			<par var="IT_THA3" type="int" byte="15" index="0"></par>
+			<par var="IT_THA4" type="int" byte="19" index="0"></par>
+			<par var="IT_THA5" type="int" byte="23" index="0"></par>
+			<par var="IT_THA6" type="int" byte="27" index="0"></par>
+			<par var="IT_THA7" type="int" byte="31" index="0"></par>
+			<par var="IT_THA8" type="int" byte="35" index="0">Температура газа, С. Выход из 6 цилиндра дизеля</par>
+			<par var="IT_THA9" type="int" byte="7" index="1"></par>
+			<par var="IT_THA10" type="int" byte="11" index="1">Температура газа, С. Выход из 5 цилиндра дизеля</par>
+			<par var="IT_THA11" type="int" byte="15" index="1">Температура газа, С. Вход в ТК</par>
+			<par var="IT_THA12" type="int" byte="19" index="1">Температура газа, С. Выход из 4 цилиндра дизеля</par>
+			<par var="IT_THA13" type="int" byte="23" index="1"></par>
+			<par var="IT_THA14" type="int" byte="27" index="1"></par>
+			<par var="IT_THA15" type="int" byte="31" index="1"></par>
+			<par var="IT_THA16" type="int" byte="35" index="1"></par>
+			<par var="IT_THA17" type="int" byte="7" index="2"></par>
+			<par var="IT_THA18" type="int" byte="11" index="2"></par>
+			<par var="IT_THA19" type="int" byte="15" index="2">Температура газа, С. Выход из 1 цилиндра дизеля</par>
+			<par var="IT_THA20" type="int" byte="19" index="2"></par>
+			<par var="IT_THA21" type="int" byte="23" index="2">Температура газа, С. Выход из 2 цилиндра дизеля</par>
+			<par var="IT_THA22" type="int" byte="27" index="2"></par>
+			<par var="IT_THA23" type="int" byte="31" index="2">Температура газа, С. Выход из 3 цилиндра дизеля</par>
+			<par var="IT_THA24" type="int" byte="35" index="2"></par>
 		</input>
+		<output length="38">
+		</output>
+	</spstream>
+	<!--spstream name="IMIT_IT" exchange="master" protocol = "staffing">
+		<port baudrate="9600" parity="Even" databits="8" stopbits="2" flowcontrol="No">COM9</port>
+		<output length="38">
+		</output>
 	</spstream-->
 	<!--spstream name="MSS" exchange="master" protocol = "staffing" delay="1000">
 		<port baudrate="19200" parity="Odd" databits="8" stopbits="2">COM6</port>

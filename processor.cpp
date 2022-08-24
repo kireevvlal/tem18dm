@@ -7,20 +7,22 @@ Processor::Processor(QObject *parent) : QObject(parent)
 }
 //--------------------------------------------------------------------------------
 // Load configuration from files and create objects
-bool Processor:: Load(QString startPath)
+bool Processor:: Load(QString startPath, QString cfgfile)
 {
     int i;
-    if (_tree.ReadFile(startPath)) { // read start configuration file
+    _start_path = startPath;
+    if (_tree.ReadFile(_start_path + "/" + cfgfile)) { // read start configuration file
         Parse(_tree.Root);
         for (i = 0; i < _files.length(); i++) {
             _tree.Clear();
-            if (_tree.ReadFile(_files[i]))
+            if (_tree.ReadFile(_start_path + "/" + _files[i]))
                 ParseObjects(_tree.Root);
             else
                 return false;
         }
     } else
         return false;
+    Storage.FillMaps(SerialPorts);
     return true;
 }
 //--------------------------------------------------------------------------------
@@ -35,6 +37,7 @@ void Processor::Run()
 //--------------------------------------------------------------------------------
 void Processor::Unpack(ThreadSerialPort *port)
 {
+    Storage.LoadSpData(port);
     qDebug() << "Unpack " + port->Alias;
 }
 
@@ -173,17 +176,17 @@ QJsonArray Processor::getParamMain()
     int dsk_iSA1 = 1;   // dsk_iSA1  = dsk[0,iSA1 ];
     int dsk_iKMv0 = 1;  // dsk_iKMv0 = dsk[0,iKMv0];
     int dsk_iDizZ = 0;  // dsk_iDizZ = dsk[0,iDizZ];
-    QJsonArray rej_prt = RejPrT();
+    //QJsonArray rej_prt = RejPrT();
 
     return {
-        QTime::currentTime().toString("HH:mm:ss"), QDate::currentDate().toString("dd/MM/yy"), // date and time
-        rand() % 4,  // Reversor заглушка пока возвращем число в диапазоне от 0 до 3
+        QJsonArray { QTime::currentTime().toString("HH:mm:ss"), QDate::currentDate().toString("dd/MM/yy")}, // date and time
+        QJsonArray { rand() % 4,  // Reversor заглушка пока возвращем число в диапазоне от 0 до 3
         rand() % 10, // PKM заглушка
-        (!(rg >= 1 && rg <= 4)) ? 0 : rg, // Regim заглушка
-        ((bt & 0x30) == 0x00) ? "" : (((bt & 0x30) == 0x10) ? "Прожиг коллектора": "Завершение прожига"), // RejPro
-        (dsk_iAPvkl1 == 00) ? "" : ((dsk_iSA1 == 01) ? "Режим АвтоПрогрева" : ((dsk_iKMv0 == 00) ? "АП: Установи ПКМ в 0" : ((dsk_iDizZ == 00) ? "АП: Запусти дизель" : ""))), // RejAP
-        rej_prt[0], rej_prt[1], rej_prt[2], // getRejPrT
-        float(rand() % 100), float(rand() % 1500), float(rand() % 100), float(rand() % 100), float(rand() % 60), float(rand() % 60) // ??????????????
+        (!(rg >= 1 && rg <= 4)) ? 0 : rg }, // Regim заглушка
+        QJsonArray { ((bt & 0x30) == 0x00) ? "" : (((bt & 0x30) == 0x10) ? "Прожиг коллектора": "Завершение прожига"), // RejPro
+        (dsk_iAPvkl1 == 00) ? "" : ((dsk_iSA1 == 01) ? "Режим АвтоПрогрева" : ((dsk_iKMv0 == 00) ? "АП: Установи ПКМ в 0" : ((dsk_iDizZ == 00) ? "АП: Запусти дизель" : ""))) }, // RejAP
+        RejPrT(), // getRejPrT
+        QJsonArray { float(rand() % 100), float(rand() % 1500), float(rand() % 100), float(rand() % 100), float(rand() % 60), float(rand() % 60) } // ??????????????
     };
 }
 //------------------------------------------------------------------------------
@@ -265,7 +268,90 @@ QStringList Processor::getStructDiskr(int indx)
     list.append(zapDiskr[indx].i);
     return list;
 }
-
+//------------------------------------------------------------------------------
+// Discret values for tables
+QJsonArray Processor::getDiskretArray(int offset) {
+    QJsonArray result;
+    qint8 byte1, byte2, byte3;
+    switch (offset) {
+    case (0) : // БЭЛ Дискретные выходы
+        byte1 = Storage.Byte("BEL_Keys_1");
+        byte2 = Storage.Byte("BEL_Keys_2");
+        byte3 = Storage.Byte("BEL_Keys_3");
+        break;
+    case (24) : // БЭЛ Дискретные входы
+        byte1 = Storage.Byte("BEL_Inputs_1");
+        byte2 = Storage.Byte("BEL_Inputs_2");
+        byte3 = Storage.Byte("BEL_Inputs_3");
+        break;
+    case (48) : // УСТА Дискретные выходы
+        byte1 = Storage.Byte("USTA_Outputs_1");
+        byte2 = Storage.Byte("USTA_Outputs_2");
+        byte3 = Storage.Byte("USTA_Outputs_3");
+        break;
+    case (72) : // УСТА Дискретные входы
+        byte1 = Storage.Byte("USTA_Inputs_1");
+        byte2 = Storage.Byte("USTA_Inputs_2");
+        byte3 = Storage.Byte("USTA_Inputs_3");
+        break;
+    }
+    result = { byte1 & 1, (byte1 & 2) >> 1, (byte1 & 4) >> 2, (byte1 & 8) >> 3, (byte1 & 16) >> 4, (byte1 & 32) >> 5, (byte1 & 64) >> 6, (byte1 & 128) >> 7,
+             byte2 & 1, (byte2 & 2) >> 1, (byte2 & 4) >> 2, (byte2 & 8) >> 3, (byte2 & 16) >> 4, (byte2 & 32) >> 5, (byte2 & 64) >> 6, (byte2 & 128) >> 7,
+             byte3 & 1, (byte3 & 2) >> 1, (byte3 & 4) >> 2, (byte3 & 8) >> 3, (byte3 & 16) >> 4, (byte3 & 32) >> 5, (byte3 & 64) >> 6, (byte3 & 128) >> 7 };
+    return result;
+}
+//------------------------------------------------------------------------------
+// Discret values for tables
+QJsonArray Processor::getAnalogArray(int offset) {
+    QJsonArray result;
+    qint8 byte;
+    switch (offset) {
+    case (0) : // USTA
+        result = { 2, Storage.Float("USTA_Ug"), Storage.Float("USTA_Ig"), Storage.Float("USTA_Ubuks2"), Storage.Float("USTA_Ubuks1"), Storage.Int16("USTA_Ucu"),
+                 Storage.Float("USTA_Ited1"), Storage.Float("USTA_Ited2"), Storage.Float("USTA_Ubs"), Storage.Float("USTA_Ivzb_vst"), Storage.Float("USTA_Pf_tnvd") };
+        break;
+    case (10) : // USTA
+        result = { 2, Storage.Float("USTA_Pf_ftot"), Storage.Float("USTA_Iakb"), Storage.Float("USTA_Po_diz"), Storage.Float("USTA_Po_mn2"), Storage.Float("USTA_Ivzb_gen"),
+                 Storage.Int16("USTA_PKM"), Storage.Int16("USTA_N"), Storage.Int16("USTA_F"), Storage.Float("USTA_Ubs_filtr"), Storage.Float("USTA_Ugol_vsv") };
+        break;
+    case (20) : // USTA
+        result = { 2, Storage.Float("USTA_Ug_zad"), Storage.Float("USTA_Ug_filtr"), Storage.Float("USTA_Ugol_uvvg"), Storage.Float("USTA_Ig_filtr"), Storage.Float("USTA_Ited1_filtr"),
+                   Storage.Float("USTA_Ited2_filtr"), Storage.Float("USTA_Pg_zad"), Storage.Float("USTA_Pg_rasch"), Storage.Float("USTA_Pg"), Storage.Int16("USTA_Regim_rn") };
+        break;
+    case (30) : // USTA
+        result = { 2, Storage.Float("USTA_Itorm_zad"), Storage.Float("USTA_Ivozb_zad"), Storage.Float("USTA_Ubuks1_filtr"), Storage.Float("USTA_Ubuks2_filtr"), Storage.Int16("USTA_Flag_buks"),
+                   Storage.Int16("USTA_Rezerv1"), Storage.Int16("USTA_Rezerv2"), Storage.Int16("USTA_Rezerv3"), Storage.Int16("USTA_Rezerv4"), Storage.Int16("USTA_Rezerv5") };
+        break;
+    case (40) : // BEL
+         byte = Storage.Byte("BEL_Diagn");
+        result = { 0, byte & 1, (byte & 2) >> 1, (byte & 4) >> 2, (byte & 8) >> 3, (byte & 16) >> 4, (byte & 32) >> 5, (byte & 64) >> 6, (byte & 128) >> 7,
+                   Storage.Byte("BEL_PKM"), 0 };
+        break;
+    case (50) : // TI TSM
+        result = { 2, Storage.Float("IT_TSM1"), Storage.Float("IT_TSM2"), Storage.Float("IT_TSM3"), Storage.Float("IT_TSM4"), Storage.Float("IT_TSM5"), Storage.Float("IT_TSM6"),
+                 Storage.Float("IT_TSM7"), Storage.Float("IT_TSM8"), Storage.Float("IT_TSM9"), Storage.Float("IT_TSM10") };
+        break;
+    case (60) : // TI TSM
+        result = { 2, Storage.Float("IT_TSM11"), Storage.Float("IT_TSM12"), Storage.Float("IT_TSM13"), Storage.Float("IT_TSM14"), Storage.Float("IT_TSM15"), Storage.Float("IT_TSM16"),
+                 Storage.Float("IT_TSM17"), Storage.Float("IT_TSM18"), Storage.Float("IT_TSM19"), Storage.Float("IT_TSM20") };
+        break;
+    case (70) : // TI TSM
+        result = { 2, Storage.Float("IT_TSM21"), Storage.Float("IT_TSM22"), Storage.Float("IT_TSM23"), Storage.Float("IT_TSM24"), 0, 0, 0, 0, 0, 0 };
+        break;
+    case (80) : // TI THA
+        result = { 0, Storage.Int16("IT_THA1"), Storage.Int16("IT_THA2"), Storage.Int16("IT_THA3"), Storage.Int16("IT_THA4"), Storage.Int16("IT_THA5"), Storage.Int16("IT_THA6"),
+                 Storage.Int16("IT_THA7"), Storage.Int16("IT_THA8"), Storage.Int16("IT_THA9"), Storage.Int16("IT_THA10") };
+        break;
+    case (90) : // TI THA
+        result = { 0, Storage.Int16("IT_THA11"), Storage.Int16("IT_THA12"), Storage.Int16("IT_THA13"), Storage.Int16("IT_THA14"), Storage.Int16("IT_THA15"), Storage.Int16("IT_THA16"),
+                 Storage.Int16("IT_THA17"), Storage.Int16("IT_THA18"), Storage.Int16("IT_THA19"), Storage.Int16("IT_THA10") };
+        break;
+    case (100) : // TI THA
+        result = { 0, Storage.Int16("IT_THA21"), Storage.Int16("IT_THA22"), Storage.Int16("IT_THA23"), Storage.Int16("IT_THA24"), 0, 0, 0, 0, 0, 0 };
+        break;
+    }
+    return result;
+}
 //------------------------------------------------------------------------------
 // Old realisation
 

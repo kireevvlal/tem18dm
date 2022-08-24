@@ -2,13 +2,13 @@
 
 InputPacket::InputPacket()
 {
-    Data.resize(1024);
-    FlagBegin = false;
-    Checksum = 0;
-    Counter = 0;
-    BytesLen = 1;
-    OffsetLength = 0;
-    Index = 0;
+    // Data.resize(1024);
+    _flag_begin = false;
+    _checksum = 0;
+    _counter = 0;
+    _bytes_len = 1;
+    _offset = 0;
+    Index = 0xff; // нет индекса
     Order = OrderType::Direct;
 }
 //--------------------------------------------------------------------------------
@@ -19,11 +19,11 @@ void InputPacket::Parse(NodeXML* node)
     for (i = 0; i < node->Attributes.count(); i++) {
         AttributeXML *attr = node->Attributes[i];
         if (attr->Name == "inclen")
-            OffsetLength = attr->Value.toInt();
+            _offset = attr->Value.toInt();
         else if (attr->Name == "order")
             Order = (attr->Value.toLower() == "reverse") ? OrderType::Reverse : OrderType::Direct;
         else if (attr->Name == "byteslen")
-            BytesLen = attr->Value.toInt();
+            _bytes_len = attr->Value.toInt();
         else if (attr->Name == "index")
             Index = attr->Value.toInt();
     }
@@ -33,7 +33,7 @@ void InputPacket::Parse(NodeXML* node)
             if (node->Name == "par") {
                 Parameter *newPar = new Parameter;
                 newPar->Parse(node);
-                Parameters.append(newPar);
+                _parameters.append(newPar);
             }
             node = node->Next;
         }
@@ -49,26 +49,26 @@ bool InputPacket::Decode(QByteArray data)
     {
         ch = data[i]; // Прием байта
         if (ch == 0xff)          // Прием синхробайта?
-            LastByte = 0xff;
+            _last_byte = 0xff;
         else
             if (ch == 0xfe)      // Прием байт-стаффинга (FE)
             {
-                if ((quint8)LastByte == 0xff)
+                if ((quint8)_last_byte == 0xff)
                 {                   // Был байт ff информации
                     ch = 0xff;      // Восстановление ff
-                    LastByte = 0;   // Сброс
+                    _last_byte = 0;   // Сброс
                 }
-                if (FlagBegin == false)  // Прием без стартового байта FF
+                if (_flag_begin == false)  // Прием без стартового байта FF
                     error = true;
                 else
                 {
-                    Checksum += ch;     // накапливаем сумму
-                    Counter++;       // принят очередной байт информации
+                    _checksum += ch;     // накапливаем сумму
+                    _counter++;       // принят очередной байт информации
                     // Data[Counter] = ch;         // в пакет
-                    Data[Counter - BytesLen - 1] = ch;         // в пакет
-                    if (Counter == Length + OffsetLength + 1)        // заказанная длина пакета
+                    _data.append(ch); // Data[Counter - BytesLen - 1] = ch;         // в пакет
+                    if (_counter == _length + _offset + 1)        // заказанная длина пакета
                     {
-                        if (Checksum != 0)          // ошибка контрольной суммы
+                        if (_checksum != 0)          // ошибка контрольной суммы
                             error = true;
                         else     // конец пакета
                             flagEnd = true;     // Happy end !!!!
@@ -76,24 +76,25 @@ bool InputPacket::Decode(QByteArray data)
                 }
             }
             else                    // Прием иного символа
-                if ((quint8)LastByte == 0xff)
+                if ((quint8)_last_byte == 0xff)
                 {                   // Был действительно!
-                    Length = ch;  // Байт длины посылки
-                    Checksum = ch;      // инициализация констрольной суммы
-                    Counter = 1;       // Счетчик байт
-                    LastByte = 0;
-                    FlagBegin = true; // Начало информации в пакете
+                    _length = ch;  // Байт длины посылки
+                    _checksum = ch;      // инициализация констрольной суммы
+                    _counter = 1;       // Счетчик байт
+                    _last_byte = 0;
+                    _flag_begin = true; // Начало информации в пакете
                    // Data[0] = 0xff;
                    // Data[1] = ch;
-                    if (BytesLen == 2)
+                    _data.clear();
+                    if (_bytes_len == 2)
                     {
                         i++;
                         if (i < data.length())
                         {
                             ch = data[i];
-                            Length += (ch << 8);
-                            Checksum += ch;
-                            Counter++;
+                            _length += (ch << 8);
+                            _checksum += ch;
+                            _counter++;
                      //       Data[2] = ch;
                         }
                         else
@@ -102,17 +103,17 @@ bool InputPacket::Decode(QByteArray data)
                 }
                 else
                 {
-                    if (FlagBegin == false)  // Прием без стартового байта FF
+                    if (_flag_begin == false)  // Прием без стартового байта FF
                         error = true;
                     else
                     {
-                        Checksum += ch;     // накапливаем сумму
-                        Counter++;       // принят очередной байт информации
+                        _checksum += ch;     // накапливаем сумму
+                        _counter++;       // принят очередной байт информации
                         // Data[Counter] = ch;         // в пакет
-                        Data[Counter - BytesLen - 1] = ch;         // в пакет
-                        if (Counter == Length + OffsetLength + 1)        // заказанная длина пакета ????? : +1
+                        _data.append(ch); // Data[Counter - BytesLen - 1] = ch;         // в пакет
+                        if (_counter == _length + _offset + 1)        // заказанная длина пакета ????? : +1
                         {
-                            if (Checksum != 0)          // ошибка контрольной суммы
+                            if (_checksum != 0)          // ошибка контрольной суммы
                                 error = true;
                             else     // конец пакета
                                 flagEnd = true;     // Happy end !!!!
@@ -121,10 +122,10 @@ bool InputPacket::Decode(QByteArray data)
                 }
         if ((error == true) || (flagEnd == true)) // обработка ошибки или приема конца пакета
         {
-            Counter = 1;           // все инициализируем исходными данными
-            FlagBegin = false;
-            Checksum = 0;
-            LastByte = 0;
+            _counter = 1;           // все инициализируем исходными данными
+            _flag_begin = false;
+            _checksum = 0;
+            _last_byte = 0;
             if (error == true)
                 return false; // произошла ошибка
             else
@@ -134,12 +135,12 @@ bool InputPacket::Decode(QByteArray data)
     return false;
 }
 //--------------------------------------------------------------------------------
-ParameterList InputPacket::GetParameters()
+ParameterList InputPacket::Parameters()
 {
-    return Parameters;
+    return _parameters;
 }
 //--------------------------------------------------------------------------------
-QByteArray InputPacket::GetData()
+QByteArray InputPacket::Data()
 {
-    return Data;
+    return _data;
 }

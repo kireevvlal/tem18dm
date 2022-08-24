@@ -12,12 +12,13 @@ public:
     void Parse(NodeXML*);
     QByteArray Build();
     void SetProtocol(ProtocolType);
+    ParameterList Parameters();
     void SetData(int, int, QByteArray);
 private:
-    ParameterList Values;
-     QByteArray Data;
-    int Length;
-    OrderType Order;
+    ParameterList _parameters;
+     QByteArray _data;
+    int _length;
+    OrderType _order;
     QByteArray (OutputPacket::*BuildFunction)();
     QByteArray Staffing();
     void Pack();
