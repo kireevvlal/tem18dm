@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <files>
-	<path>D:\Development\Qt\tem18dm\serialports.xml</path>
+	<path>serialports.xml</path>
+	<path>drive.xml</path>
+	<path>diagnostic.xml</path>
 </files>

@@ -7,6 +7,8 @@
 class DataStore
 {
 private:
+    QByteArray _record;  // буфер данных (запись) для регистрации
+    // словари по разным типам данных
     QMap<QString, bool> _bits_map;
     QMap<QString, qint8> _bytes_map;
     QMap<QString, quint8> _ubytes_map;
@@ -18,20 +20,26 @@ private:
     QMap<QString, double> _double_map;
 public:
     DataStore();
+    QByteArray Record() { return _record; }
+    bool UpdateRecord(uint, uint, QByteArray);
+    bool SetByteRecord(uint, qint8);
+    void SetRecordSize(int size) { _record.resize(size); _record.fill('\0'); }
+    void WriteRecord();
+    // maps methods
     void FillMaps(QList<ThreadSerialPort*>);
     QStringList OutMaps();
     bool Exist(QString, DataType);
     bool Add(QString, DataType);
     int LoadSpData(ThreadSerialPort*);
     // get value
-    bool Bit(QString);
-    qint8 Byte(QString);
-    quint8 UByte(QString);
-    qint16 Int16(QString);
-    quint16 UInt16(QString);
-    qint32 Int32(QString);
-    quint32 UInt32(QString);
-    float Float(QString);
+    bool Bit(QString key) { return _bits_map.contains(key) ? _bits_map[key] : false; }
+    qint8 Byte(QString key) { return _bytes_map.contains(key) ? _bytes_map[key] : 0; }
+    quint8 UByte(QString key) { return _ubytes_map.contains(key) ? _ubytes_map[key] : 0; }
+    qint16 Int16(QString key) { return _int16_map.contains(key) ? _int16_map[key] : 0; }
+    quint16 UInt16(QString key) { return _uint16_map.contains(key) ? _uint16_map[key] : 0; }
+    qint32 Int32(QString key) { return _int32_map.contains(key) ? _int32_map[key] : 0; }
+    quint32 UInt32(QString key) { return _uint32_map.contains(key) ? _uint32_map[key] : 0; }
+    float Float(QString key) { return _float_map.contains(key) ? _float_map[key] : 0; }
     // set value
     bool Bit(QString key, bool value);
     bool Byte(QString key, qint8 value);

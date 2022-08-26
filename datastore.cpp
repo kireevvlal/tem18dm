@@ -1,8 +1,24 @@
 #include "datastore.h"
+//#include <QDebug>
 
 DataStore::DataStore()
 {
 
+}
+//--------------------------------------------------------------------------------
+bool DataStore::UpdateRecord(uint position, uint length, QByteArray buffer) {
+    if (position + length > _record.length())
+        return false;
+    _record.replace(position, length, buffer);
+//    qDebug() << QString::number(position) + " "  + QString::number(length) + " " + QString::number(_record.length());
+    return true;
+}
+//--------------------------------------------------------------------------------
+bool DataStore::SetByteRecord(uint position, qint8 byte) {
+    if (position > _record.length())
+        return false;
+    _record[position] = byte;
+    return true;
 }
 //--------------------------------------------------------------------------------
 void DataStore::FillMaps(QList<ThreadSerialPort*> ports) {
@@ -82,34 +98,10 @@ bool DataStore::Add(QString key, DataType type) {
         return true;
     }
 }
-bool DataStore::Bit(QString key) {
-    return _bits_map.contains(key) ? _bits_map[key] : false;
-    }
-qint8 DataStore::Byte(QString key) {
-    return _bytes_map.contains(key) ? _bytes_map[key] : 0;
-}
-quint8 DataStore::UByte(QString key) {
-    return _ubytes_map.contains(key) ? _ubytes_map[key] : 0;
-    }
-qint16 DataStore::Int16(QString key) {
-    return _int16_map.contains(key) ? _int16_map[key] : 0;
-}
-quint16 DataStore::UInt16(QString key) {
-    return _uint16_map.contains(key) ? _uint16_map[key] : 0;
-    }
-qint32 DataStore::Int32(QString key) {
-    return _int32_map.contains(key) ? _int32_map[key] : 0;
-}
-quint32 DataStore::UInt32(QString key) {
-    return _uint32_map.contains(key) ? _uint32_map[key] : 0;
-    }
-float DataStore::Float(QString key) {
-    return _float_map.contains(key) ? _float_map[key] : 0;
-}
 //--------------------------------------------------------------------------------
 bool DataStore::Bit(QString key, bool value) {
     if (_bits_map.contains(key)) {
-        _bits_map["key"] = value;
+        _bits_map[key] = value;
         return true;
     }
     else
@@ -118,7 +110,7 @@ bool DataStore::Bit(QString key, bool value) {
 //--------------------------------------------------------------------------------
 bool DataStore::Byte(QString key, qint8 value) {
     if (_bytes_map.contains(key)) {
-        _bytes_map["key"] = value;
+        _bytes_map[key] = value;
         return true;
     }
     else
@@ -127,7 +119,7 @@ bool DataStore::Byte(QString key, qint8 value) {
 //--------------------------------------------------------------------------------
 bool DataStore::UByte(QString key, quint8 value) {
     if (_ubytes_map.contains(key)) {
-        _ubytes_map["key"] = value;
+        _ubytes_map[key] = value;
         return true;
     }
     else
@@ -136,7 +128,7 @@ bool DataStore::UByte(QString key, quint8 value) {
 //--------------------------------------------------------------------------------
 bool DataStore::Int16(QString key, qint16 value) {
     if (_int16_map.contains(key)) {
-        _int16_map["key"] = value;
+        _int16_map[key] = value;
         return true;
     }
     else
@@ -145,7 +137,7 @@ bool DataStore::Int16(QString key, qint16 value) {
 //--------------------------------------------------------------------------------
 bool DataStore::UInt16(QString key, quint16 value) {
     if (_uint16_map.contains(key)) {
-        _uint16_map["key"] = value;
+        _uint16_map[key] = value;
         return true;
     }
     else
@@ -154,7 +146,7 @@ bool DataStore::UInt16(QString key, quint16 value) {
 //--------------------------------------------------------------------------------
 bool DataStore::Int32(QString key, qint32 value) {
     if (_int32_map.contains(key)) {
-        _int32_map["key"] = value;
+        _int32_map[key] = value;
         return true;
     }
     else
@@ -163,7 +155,7 @@ bool DataStore::Int32(QString key, qint32 value) {
 //--------------------------------------------------------------------------------
 bool DataStore::UInt32(QString key, quint32 value) {
     if (_uint32_map.contains(key)) {
-        _uint32_map["key"] = value;
+        _uint32_map[key] = value;
         return true;
     }
     else
@@ -172,7 +164,7 @@ bool DataStore::UInt32(QString key, quint32 value) {
 //--------------------------------------------------------------------------------
 bool DataStore::Float(QString key, float value) {
     if (_float_map.contains(key)) {
-        _float_map["key"] = value;
+        _float_map[key] = value;
         return true;
     }
     else
@@ -231,37 +223,34 @@ int DataStore::LoadSpData(ThreadSerialPort *port) {
     QByteArray data = port->InData.Data();
     UnionInt16 i16;
     int result = 0;
+    int byte;
 
     for (int i = 0; i < parameters.size(); i++) {
         current = parameters[i];
-        if ((port->InData.Index == 0xff) || (port->InData.Index != 0xff && (int)data[port->InData.Index] == current->Index))
+        byte = current->Byte;
+        if ((port->InData.Index == 0xffff) || ((port->InData.Index != 0xffff) && ((int)data[port->InData.Index] == current->Index)))
             switch(current->Type) {
             case DataType::Bit:
                 if (_bits_map.contains(current->Variable))
-                    _bits_map[current->Variable] = data[current->Byte] & (1 << current->Bit);
+                    _bits_map[current->Variable] = data[byte] & (1 << current->Bit);
                 else
                     result++;
                 break;
             case DataType::Byte:
                 if (_bytes_map.contains(current->Variable))
-                    _bytes_map[current->Variable] = data[current->Byte];
+                    _bytes_map[current->Variable] = data[byte];
                 else
                     result++;
                 break;
             case DataType::UByte:
                 if (_ubytes_map.contains(current->Variable))
-                    _ubytes_map[current->Variable] = data[current->Byte];
+                    _ubytes_map[current->Variable] = data[byte];
                 else
                     result++;
                 break;
             case DataType::Int16:
-                if (port->InData.Order == OrderType::Direct) {
-                    i16.Array[0] = data[current->Byte];
-                    i16.Array[1] = data[current->Byte + 1];
-                } else {
-                    i16.Array[0] = data[current->Byte + 1];
-                    i16.Array[1] = data[current->Byte];
-                }
+                    i16.Array[0] = data[byte];
+                    i16.Array[1] = data[byte + 1];
                 if (_int16_map.contains(current->Variable))
                     _int16_map[current->Variable] = i16.Value;
                 else
@@ -269,13 +258,8 @@ int DataStore::LoadSpData(ThreadSerialPort *port) {
                 break;
             case DataType::Uint16:
                 UnionUInt16 ui16;
-                if (port->InData.Order == OrderType::Direct) {
-                    ui16.Array[0] = data[current->Byte];
-                    ui16.Array[1] = data[current->Byte + 1];
-                } else {
-                    ui16.Array[0] = data[current->Byte + 1];
-                    ui16.Array[1] = data[current->Byte];
-                }
+                    ui16.Array[0] = data[byte];
+                    ui16.Array[1] = data[byte + 1];
                 if (_uint16_map.contains(current->Variable))
                     _uint16_map[current->Variable] = ui16.Value;
                 else
@@ -283,17 +267,10 @@ int DataStore::LoadSpData(ThreadSerialPort *port) {
                 break;
             case DataType::Int32:
                 UnionInt32 i32;
-                if (port->InData.Order == OrderType::Direct) {
-                    i32.Array[0] = data[current->Byte];
-                    i32.Array[1] = data[current->Byte + 1];
-                    i32.Array[2] = data[current->Byte + 2];
-                    i32.Array[3] = data[current->Byte + 3];
-                } else {
-                    i32.Array[0] = data[current->Byte + 3];
-                    i32.Array[1] = data[current->Byte + 2];
-                    i32.Array[2] = data[current->Byte + 1];
-                    i32.Array[3] = data[current->Byte];
-                }
+                    i32.Array[0] = data[byte];
+                    i32.Array[1] = data[byte + 1];
+                    i32.Array[2] = data[byte + 2];
+                    i32.Array[3] = data[byte + 3];
                 if (_int32_map.contains(current->Variable))
                     _int32_map[current->Variable] = i32.Value;
                 else
@@ -301,30 +278,18 @@ int DataStore::LoadSpData(ThreadSerialPort *port) {
                 break;
             case DataType::Uint32:
                 UnionUInt32 ui32;
-                if (port->InData.Order == OrderType::Direct) {
-                    ui32.Array[0] = data[current->Byte];
-                    ui32.Array[1] = data[current->Byte + 1];
-                    ui32.Array[2] = data[current->Byte + 2];
-                    ui32.Array[3] = data[current->Byte + 3];
-                } else {
-                    ui32.Array[0] = data[current->Byte + 3];
-                    ui32.Array[1] = data[current->Byte + 2];
-                    ui32.Array[2] = data[current->Byte + 1];
-                    ui32.Array[3] = data[current->Byte];
-                }
+                    ui32.Array[0] = data[byte];
+                    ui32.Array[1] = data[byte + 1];
+                    ui32.Array[2] = data[byte + 2];
+                    ui32.Array[3] = data[byte + 3];
                 if (_uint32_map.contains(current->Variable))
                     _uint32_map[current->Variable] = ui32.Value;
                 else
                     result++;
                 break;
             case DataType::Float:
-                if (port->InData.Order == OrderType::Direct) {
-                    i16.Array[0] = data[current->Byte];
-                    i16.Array[1] = data[current->Byte + 1];
-                } else {
-                    i16.Array[0] = data[current->Byte + 1];
-                    i16.Array[1] = data[current->Byte];
-                }
+                    i16.Array[0] = data[byte];
+                    i16.Array[1] = data[byte + 1];
                 if (_float_map.contains(current->Variable))
                     _float_map[current->Variable] = i16.Value * current->Coefficient;
                 else

@@ -161,8 +161,7 @@ void ThreadSerialPort::Read()
     }
 }
 //--------------------------------------------------------------------------------
-void ThreadSerialPort:: Parse(NodeXML* node)
-{
+void ThreadSerialPort::Parse(NodeXML* node) {
     int i;
     QString value;
     for (i = 0; i < node->Attributes.count(); i++) {

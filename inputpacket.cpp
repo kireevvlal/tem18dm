@@ -1,19 +1,18 @@
 #include "inputpacket.h"
 
-InputPacket::InputPacket()
-{
-    // Data.resize(1024);
+InputPacket::InputPacket() {
+    //_data.resize(1024);
     _flag_begin = false;
     _checksum = 0;
     _counter = 0;
     _bytes_len = 1;
     _offset = 0;
-    Index = 0xff; // нет индекса
-    Order = OrderType::Direct;
+    _delta = -1;
+    Index = 0xffff; // нет индекса
+    _order = OrderType::Direct;
 }
 //--------------------------------------------------------------------------------
-void InputPacket::Parse(NodeXML* node)
-{
+void InputPacket::Parse(NodeXML* node) {
     int i;
     QString value;
     for (i = 0; i < node->Attributes.count(); i++) {
@@ -21,7 +20,7 @@ void InputPacket::Parse(NodeXML* node)
         if (attr->Name == "inclen")
             _offset = attr->Value.toInt();
         else if (attr->Name == "order")
-            Order = (attr->Value.toLower() == "reverse") ? OrderType::Reverse : OrderType::Direct;
+            _order = (attr->Value.toLower() == "reverse") ? OrderType::Reverse : OrderType::Direct;
         else if (attr->Name == "byteslen")
             _bytes_len = attr->Value.toInt();
         else if (attr->Name == "index")
@@ -40,8 +39,7 @@ void InputPacket::Parse(NodeXML* node)
     }
 }
 //--------------------------------------------------------------------------------
-bool InputPacket::Decode(QByteArray data)
-{
+bool InputPacket::Decode(QByteArray data) {
     uchar ch;
     bool error = false, flagEnd = false;
     int len = data.length();
@@ -64,7 +62,6 @@ bool InputPacket::Decode(QByteArray data)
                 {
                     _checksum += ch;     // накапливаем сумму
                     _counter++;       // принят очередной байт информации
-                    // Data[Counter] = ch;         // в пакет
                     _data.append(ch); // Data[Counter - BytesLen - 1] = ch;         // в пакет
                     if (_counter == _length + _offset + 1)        // заказанная длина пакета
                     {
@@ -109,7 +106,6 @@ bool InputPacket::Decode(QByteArray data)
                     {
                         _checksum += ch;     // накапливаем сумму
                         _counter++;       // принят очередной байт информации
-                        // Data[Counter] = ch;         // в пакет
                         _data.append(ch); // Data[Counter - BytesLen - 1] = ch;         // в пакет
                         if (_counter == _length + _offset + 1)        // заказанная длина пакета ????? : +1
                         {
@@ -126,6 +122,7 @@ bool InputPacket::Decode(QByteArray data)
             _flag_begin = false;
             _checksum = 0;
             _last_byte = 0;
+            _delta = -1;
             if (error == true)
                 return false; // произошла ошибка
             else
@@ -135,12 +132,23 @@ bool InputPacket::Decode(QByteArray data)
     return false;
 }
 //--------------------------------------------------------------------------------
-ParameterList InputPacket::Parameters()
-{
+ParameterList InputPacket::Parameters() {
     return _parameters;
 }
 //--------------------------------------------------------------------------------
-QByteArray InputPacket::Data()
-{
+QByteArray InputPacket::Data() {
     return _data;
+}
+//--------------------------------------------------------------------------------
+void InputPacket::Swap() {
+    int i, tmp;
+    if (_order == OrderType::Reverse)
+        for (i = 0; i < _parameters.count(); i++) {
+            if (_parameters[i]->Type == DataType::Float || _parameters[i]->Type == DataType::Int16 ||
+                    _parameters[i]->Type == DataType::Uint16) {
+                tmp = _data[_parameters[i]->Byte];
+                _data[_parameters[i]->Byte] = _data[_parameters[i]->Byte + 1];
+                _data[_parameters[i]->Byte + 1] = tmp;
+            }
+        }
 }

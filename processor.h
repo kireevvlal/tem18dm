@@ -6,6 +6,16 @@
 #include "threadserialport.h"
 #include "treexml.h"
 #include "datastore.h"
+#include "registrator.h"
+
+#define nobit0 0xfe
+#define nobit1 0xfd
+#define nobit2 0xfb
+#define nobit3 0xf7
+#define nobit4 0xef
+#define nobit5 0xdf
+#define nobit6 0xbf
+#define nobit7 0x7f
 
 class Processor : public QObject
 {
@@ -14,6 +24,9 @@ private:
 //    QByteArray _bytes_data;
 //    QMap<QString, qint16> _int_data;
 //    QMap<QString, float> _float_data;
+    QThread *_reg_thread;
+    QTimer *_reg_timer;
+    Registrator *_registrator;
     QString _start_path;
     QStringList _files;
     TreeXML _tree;
@@ -22,6 +35,7 @@ private:
     void ParseFiles(NodeXML*);
     void ParseObjects(NodeXML*);
     void ParseSerialPorts(NodeXML*);
+    void ParseDiagnostic(NodeXML*);
 public:
     QList<ThreadSerialPort*> SerialPorts;
     DataStore Storage;
@@ -29,8 +43,14 @@ public:
     ~ Processor() {}
     bool Load(QString, QString);
     void Run();
-    public slots:
+signals:
+    void AddRecordSignal(QByteArray);
+private slots:
+    void RegTimerStep();
+public slots:
     void Unpack(ThreadSerialPort*);
+    void LostConnection(ThreadSerialPort*);
+    void RestoreConnection(ThreadSerialPort*);
     // New:
     QJsonArray getTrevogaTotal();
     QJsonArray getTrevogaDiesel();

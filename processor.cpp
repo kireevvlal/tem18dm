@@ -1,9 +1,14 @@
 #include "processor.h"
-
-
+#if QT_VERSION < QT_VERSION_CHECK(5, 12, 0)
+#include <QDebug>
+#include <QTime>
+#include <QDate>
+#endif
 Processor::Processor(QObject *parent) : QObject(parent)
 {
-    //_tr_total.resize(10);
+    _reg_timer = new QTimer();
+    _reg_thread = new QThread();
+    _registrator = new Registrator();
 }
 //--------------------------------------------------------------------------------
 // Load configuration from files and create objects
@@ -31,16 +36,62 @@ void Processor::Run()
     // start serial ports
     for (int i = 0; i < SerialPorts.count(); i++) {
         connect(SerialPorts[i], SIGNAL(DecodeSignal(ThreadSerialPort*)), this, SLOT(Unpack(ThreadSerialPort*)));
+        connect(SerialPorts[i], SIGNAL(LostExchangeSignal(ThreadSerialPort*)), this, SLOT(LostConnection(ThreadSerialPort*)));
+        connect(SerialPorts[i], SIGNAL(RestoreExchangeSignal(ThreadSerialPort*)), this, SLOT(RestoreConnection(ThreadSerialPort*)));
         SerialPorts[i]->Start();
     }
+    // start registration
+    _registrator->moveToThread(_reg_thread);
+    connect(this, SIGNAL(AddRecordSignal(QByteArray)), _registrator, SLOT(AddRecord(QByteArray)));
+    _reg_thread->start();
+    connect(_reg_timer, SIGNAL(timeout()), this, SLOT(RegTimerStep()));
+    _reg_timer->start(_registrator->Interval());
 }
 //--------------------------------------------------------------------------------
-void Processor::Unpack(ThreadSerialPort *port)
-{
+void Processor::RegTimerStep() {
+    // need add fill record
+    AddRecordSignal(Storage.Record());
+}
+//--------------------------------------------------------------------------------
+void Processor::LostConnection(ThreadSerialPort *port) {
+    if (port->Alias == "BEL")
+        Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") & nobit0);
+    else if (port->Alias == "USTA")
+        Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") & nobit1);
+    if (port->Alias == "IT")
+        Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") & nobit2);
+    else if (port->Alias == "MSS")
+        Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") & nobit3);
+}
+//--------------------------------------------------------------------------------
+void Processor::RestoreConnection(ThreadSerialPort *port) {
+    if (port->Alias == "BEL")
+        Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") | 1);
+    else if (port->Alias == "USTA")
+        Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") | 2);
+    if (port->Alias == "IT")
+        Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") | 4);
+    else if (port->Alias == "MSS")
+        Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") | 8);
+}
+//--------------------------------------------------------------------------------
+void Processor::Unpack(ThreadSerialPort *port) {
+    QByteArray data = port->InData.Data();
+    port->InData.Swap();
     Storage.LoadSpData(port);
+    // update record registration
+    if (port->Alias == "USTA") {
+        Storage.UpdateRecord(0, 80, data.mid(0, 80));             // аналоговые
+        Storage.UpdateRecord(332, 6, data.mid(80, 6)); // дискретные
+    }
+    else if (port->Alias == "IT")
+        Storage.UpdateRecord(80 + data[port->InData.Index] * 32, 32, data.mid(5, 32));
+    else if (port->Alias == "BEL") {
+        Storage.SetByteRecord(186, Storage.Byte("BEL_PKM")); // ???????????????????????????????????????????????
+        Storage.UpdateRecord(338, 8, data.mid(1, 8)); // дискретные (+ ПКМ)
+    }
     qDebug() << "Unpack " + port->Alias;
 }
-
 //--------------------------------------------------------------------------------
 void Processor::Parse(NodeXML *node)
 {
@@ -68,7 +119,29 @@ void Processor::ParseObjects(NodeXML *node)
         if (node->Name == "serialports") {
             ParseSerialPorts(node->Child);
         }
+        if (node->Name == "drive") {
+            if (int rs = _registrator->Parse(node))
+                Storage.SetRecordSize(rs);
+        }
+        if (node->Name == "diagnostic") {
+            ParseDiagnostic(node);
+        }
         node = node->Next;
+    }
+}
+//--------------------------------------------------------------------------------
+void Processor::ParseDiagnostic(NodeXML *node)
+{
+    if (node->Child != nullptr) {
+        node = node->Child;
+        while (node != nullptr) {
+            if (node->Name == "par") {
+                Parameter *newPar = new Parameter;
+                newPar->Parse(node);
+                Storage.Add(newPar->Variable, newPar->Type);
+            }
+            node = node->Next;
+        }
     }
 }
 //--------------------------------------------------------------------------------

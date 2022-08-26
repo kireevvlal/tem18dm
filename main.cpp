@@ -3,19 +3,23 @@
 #include <QQmlContext>
 #include <QObject>
 #include <QDebug>
+#include <signal.h>
 #include "processor.h"
 
+void handleSignals(int signal) {
+    switch (signal) {
+    case SIGABRT:
+        qDebug() << "";
+                  break;
+    }
+}
 int main(int argc, char *argv[])
 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
     QGuiApplication app(argc, argv);
-#ifdef Q_OS_WIN
-    qDebug() << "Windows";
-#else
-    qDebug() << "Linux";
-#endif
+
     Processor ioBf(&app);
     qmlRegisterType<Processor>("ConnectorModule", 1, 0, "Connector");
 

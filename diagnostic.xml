@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<diagnostic>
+	<par var="DIAG_Connections" type="byte">Наличие связи по последовательным портам</par>
+	<par var="DIAG_Discret_2" type="byte">Флаги диагностики байт 2</par>
+	<par var="DIAG_Discret_3" type="byte">Флаги диагностики байт 3</par>
+	<par var="DIAG_Discret_4" type="byte">Флаги диагностики байт 4</par>
+	<par var="DIAG_Discret_5" type="byte">Флаги диагностики байт 5</par>
+	<par var="DIAG_Discret_6" type="byte">Флаги диагностики байт 6</par>
+	<par var="DIAG_CQ_BEL" type="int">Качество связи БЭЛ</par>
+	<par var="DIAG_CQ_USTA" type="int">Качество связи УСТА</par>
+	<par var="DIAG_CQ_IT" type="int">Качество связи ТИ</par>
+	<par var="DIAG_CQ_MSS" type="int">Качество связи локомотив</par>
+	<par var="DIAG_MESS_NUM" type="int">Номер тревожного сообщения</par>
+	<par var="DIAG_PKM_BEL" type="int">Позиция КМ БЭЛ</par>
+	<par var="DIAG_Rplus" type="int">R плюс ЦУ-корпус</par>
+	<par var="DIAG_Rminus" type="int">R минус ЦУ-корпус</par>
+	<par var="DIAG_Motoresurs" type="uint32">Моторесурс дизеля</par>
+	<par var="DIAG_Apol" type="uint32">Полезная работа дизеля</par>
+	<par var="DIAG_Tt" type="uint32">Время работы в тяге дизеля</par>
+</diagnostic>
