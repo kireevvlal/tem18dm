@@ -28,12 +28,12 @@ public:
     ~ThreadSerialPort();
     QString Alias;
     bool IsExchange() { return _is_exchange; }
-    int QualityCounter() { return _qualityCounter; }
+    int Quality() { return _quality; }
     void Parse(NodeXML*);           // разбор ветви дерава XML с параметрами объекта
     void WriteSettings(QString, int, int, int, int, int);
 private:
     bool _is_exchange;          // наличие приема данных за заданный интервал
-    int _qualityCounter;
+    int _quality;
     QTimer _timer;
     //QSerialPort *_port;
     SerialPortSettings _settings;
@@ -52,10 +52,10 @@ signals:
     void FinishedSignal();      // Сигнал закрытия класса
     void LogSignal(QString);    // Сигнал лога порта
     void ReadSignal(QString);   // QByteArray data); // Сигнал получения данных
-    void DecodeSignal(ThreadSerialPort*); // Success decode packet
-    void WriteSignal(ThreadSerialPort*);  // QByteArray);
-    void LostExchangeSignal(ThreadSerialPort*);
-    void RestoreExchangeSignal(ThreadSerialPort*);
+    void DecodeSignal(QString); // Success decode packet
+    void WriteSignal(QString);  // QByteArray);
+    void LostExchangeSignal(QString);
+    void RestoreExchangeSignal(QString);
 public slots:
     void Disconnect();  // Слот отключения порта
     void Start();       // Run threader? open port and start timer

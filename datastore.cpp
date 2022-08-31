@@ -14,50 +14,68 @@ bool DataStore::UpdateRecord(uint position, uint length, QByteArray buffer) {
     return true;
 }
 //--------------------------------------------------------------------------------
-bool DataStore::SetByteRecord(uint position, qint8 byte) {
+bool DataStore::SetByteRecord(uint position, quint8 value) {
     if (position > _record.length())
         return false;
-    _record[position] = byte;
+    _record[position] = value;
     return true;
 }
 //--------------------------------------------------------------------------------
-void DataStore::FillMaps(QList<ThreadSerialPort*> ports) {
+bool DataStore::SetWordRecord(uint position, quint16 value) {
+    UnionUInt16 un;
+    if (position + 1 > _record.length())
+        return false;
+    un.Value = value;
+    _record[position] = un.Array[0];
+    _record[position + 1] = un.Array[1];
+    return true;
+}
+//--------------------------------------------------------------------------------
+bool DataStore::SetDoubleWordRecord(uint position, quint32 value) {
+    UnionUInt32 un;
+    if (position + 3 > _record.length())
+        return false;
+    un.Value = value;
+    _record[position] = un.Array[0];
+    _record[position + 1] = un.Array[1];
+    _record[position + 2] = un.Array[2];
+    _record[position + 3] = un.Array[3];
+    return true;
+}
+//--------------------------------------------------------------------------------
+void DataStore::FillMaps(ThreadSerialPort* port) {
     int j;
-    ThreadSerialPort *port;
     ParameterList parameters;
     Parameter *current;
-    for (int i = 0; i < ports.size(); i++) {
-        port = ports[i];
-        parameters = port->InData.Parameters();
-        for (j = 0; j < parameters.size(); j++) {
-            current = parameters[j];
-            switch(current->Type) {
-            case DataType::Bit: _bits_map.insert(current->Variable, 0); break;
-            case DataType::Byte: _bytes_map.insert(current->Variable, 0); break;
-            case DataType::UByte: _ubytes_map.insert(current->Variable, 0); break;
-            case DataType::Int16: _int16_map.insert(current->Variable, 0); break;
-            case DataType::Uint16: _uint16_map.insert(current->Variable, 0); break;
-            case DataType::Int32: _int32_map.insert(current->Variable, 0); break;
-            case DataType::Uint32: _uint32_map.insert(current->Variable, 0); break;
-            case DataType::Float:  _float_map.insert(current->Variable, 0); break;
-            case DataType::Double: _double_map.insert(current->Variable, 0); break;
-            }
+    parameters = port->InData.Parameters();
+    for (j = 0; j < parameters.size(); j++) {
+        current = parameters[j];
+        switch(current->Type) {
+        case DataType::Bit: _bits_map.insert(current->Variable, 0); break;
+        case DataType::Byte: _bytes_map.insert(current->Variable, 0); break;
+        case DataType::UByte: _ubytes_map.insert(current->Variable, 0); break;
+        case DataType::Int16: _int16_map.insert(current->Variable, 0); break;
+        case DataType::Uint16: _uint16_map.insert(current->Variable, 0); break;
+        case DataType::Int32: _int32_map.insert(current->Variable, 0); break;
+        case DataType::Uint32: _uint32_map.insert(current->Variable, 0); break;
+        case DataType::Float:  _float_map.insert(current->Variable, 0); break;
+        case DataType::Double: _double_map.insert(current->Variable, 0); break;
         }
+    }
 
-        parameters = port->OutData.Parameters();
-        for (j = 0; j < parameters.size(); j++) {
-            current = parameters[j];
-            switch(current->Type) {
-            case DataType::Bit: _bits_map.insert(current->Variable, 0); break;
-            case DataType::Byte: _bytes_map.insert(current->Variable, 0); break;
-            case DataType::UByte: _ubytes_map.insert(current->Variable, 0); break;
-            case DataType::Int16: _int16_map.insert(current->Variable, 0); break;
-            case DataType::Uint16: _uint16_map.insert(current->Variable, 0); break;
-            case DataType::Int32: _int32_map.insert(current->Variable, 0); break;
-            case DataType::Uint32: _uint32_map.insert(current->Variable, 0); break;
-            case DataType::Float:  _float_map.insert(current->Variable, 0); break;
-            case DataType::Double: _double_map.insert(current->Variable, 0); break;
-            }
+    parameters = port->OutData.Parameters();
+    for (j = 0; j < parameters.size(); j++) {
+        current = parameters[j];
+        switch(current->Type) {
+        case DataType::Bit: _bits_map.insert(current->Variable, 0); break;
+        case DataType::Byte: _bytes_map.insert(current->Variable, 0); break;
+        case DataType::UByte: _ubytes_map.insert(current->Variable, 0); break;
+        case DataType::Int16: _int16_map.insert(current->Variable, 0); break;
+        case DataType::Uint16: _uint16_map.insert(current->Variable, 0); break;
+        case DataType::Int32: _int32_map.insert(current->Variable, 0); break;
+        case DataType::Uint32: _uint32_map.insert(current->Variable, 0); break;
+        case DataType::Float:  _float_map.insert(current->Variable, 0); break;
+        case DataType::Double: _double_map.insert(current->Variable, 0); break;
         }
     }
 }

@@ -27,18 +27,19 @@ bool Processor:: Load(QString startPath, QString cfgfile)
         }
     } else
         return false;
-    Storage.FillMaps(SerialPorts);
+    for (QMap<QString, ThreadSerialPort*>::iterator i = SerialPorts.begin(); i != SerialPorts.end(); i++)
+        Storage.FillMaps(i.value());
     return true;
 }
 //--------------------------------------------------------------------------------
 void Processor::Run()
 {
     // start serial ports
-    for (int i = 0; i < SerialPorts.count(); i++) {
-        connect(SerialPorts[i], SIGNAL(DecodeSignal(ThreadSerialPort*)), this, SLOT(Unpack(ThreadSerialPort*)));
-        connect(SerialPorts[i], SIGNAL(LostExchangeSignal(ThreadSerialPort*)), this, SLOT(LostConnection(ThreadSerialPort*)));
-        connect(SerialPorts[i], SIGNAL(RestoreExchangeSignal(ThreadSerialPort*)), this, SLOT(RestoreConnection(ThreadSerialPort*)));
-        SerialPorts[i]->Start();
+    for (QMap<QString, ThreadSerialPort*>::iterator i = SerialPorts.begin(); i != SerialPorts.end(); i++) {
+        connect(i.value(), SIGNAL(DecodeSignal(QString)), this, SLOT(Unpack(QString)));
+        connect(i.value(), SIGNAL(LostExchangeSignal(QString)), this, SLOT(LostConnection(QString)));
+        connect(i.value(), SIGNAL(RestoreExchangeSignal(QString)), this, SLOT(RestoreConnection(QString)));
+        i.value()->Start();
     }
     // start registration
     _registrator->moveToThread(_reg_thread);
@@ -49,48 +50,82 @@ void Processor::Run()
 }
 //--------------------------------------------------------------------------------
 void Processor::RegTimerStep() {
-    // need add fill record
+    QDateTime dt = QDateTime::currentDateTime();
+    QDate date = dt.date();
+    QTime time = dt.time();
+    // word diagnostic
+    Storage.SetWordRecord(176, Storage.UInt16("DIAG_CQ_BEL"));
+    Storage.SetWordRecord(178, Storage.UInt16("DIAG_CQ_USTA"));
+    Storage.SetWordRecord(180, Storage.UInt16("DIAG_CQ_IT"));
+    Storage.SetWordRecord(182, Storage.UInt16("DIAG_CQ_MSS"));
+    Storage.SetWordRecord(184, Storage.UInt16("DIAG_MESS_NUM"));
+    Storage.SetWordRecord(186, Storage.UInt16("DIAG_PKM_BEL"));
+    Storage.SetWordRecord(188, Storage.UInt16("DIAG_Rplus"));
+    Storage.SetWordRecord(190, Storage.UInt16("DIAG_Rminus"));
+    // double word diagnostic
+    Storage.SetDoubleWordRecord(206, Storage.UInt32("DIAG_Motoresurs"));
+    Storage.SetDoubleWordRecord(210, Storage.UInt32("DIAG_Apol"));
+    Storage.SetDoubleWordRecord(214, Storage.UInt32("DIAG_Tt"));
+    // message params
+    Storage.SetByteRecord(318, 0); // hour
+    Storage.SetByteRecord(319, 0); // minute
+    Storage.SetByteRecord(320, 0); // second
+    Storage.SetByteRecord(322, 0); // index
+    // date and time
+    Storage.SetByteRecord(326, date.day());
+    Storage.SetByteRecord(327, date.month());
+    Storage.SetByteRecord(328, date.year() % 100);
+    Storage.SetByteRecord(329, time.hour());
+    Storage.SetByteRecord(330, time.minute());
+    Storage.SetByteRecord(331, time.second());
+    // discret diagnostic
+    Storage.SetByteRecord(346, Storage.Byte("DIAG_Connections"));
+    Storage.SetByteRecord(347, Storage.Byte("DIAG_Discret_2"));
+    Storage.SetByteRecord(348, Storage.Byte("DIAG_Discret_3"));
+    Storage.SetByteRecord(349, Storage.Byte("DIAG_Discret_4"));
+    Storage.SetByteRecord(350, Storage.Byte("DIAG_Discret_5"));
+    Storage.SetByteRecord(351, Storage.Byte("DIAG_Discret_6"));
     AddRecordSignal(Storage.Record());
 }
 //--------------------------------------------------------------------------------
-void Processor::LostConnection(ThreadSerialPort *port) {
-    if (port->Alias == "BEL")
+void Processor::LostConnection(QString alias) {
+    if (alias == "BEL")
         Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") & nobit0);
-    else if (port->Alias == "USTA")
+    else if (alias == "USTA")
         Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") & nobit1);
-    if (port->Alias == "IT")
+    if (alias == "IT")
         Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") & nobit2);
-    else if (port->Alias == "MSS")
+    else if (alias == "MSS")
         Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") & nobit3);
 }
 //--------------------------------------------------------------------------------
-void Processor::RestoreConnection(ThreadSerialPort *port) {
-    if (port->Alias == "BEL")
+void Processor::RestoreConnection(QString alias) {
+    if (alias == "BEL")
         Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") | 1);
-    else if (port->Alias == "USTA")
+    else if (alias == "USTA")
         Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") | 2);
-    if (port->Alias == "IT")
+    if (alias == "IT")
         Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") | 4);
-    else if (port->Alias == "MSS")
+    else if (alias == "MSS")
         Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") | 8);
 }
 //--------------------------------------------------------------------------------
-void Processor::Unpack(ThreadSerialPort *port) {
-    QByteArray data = port->InData.Data();
-    port->InData.Swap();
-    Storage.LoadSpData(port);
+void Processor::Unpack(QString alias) {
+    QByteArray data = SerialPorts[alias]->InData.Data();
+    SerialPorts[alias]->InData.Swap();
+    Storage.LoadSpData(SerialPorts[alias]);
     // update record registration
-    if (port->Alias == "USTA") {
+    if (alias == "USTA") {
         Storage.UpdateRecord(0, 80, data.mid(0, 80));             // аналоговые
         Storage.UpdateRecord(332, 6, data.mid(80, 6)); // дискретные
     }
-    else if (port->Alias == "IT")
-        Storage.UpdateRecord(80 + data[port->InData.Index] * 32, 32, data.mid(5, 32));
-    else if (port->Alias == "BEL") {
-        Storage.SetByteRecord(186, Storage.Byte("BEL_PKM")); // ???????????????????????????????????????????????
+    else if (alias == "IT")
+        Storage.UpdateRecord(80 + data[SerialPorts[alias]->InData.Index] * 32, 32, data.mid(5, 32));
+    else if (alias == "BEL") {
+        //Storage.SetByteRecord(186, Storage.Byte("BEL_PKM")); // ???????????????????????????????????????????????
         Storage.UpdateRecord(338, 8, data.mid(1, 8)); // дискретные (+ ПКМ)
     }
-    qDebug() << "Unpack " + port->Alias;
+    qDebug() << "Unpack " + alias;
 }
 //--------------------------------------------------------------------------------
 void Processor::Parse(NodeXML *node)
@@ -150,8 +185,8 @@ void Processor::ParseSerialPorts(NodeXML *node)
     while (node != nullptr) {
         if (node->Name == "spstream") {   // serial port stream
             ThreadSerialPort *newPort = new ThreadSerialPort;
-            SerialPorts.append(newPort);
             newPort->Parse(node);
+            SerialPorts[newPort->Alias] = newPort; //SerialPorts.append(newPort);
         }
         node = node->Next;
     }

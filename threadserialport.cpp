@@ -16,7 +16,7 @@ ThreadSerialPort::ThreadSerialPort(QObject *parent)
     _wait = _watchdog = 0;
     _is_exchange = false;
     _counter = 0;
-    _qualityCounter = 0;
+    _quality = 0;
 }
 //--------------------------------------------------------------------------------
 ThreadSerialPort::~ThreadSerialPort()
@@ -110,7 +110,7 @@ void ThreadSerialPort::TimerStep()
     if (_type_exchange == ExchangeType::Master) {
         if (_wait + TIMEOUT >= _delay) {
             Write();
-            _qualityCounter -= ((_qualityCounter > 0) ? 1 : 0);
+            _quality -= ((_quality > 0) ? 1 : 0);
             _wait = 0;
         } else
             _wait += TIMEOUT;
@@ -119,7 +119,7 @@ void ThreadSerialPort::TimerStep()
     if (_watchdog > _limit) {
         if (_is_exchange) {
             _is_exchange = false;
-            LostExchangeSignal(this);
+            LostExchangeSignal(Alias);
         }
         _watchdog = _limit; //
     }
@@ -131,7 +131,7 @@ void ThreadSerialPort::Write()
     if (isOpen()){
         QByteArray out = OutData.Build();
         write(out);
-        WriteSignal(this);
+        WriteSignal(Alias);
     }
 }
 //--------------------------------------------------------------------------------
@@ -142,16 +142,16 @@ void ThreadSerialPort::Read()
         if (InData.Decode(readAll())) {
             if (!_is_exchange) {
                 _is_exchange = true;
-                RestoreExchangeSignal(this);
+                RestoreExchangeSignal(Alias);
             }
             _watchdog = _timer.remainingTime();
             _counter++;
-            DecodeSignal(this);
+            DecodeSignal(Alias);
             if (_type_exchange == ExchangeType::Slave) {
                 //_thread->msleep(100);
                 Write();
             } else if (_type_exchange == ExchangeType::Master) {
-                _qualityCounter += ((_qualityCounter == 19) ? 1 : (_qualityCounter < 19) ? 2 : 0);
+                _quality += ((_quality == 19) ? 1 : (_quality < 19) ? 2 : 0);
             }
         }
     } else {

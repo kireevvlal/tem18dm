@@ -22,11 +22,13 @@ public:
     DataStore();
     QByteArray Record() { return _record; }
     bool UpdateRecord(uint, uint, QByteArray);
-    bool SetByteRecord(uint, qint8);
+    bool SetByteRecord(uint, quint8);
+    bool SetWordRecord(uint, quint16);
+    bool SetDoubleWordRecord(uint, quint32);
     void SetRecordSize(int size) { _record.resize(size); _record.fill('\0'); }
     void WriteRecord();
     // maps methods
-    void FillMaps(QList<ThreadSerialPort*>);
+    void FillMaps(ThreadSerialPort*);
     QStringList OutMaps();
     bool Exist(QString, DataType);
     bool Add(QString, DataType);

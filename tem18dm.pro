@@ -30,6 +30,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
+    qml/ExtBeadItem.qml \
+    qml/ExtBeads.qml \
     qml/ExtCircularGauge.qml \
     qml/ExtGauge.qml \
     qml/Gauge/edit.png \

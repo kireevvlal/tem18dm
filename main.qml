@@ -782,38 +782,61 @@ if  (cnt>6 ) { cnt = 0};
             source: "Pictogram/ind_box.png"
         }
 
-     PrBar{ //   PrBar {
+//     PrBar{ //   PrBar {
+//            id: pr_Mtg1
+//            x: 34
+//            y: 242
+//            width: 27
+//            height: 170
+//            color: "#000000"
+//            radius: 0
+//            val_max: 1500
+//            opacity: 1
+//            color1: "#4682b4" // #f32b2b"
+//            color2: "#b0e0e6"
+//            kind: 0
+//            value: 1500
+//            txtvzbl: true
+//        }
+
+        ExtBeads {
             id: pr_Mtg1
             x: 34
-            y: 242
-            width: 27
-            height: 170
-            color: "#000000"
-            radius: 0
-            val_max: 1500
-            opacity: 1
-            color1: "#4682b4" // #f32b2b"
-            color2: "#b0e0e6"
-            kind: 0
-            value: 1500
-            txtvzbl: true
+            y: 230
+            height: 180
+            width: 28
+            cntitems: 15
+            colors: ["#f01f00", "#f02f00", "#f03f00", "#f04f00", "#f05f00", "#f06f00", "#f07f00", "#f08f00", "#f09f99", "#f0afaa", "#f0bfbb", "#f0cfcc", "#f0dfdd", "#f0efee", "#f0ffff"]
+            value: 0
+            maxvalue: 1500
         }
 
-      PrBar{ //   PrBar {
+//      PrBar{ //   PrBar {
+//            id: pr_Mtg2
+//            x: 98
+//            y: 242
+//            width: 27
+//            height: 170
+//            color: "#000000"
+//            radius: 0
+//            val_max: 1500
+//            value: 1500
+//            color2: "#b0e0e6"
+//            color1: "#4682b4"
+//            kind: 0
+//            txtvzbl: true
+//      }
+        ExtBeads {
             id: pr_Mtg2
             x: 98
-            y: 242
-            width: 27
-            height: 170
-            color: "#000000"
-            radius: 0
-            val_max: 1500
+            y: 230
+            height: 180
+            width: 28
+            cntitems: 15
+            colors: ["#f01f00", "#f02f00", "#f03f00", "#f04f00", "#f05f00", "#f06f00", "#f07f00", "#f08f00", "#f09f99", "#f0afaa", "#f0bfbb", "#f0cfcc", "#f0dfdd", "#f0efee", "#f0ffff"]
             value: 1500
-            color2: "#b0e0e6"
-            color1: "#4682b4"
-            kind: 0
-            txtvzbl: true
-      }
+            maxvalue: 1500
+        }
 
       TInd {
           id: in1DR

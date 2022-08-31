@@ -37,7 +37,7 @@ private:
     void ParseSerialPorts(NodeXML*);
     void ParseDiagnostic(NodeXML*);
 public:
-    QList<ThreadSerialPort*> SerialPorts;
+    QMap<QString, ThreadSerialPort*> SerialPorts;
     DataStore Storage;
     explicit Processor(QObject *parent = nullptr);
     ~ Processor() {}
@@ -48,9 +48,9 @@ signals:
 private slots:
     void RegTimerStep();
 public slots:
-    void Unpack(ThreadSerialPort*);
-    void LostConnection(ThreadSerialPort*);
-    void RestoreConnection(ThreadSerialPort*);
+    void Unpack(QString);
+    void LostConnection(QString);
+    void RestoreConnection(QString);
     // New:
     QJsonArray getTrevogaTotal();
     QJsonArray getTrevogaDiesel();
