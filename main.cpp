@@ -3,14 +3,28 @@
 #include <QQmlContext>
 #include <QObject>
 #include <QDebug>
+#include <QIcon>
 #include <signal.h>
 #include "processor.h"
 
+Processor *pProcessor;
+
 void handleSignals(int signal) {
     switch (signal) {
-    case SIGABRT:
-        qDebug() << "";
-                  break;
+//    case SIGABRT:
+//        break;
+    case SIGTERM:
+//        break;
+#ifndef Q_OS_WIN
+    case SIGHUP:
+//        break;
+    case SIGQUIT:
+//        break;
+#endif
+    case SIGINT:
+        pProcessor->Stop();
+        exit(0);
+        break;
     }
 }
 int main(int argc, char *argv[])
@@ -20,7 +34,10 @@ int main(int argc, char *argv[])
 #endif
     QGuiApplication app(argc, argv);
 
+    app.setWindowIcon(QIcon(":/Locomotive.ico"));
+
     Processor ioBf(&app);
+    pProcessor = &ioBf;
     qmlRegisterType<Processor>("ConnectorModule", 1, 0, "Connector");
 
     QQmlApplicationEngine engine;
@@ -38,5 +55,11 @@ int main(int argc, char *argv[])
     } else
         qDebug() << "Config read error.";
 
+    signal(SIGTERM, handleSignals);
+#ifndef Q_OS_WIN
+    signal(SIGHUP, handleSignals);
+    signal(SIGQUIT, handleSignals);
+#endif
+    signal(SIGINT, handleSignals);
     return app.exec();
 }

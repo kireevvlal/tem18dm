@@ -30,6 +30,10 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
+    ../build-tem18dm-Desktop_Qt_5_15_2_MSVC2019_64bit-Debug/debug/config.xml \
+    ../build-tem18dm-Desktop_Qt_5_15_2_MSVC2019_64bit-Debug/debug/diagnostic.xml \
+    ../build-tem18dm-Desktop_Qt_5_15_2_MSVC2019_64bit-Debug/debug/registration.xml \
+    ../build-tem18dm-Desktop_Qt_5_15_2_MSVC2019_64bit-Debug/debug/serialports.xml \
     qml/ExtBeadItem.qml \
     qml/ExtBeads.qml \
     qml/ExtCircularGauge.qml \
@@ -81,3 +85,5 @@ HEADERS += \
     threadserialport.h \
     treexml.h \
     zapuso.h
+
+win32:RC_FILE = ico.rc

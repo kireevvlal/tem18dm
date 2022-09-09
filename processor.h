@@ -43,6 +43,7 @@ public:
     ~ Processor() {}
     bool Load(QString, QString);
     void Run();
+    void Stop();
 signals:
     void AddRecordSignal(QByteArray);
 private slots:

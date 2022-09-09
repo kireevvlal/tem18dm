@@ -12,7 +12,7 @@ Rectangle {
 
     signal switchUso_USTA_DisVih();    // переход на меню
     signal switchUso_USTA_DisVhod();  //
-    signal switchUso_USTA_Analogi();   //
+    signal switchUso_USTA_Analogi(int offset);   //
     signal switchUso_Exit();    // переход на уровень ввех
 
     signal knopaS();  // сигнал о нажатии клавиши ДМ "S"
@@ -25,8 +25,8 @@ Rectangle {
 
     Keys.onPressed: {
         switch(event.key) {
-        case Qt.Key_Down: { knopaDwn(); }
-        case Qt.Key_Up:   { knopaUp();  }
+//        case Qt.Key_Down: { knopaDwn(); }
+//        case Qt.Key_Up:   { knopaUp();  }
 
         case Qt.Key_0:   {
             // ?? надо на Главное меню вернуться
@@ -78,11 +78,15 @@ Rectangle {
             break;
         }
         case Qt.Key_9:        {
-            img7.source = "../Pictogram/uso/0_dot.png"
-            img8.source = "../Pictogram/uso/0_din.png"
-            img9.source = "../Pictogram/uso/1_aud.png"
-
-            switchUso_USTA_Analogi();
+            if (kdr_USTA_Analog.opacity == 1) {
+                switchUso_USTA_Analogi(1);
+            }
+            else {
+                img7.source = "../Pictogram/uso/0_dot.png"
+                img8.source = "../Pictogram/uso/0_din.png"
+                img9.source = "../Pictogram/uso/1_aud.png"
+                switchUso_USTA_Analogi(0);
+            }
             break;
         }
         // *** ! кодировка на ТПК может отличаться

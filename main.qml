@@ -532,22 +532,33 @@ if  (cnt>6 ) { cnt = 0};
             height: 64
             opacity: 0
             z: 37
-            onSwitchUso_TI_TXA: { opastyNul(); kdr_TI_TXA.opacity = 1; }
-            onSwitchUso_TI_TCM: { opastyNul(); kdr_TI_TCM.opacity = 1; }
-
-            onKnopaDwn: { //  нужно только один экран листать
-                if (kdr_TI_TXA.opacity == 1) {
-                kdr_TI_TXA.numPage = kdr_TI_TXA.numPage + 1;}
-
-                if (kdr_TI_TCM.opacity == 1) {
-                kdr_TI_TCM.numPage = kdr_TI_TCM.numPage + 1;}
+            onSwitchUso_TI_TXA: function(offset) {
+                if (offset) {
+                    if (kdr_TI_TXA.offset == 100) {
+                        kdr_TI_TXA.offset = 80;
+                        kdr_TI_TXA.numPage = 1;
+                    }
+                    else {
+                        kdr_TI_TXA.offset += 10;
+                        kdr_TI_TXA.numPage++;
+                    }
+                }
+                opastyNul();
+                kdr_TI_TXA.opacity = 1;
             }
-            onKnopaUp: {
-                if (kdr_TI_TXA.opacity == 1) {
-                kdr_TI_TXA.numPage = kdr_TI_TXA.numPage - 1;}
-
-                if (kdr_TI_TCM.opacity == 1) {
-                kdr_TI_TCM.numPage = kdr_TI_TCM.numPage - 1;}
+            onSwitchUso_TI_TCM: function(offset) {
+                if (offset) {
+                    if (kdr_TI_TCM.offset == 70) {
+                        kdr_TI_TCM.offset = 50;
+                        kdr_TI_TCM.numPage = 1;
+                    }
+                    else {
+                        kdr_TI_TCM.offset += 10;
+                        kdr_TI_TCM.numPage++;
+                    }
+                }
+                opastyNul();
+                kdr_TI_TCM.opacity = 1;
             }
 
             onSwitchUso_Exit:  { go_Exit();    }
@@ -570,10 +581,23 @@ if  (cnt>6 ) { cnt = 0};
 
             onSwitchUso_USTA_DisVih:  { opastyNul(); kdr_USTA_DskrVihodi.opacity = 1; }
             onSwitchUso_USTA_DisVhod: { opastyNul(); kdr_USTA_DskrVh.opacity = 1;     }
-            onSwitchUso_USTA_Analogi: { opastyNul(); kdr_USTA_Analog.opacity = 1;     }
+            onSwitchUso_USTA_Analogi: function(offset) {
+                if (offset) {
+                    if (kdr_USTA_Analog.offset == 30) {
+                        kdr_USTA_Analog.offset = 0;
+                        kdr_USTA_Analog.numPage = 1;
+                    }
+                    else {
+                        kdr_USTA_Analog.offset += 10;
+                        kdr_USTA_Analog.numPage++;
+                    }
+                }
+                opastyNul();
+                kdr_USTA_Analog.opacity = 1;
+            }
 
-            onKnopaDwn: { kdr_USTA_Analog.numPage = kdr_USTA_Analog.numPage + 1;  }
-            onKnopaUp:  { kdr_USTA_Analog.numPage = kdr_USTA_Analog.numPage - 1;  }
+//            onKnopaDwn: { kdr_USTA_Analog.numPage = kdr_USTA_Analog.numPage + 1;  }
+//            onKnopaUp:  { kdr_USTA_Analog.numPage = kdr_USTA_Analog.numPage - 1;  }
 
 
             onSwitchUso_Exit: { go_Exit(); }

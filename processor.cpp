@@ -49,19 +49,33 @@ void Processor::Run()
     _reg_timer->start(_registrator->Interval());
 }
 //--------------------------------------------------------------------------------
+void Processor::Stop() {
+    _registrator->Stop();
+}
+//--------------------------------------------------------------------------------
 void Processor::RegTimerStep() {
+    // for main circle
+    if (SerialPorts.contains("BEL"))
+        Storage.Int16("DIAG_CQ_BEL", SerialPorts["BEL"]->Quality());
+    if (SerialPorts.contains("USTA"))
+        Storage.Int16("DIAG_CQ_USTA", SerialPorts["USTA"]->Quality());
+    if (SerialPorts.contains("IT"))
+        Storage.Int16("DIAG_CQ_IT", SerialPorts["IT"]->Quality());
+    if (SerialPorts.contains("MSS"))
+        Storage.Int16("DIAG_CQ_MSS", SerialPorts["MSS"]->Quality());
+    //
     QDateTime dt = QDateTime::currentDateTime();
     QDate date = dt.date();
     QTime time = dt.time();
     // word diagnostic
-    Storage.SetWordRecord(176, Storage.UInt16("DIAG_CQ_BEL"));
-    Storage.SetWordRecord(178, Storage.UInt16("DIAG_CQ_USTA"));
-    Storage.SetWordRecord(180, Storage.UInt16("DIAG_CQ_IT"));
-    Storage.SetWordRecord(182, Storage.UInt16("DIAG_CQ_MSS"));
-    Storage.SetWordRecord(184, Storage.UInt16("DIAG_MESS_NUM"));
-    Storage.SetWordRecord(186, Storage.UInt16("DIAG_PKM_BEL"));
-    Storage.SetWordRecord(188, Storage.UInt16("DIAG_Rplus"));
-    Storage.SetWordRecord(190, Storage.UInt16("DIAG_Rminus"));
+    Storage.SetWordRecord(176, Storage.Int16("DIAG_CQ_BEL"));
+    Storage.SetWordRecord(178, Storage.Int16("DIAG_CQ_USTA"));
+    Storage.SetWordRecord(180, Storage.Int16("DIAG_CQ_IT"));
+    Storage.SetWordRecord(182, Storage.Int16("DIAG_CQ_MSS"));
+    Storage.SetWordRecord(184, Storage.Int16("DIAG_MESS_NUM"));
+    Storage.SetWordRecord(186, Storage.Int16("DIAG_PKM_BEL"));
+    Storage.SetWordRecord(188, Storage.Int16("DIAG_Rplus"));
+    Storage.SetWordRecord(190, Storage.Int16("DIAG_Rminus"));
     // double word diagnostic
     Storage.SetDoubleWordRecord(206, Storage.UInt32("DIAG_Motoresurs"));
     Storage.SetDoubleWordRecord(210, Storage.UInt32("DIAG_Apol"));
@@ -89,12 +103,21 @@ void Processor::RegTimerStep() {
 }
 //--------------------------------------------------------------------------------
 void Processor::LostConnection(QString alias) {
-    if (alias == "BEL")
+    QByteArray arr;
+    arr.fill('\0', 1024);
+    if (alias == "BEL") {
         Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") & nobit0);
-    else if (alias == "USTA")
+        Storage.UpdateRecord(338, 8, arr.mid(0, 8)); // дискретные (+ ПКМ)
+    }
+    else if (alias == "USTA") {
         Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") & nobit1);
-    if (alias == "IT")
+        Storage.UpdateRecord(0, 80, arr.mid(0, 80));  // аналоговые
+        Storage.UpdateRecord(332, 6, arr.mid(0, 6)); // дискретные
+    }
+    if (alias == "IT") {
         Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") & nobit2);
+        Storage.UpdateRecord(80, 96, arr.mid(0, 96));
+    }
     else if (alias == "MSS")
         Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") & nobit3);
 }
@@ -116,11 +139,14 @@ void Processor::Unpack(QString alias) {
     Storage.LoadSpData(SerialPorts[alias]);
     // update record registration
     if (alias == "USTA") {
-        Storage.UpdateRecord(0, 80, data.mid(0, 80));             // аналоговые
+        Storage.UpdateRecord(0, 80, data.mid(0, 80));  // аналоговые
         Storage.UpdateRecord(332, 6, data.mid(80, 6)); // дискретные
     }
-    else if (alias == "IT")
-        Storage.UpdateRecord(80 + data[SerialPorts[alias]->InData.Index] * 32, 32, data.mid(5, 32));
+    else if (alias == "IT") {
+        int index = data[SerialPorts[alias]->InData.Index];
+        if (index < 3) // принимаются долько три пакета из четырех
+            Storage.UpdateRecord(80 + index * 32, 32, data.mid(5, 32));
+    }
     else if (alias == "BEL") {
         //Storage.SetByteRecord(186, Storage.Byte("BEL_PKM")); // ???????????????????????????????????????????????
         Storage.UpdateRecord(338, 8, data.mid(1, 8)); // дискретные (+ ПКМ)
@@ -154,9 +180,9 @@ void Processor::ParseObjects(NodeXML *node)
         if (node->Name == "serialports") {
             ParseSerialPorts(node->Child);
         }
-        if (node->Name == "drive") {
-            if (int rs = _registrator->Parse(node))
-                Storage.SetRecordSize(rs);
+        if (node->Name == "registration") {
+            _registrator->Parse(node);
+            Storage.SetRecordSize(_registrator->RecordSize());
         }
         if (node->Name == "diagnostic") {
             ParseDiagnostic(node);

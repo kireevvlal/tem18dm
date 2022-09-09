@@ -10,8 +10,8 @@ Rectangle {
     property string cltxtSelect:"#1bb7e4"; // цвет текста нажатой кнопки
     property string cltxt:"white";         // штатный цвет текста всех кнопок
 
-    signal switchUso_TI_TXA();  // переход на меню
-    signal switchUso_TI_TCM();  //
+    signal switchUso_TI_TXA(int offset);  // переход на меню
+    signal switchUso_TI_TCM(int offset);  //
     signal switchUso_Exit();    // переход на уровень ввех
 
     signal knopaS();  // сигнал о нажатии клавиши ДМ "S"
@@ -19,13 +19,13 @@ Rectangle {
     signal knopaSt(); // сигнал о нажатии клавиши ДМ "St"
     signal knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
 
-    signal knopaDwn(); // сигнал о нажатии клавиши ДМ "стрелка вниз"
-    signal knopaUp(); // сигнал о нажатии клавиши ДМ "стрелка вверх"
+//    signal knopaDwn(); // сигнал о нажатии клавиши ДМ "стрелка вниз"
+//    signal knopaUp(); // сигнал о нажатии клавиши ДМ "стрелка вверх"
 
     Keys.onPressed: {
         switch(event.key) {
-        case Qt.Key_Down: { knopaDwn(); }
-        case Qt.Key_Up:   { knopaUp();  }
+//        case Qt.Key_Down: { knopaDwn(); }
+//        case Qt.Key_Up:   { knopaUp();  }
 
         case Qt.Key_0:   {
             // ?? надо на Главное меню вернуться
@@ -60,17 +60,23 @@ Rectangle {
             break;
         }
         case Qt.Key_8:        {
-            img8.source =  "../Pictogram/uso/1_TXA.png"
-            img9.source =  "../Pictogram/uso/0_TSM.png"
-
-            switchUso_TI_TXA();
+            if (kdr_TI_TXA.opacity == 1) {
+                switchUso_TI_TXA(1);
+            } else {
+                img8.source =  "../Pictogram/uso/1_TXA.png"
+                img9.source =  "../Pictogram/uso/0_TSM.png"
+                switchUso_TI_TXA(0);
+            }
             break;
         }
         case Qt.Key_9:        {
-            img8.source = "../Pictogram/uso/0_TXA.png"
-            img9.source = "../Pictogram/uso/1_TSM.png"
-
-            switchUso_TI_TCM();
+            if (kdr_TI_TCM.opacity == 1) {
+                switchUso_TI_TCM(1);
+            } else {
+                img8.source = "../Pictogram/uso/0_TXA.png"
+                img9.source = "../Pictogram/uso/1_TSM.png"
+                switchUso_TI_TCM(0);
+            }
             break;
         }
         // *** ! кодировка на ТПК может отличаться

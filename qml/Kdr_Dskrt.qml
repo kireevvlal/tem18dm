@@ -170,7 +170,7 @@ Rectangle {
         id: timer_text
         triggeredOnStart: false // true - запускается сразу и по repet(т.е.срабатывает два раза)
         repeat:false            // и еще разок вывели и успокоились
-        interval: 500
+        interval: 100
         running: true
         onTriggered: {
             var i;
@@ -217,5 +217,6 @@ Rectangle {
             }
         }
     }
+
 }
 

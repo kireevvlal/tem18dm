@@ -19,18 +19,7 @@ Rectangle {// Экран отображения аналоговых сигна�
     property string str_a: "s_a";   // размерность
 
     property int  numPage: 1;     // номер активной страницы
-    onNumPageChanged: changePg(); // листаем страницы - срабатывает при изменении numPage
-
-    function changePg() {
-
-        if (numPage>cntPage) {numPage=1};
-        if (numPage<1) {numPage=cntPage};
-        // console.log("стрелка / num_page==" + numPage);
-        text1.text = qsTr(namePage+ ": окно " + numPage + "[" + cntPage + "]");
-        offset = bazaoffset + (numPage-1)*cntRowTabl;
-
-        timer_text.restart();// перерисовываем таблицу
-    }
+    onOffsetChanged: timer_text.restart();
 
     // заголовок экрана
     Text {
@@ -131,7 +120,7 @@ Rectangle {// Экран отображения аналоговых сигна�
         id: timer_text
         triggeredOnStart: false // true - запускается сразу и по repet(т.е.срабатывает два раза)
         repeat:false // и еще разок вывели и успокоились
-        interval: 500
+        interval: 100
         running: true
         onTriggered: {
             // console.log(" таймер timer_text сработал  в Kdr_Analog");

@@ -97,5 +97,6 @@
         <file>qml/Kdr_LedError.qml</file>
         <file>qml/ExtBeadItem.qml</file>
         <file>qml/ExtBeads.qml</file>
+        <file>Locomotive.ico</file>
     </qresource>
 </RCC>

@@ -6,6 +6,7 @@ enum ExchangeType { Master, Slave, Receive };
 enum OrderType { Direct, Reverse };
 enum ProtocolType { Staffing, Unknown };
 enum DataType { Bit, Byte, UByte, Int16, Uint16, Int32, Uint32, Float, Double };
+enum RegistrationType { Record,  Bulk, Archive};
 
 typedef  union {
     qint16 Value;

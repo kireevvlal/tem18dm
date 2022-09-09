@@ -107,14 +107,13 @@ void ThreadSerialPort::HandleError(QSerialPort::SerialPortError error)
 // Обработка сигнала таймера передачи пакетов
 void ThreadSerialPort::TimerStep()
 {
-    if (_type_exchange == ExchangeType::Master) {
-        if (_wait + TIMEOUT >= _delay) {
+    if (_wait + TIMEOUT >= _delay) {
+        if (_type_exchange == ExchangeType::Master)
             Write();
-            _quality -= ((_quality > 0) ? 1 : 0);
-            _wait = 0;
-        } else
-            _wait += TIMEOUT;
-    }
+        _quality += ((_quality < 20) ? 1 : 0);
+        _wait = 0;
+    } else
+        _wait += TIMEOUT;
     _watchdog += TIMEOUT;
     if (_watchdog > _limit) {
         if (_is_exchange) {
@@ -123,6 +122,7 @@ void ThreadSerialPort::TimerStep()
         }
         _watchdog = _limit; //
     }
+
 }
 //--------------------------------------------------------------------------------
 // Запись данных в порт
@@ -147,12 +147,9 @@ void ThreadSerialPort::Read()
             _watchdog = _timer.remainingTime();
             _counter++;
             DecodeSignal(Alias);
-            if (_type_exchange == ExchangeType::Slave) {
-                //_thread->msleep(100);
+            if (_type_exchange == ExchangeType::Slave)
                 Write();
-            } else if (_type_exchange == ExchangeType::Master) {
-                _quality += ((_quality == 19) ? 1 : (_quality < 19) ? 2 : 0);
-            }
+            _quality = (_quality > 1) ? _quality - 2 : 0;
         }
     } else {
         QByteArray data;
