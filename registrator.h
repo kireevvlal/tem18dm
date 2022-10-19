@@ -5,7 +5,7 @@
 #include <QFile>
 #include <QJsonArray>
 #include "treexml.h"
-#include "extratypes.h"
+#include "vktoolstypes.h"
 
 class Registrator : public QObject
 {

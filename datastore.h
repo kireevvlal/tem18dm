@@ -2,7 +2,7 @@
 #define DATASTORE_H
 #include <QMap>
 #include "threadserialport.h"
-#include "extratypes.h"
+#include "vktoolstypes.h"
 
 class DataStore
 {

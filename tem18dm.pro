@@ -7,15 +7,15 @@ QT += serialport
 
 SOURCES += \
         datastore.cpp \
-        inputpacket.cpp \
+#        inputpacket.cpp \
         main.cpp \
-        outputpacket.cpp \
-        parameter.cpp \
+#        outputpacket.cpp \
+#        parameter.cpp \
         processor.cpp \
         registrator.cpp \
         saver.cpp \
-        threadserialport.cpp \
-        treexml.cpp
+#        threadserialport.cpp \
+#        treexml.cpp
 
 RESOURCES += qml.qrc
 
@@ -77,15 +77,19 @@ DISTFILES += \
 
 HEADERS += \
     datastore.h \
-    extratypes.h \
-    inputpacket.h \
-    outputpacket.h \
-    parameter.h \
+#    extratypes.h \
+#    inputpacket.h \
+#    outputpacket.h \
+#    parameter.h \
     processor.h \
     registrator.h \
     saver.h \
-    threadserialport.h \
-    treexml.h \
+#    threadserialport.h \
+#    treexml.h \
     zapuso.h
+
+win32:INCLUDEPATH += D:/Development/Qt/vktoolslib
+
+win32:LIBS+=  D:/Development/Qt/build-vktoolslib-Desktop_Qt_5_15_2_MSVC2019_64bit-Debug/debug/vktoolslib.lib
 
 win32:RC_FILE = ico.rc
