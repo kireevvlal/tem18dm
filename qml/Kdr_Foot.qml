@@ -22,7 +22,7 @@ Rectangle {
     signal knopai();  // сигнал о нажатии клавиши ДМ "i"
     signal knopaSt(); // сигнал о нажатии клавиши ДМ "St"
     signal knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
-
+    signal saveToUSB(); // сигнал о необходимости записи на USB (для отработки под Windows)
 
     //** переключение
     Keys.onPressed: {
@@ -130,7 +130,12 @@ Rectangle {
         case Qt.Key_Escape :{
             // выходим из программы
             ioBf.close();
-
+            break;
+        }
+        // kireev add for windows
+        case Qt.Key_S: {
+                console.log("даем сигнал о нажатии S");
+            saveToUSB();
             break;
         }
 

@@ -1,12 +1,8 @@
 #include "inputpacket.h"
 
-InputPacket::InputPacket() {
+InputPacket::InputPacket(QObject *parent) : QObject(parent) {
     //_data.resize(1024);
-    _flag_begin = false;
-    _checksum = 0;
-    _counter = 0;
-    _bytes_len = 1;
-    _offset = 0;
+
     _delta = -1;
     Index = 0xffff; // нет индекса
     _order = OrderType::Direct;
@@ -18,11 +14,11 @@ void InputPacket::Parse(NodeXML* node) {
     for (i = 0; i < node->Attributes.count(); i++) {
         AttributeXML *attr = node->Attributes[i];
         if (attr->Name == "inclen")
-            _offset = attr->Value.toInt();
+            _staffing.Offset = attr->Value.toInt();
         else if (attr->Name == "order")
             _order = (attr->Value.toLower() == "reverse") ? OrderType::Reverse : OrderType::Direct;
         else if (attr->Name == "byteslen")
-            _bytes_len = attr->Value.toInt();
+            _staffing.BytesLen = attr->Value.toInt();
         else if (attr->Name == "index")
             Index = attr->Value.toInt();
     }
@@ -39,97 +35,80 @@ void InputPacket::Parse(NodeXML* node) {
     }
 }
 //--------------------------------------------------------------------------------
-bool InputPacket::Decode(QByteArray data) {
+void InputPacket::SetProtocol(ProtocolType protocol)
+{
+    if (protocol == ProtocolType::Staffing)
+        this->DecodeFunction = &InputPacket::DecodeStaffing;
+}
+//--------------------------------------------------------------------------------
+void InputPacket::Decode(QByteArray data) //Build()
+{
+    (this->*DecodeFunction)(data);
+}
+//--------------------------------------------------------------------------------
+void InputPacket::DecodeStaffing(QByteArray data) {
     uchar ch;
-    bool error = false, flagEnd = false;
     int len = data.length();
     for (int i = 0; i < len; i++)
     {
         ch = data[i]; // Прием байта
         if (ch == 0xff)          // Прием синхробайта?
-            _last_byte = 0xff;
+            _staffing.LastByte = 0xff;
         else
             if (ch == 0xfe)      // Прием байт-стаффинга (FE)
             {
-                if ((quint8)_last_byte == 0xff)
+                if ((quint8)_staffing.LastByte == 0xff)
                 {                   // Был байт ff информации
                     ch = 0xff;      // Восстановление ff
-                    _last_byte = 0;   // Сброс
+                    _staffing.LastByte = 0;   // Сброс
                 }
-                if (_flag_begin == false)  // Прием без стартового байта FF
-                    error = true;
-                else
-                {
-                    _checksum += ch;     // накапливаем сумму
-                    _counter++;       // принят очередной байт информации
-                    _data.append(ch); // Data[Counter - BytesLen - 1] = ch;         // в пакет
-                    if (_counter == _length + _offset + 1)        // заказанная длина пакета
+                if (_staffing.FlagBegin) {
+                    _staffing.Checksum += ch;     // накапливаем сумму
+                    _staffing.Counter++;       // принят очередной байт информации
+                    _buffer.append(ch); // Data[Counter - BytesLen - 1] = ch;         // в пакет
+                    if (_staffing.BytesLen == 2 && _staffing.Counter == 2)
+                        _length += (ch << 8);
+                    if (_staffing.Counter == _length + _staffing.Offset + _staffing.BytesLen)        // заказанная длина пакета
                     {
-                        if (_checksum != 0)          // ошибка контрольной суммы
-                            error = true;
-                        else     // конец пакета
-                            flagEnd = true;     // Happy end !!!!
+                        if (_staffing.Checksum == 0) {    // конец пакета
+                            _data = _buffer;
+                            _staffing.Reset();
+                            _delta = -1;
+                            ReceivePacketSignal();
+                        }    // Happy end !!!!
                     }
                 }
             }
             else                    // Прием иного символа
-                if ((quint8)_last_byte == 0xff)
+                if ((quint8)_staffing.LastByte == 0xff)
                 {                   // Был действительно!
                     _length = ch;  // Байт длины посылки
-                    _checksum = ch;      // инициализация констрольной суммы
-                    _counter = 1;       // Счетчик байт
-                    _last_byte = 0;
-                    _flag_begin = true; // Начало информации в пакете
-                   // Data[0] = 0xff;
-                   // Data[1] = ch;
-                    _data.clear();
-                    if (_bytes_len == 2)
-                    {
-                        i++;
-                        if (i < data.length())
-                        {
-                            ch = data[i];
-                            _length += (ch << 8);
-                            _checksum += ch;
-                            _counter++;
-                     //       Data[2] = ch;
-                        }
-                        else
-                            error = true; // не принят второй байт длины пакета
-                    }
+                    _staffing.Checksum = ch;      // инициализация констрольной суммы
+                    _staffing.Counter = 1;       // Счетчик байт
+                    _staffing.LastByte = 0;
+                    _staffing.FlagBegin = true; // Начало информации в пакете
+                    _buffer.clear();
                 }
                 else
                 {
-                    if (_flag_begin == false)  // Прием без стартового байта FF
-                        error = true;
-                    else
-                    {
-                        _checksum += ch;     // накапливаем сумму
-                        _counter++;       // принят очередной байт информации
-                        _data.append(ch); // Data[Counter - BytesLen - 1] = ch;         // в пакет
-                        if (_counter == _length + _offset + 1)        // заказанная длина пакета ????? : +1
+                    if (_staffing.FlagBegin) {
+                        _staffing.Checksum += ch;     // накапливаем сумму
+                        _staffing.Counter++;       // принят очередной байт информации
+                        _buffer.append(ch); // Data[Counter - BytesLen - 1] = ch;         // в пакет
+                        if (_staffing.BytesLen == 2 && _staffing.Counter == 2)
+                            _length += (ch << 8);
+                        if (_staffing.Counter == _length + _staffing.Offset + _staffing.BytesLen)        // заказанная длина пакета ????? : +1
                         {
-                            if (_checksum != 0)          // ошибка контрольной суммы
-                                error = true;
-                            else     // конец пакета
-                                flagEnd = true;     // Happy end !!!!
+                            if (_staffing.Checksum == 0)  { // конец пакета
+                                _data = _buffer;
+                                _staffing.Reset();
+                                _delta = -1;
+                                ReceivePacketSignal();
+                            }
                         }
                     }
                 }
-        if ((error == true) || (flagEnd == true)) // обработка ошибки или приема конца пакета
-        {
-            _counter = 1;           // все инициализируем исходными данными
-            _flag_begin = false;
-            _checksum = 0;
-            _last_byte = 0;
-            _delta = -1;
-            if (error == true)
-                return false; // произошла ошибка
-            else
-                return true; // пакет принят без ошибок
-        }
     }
-    return false;
 }
 //--------------------------------------------------------------------------------
 ParameterList InputPacket::Parameters() {

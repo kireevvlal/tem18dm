@@ -2,11 +2,13 @@
 #define PROCESSOR_H
 #include <QObject>
 #include <QJsonArray>
-#include  "zapuso.h"
+#include <QFileSystemWatcher>
+#include "zapuso.h"
 #include "threadserialport.h"
 #include "treexml.h"
 #include "datastore.h"
 #include "registrator.h"
+#include "saver.h"
 
 #define nobit0 0xfe
 #define nobit1 0xfd
@@ -24,34 +26,48 @@ private:
 //    QByteArray _bytes_data;
 //    QMap<QString, qint16> _int_data;
 //    QMap<QString, float> _float_data;
+    bool _is_active;
+    qint64 _msec; // системное время в миллисекундах
+    float _Adiz; // полезная работа дизеля
+    QFile _mtr_file; // имя и путь файла моторесурса
     QThread *_reg_thread;
     QTimer *_reg_timer;
+    //QThread *_diag_thread;
+    QTimer *_diag_timer;
+    int _diag_interval;
     Registrator *_registrator;
+    Saver *_saver;
+    QThread *_saver_thread;
     QString _start_path;
     QStringList _files;
     TreeXML _tree;
+    QFileSystemWatcher *_fswatcher;
     QJsonArray RejPrT();
     void Parse(NodeXML*);
     void ParseFiles(NodeXML*);
     void ParseObjects(NodeXML*);
     void ParseSerialPorts(NodeXML*);
     void ParseDiagnostic(NodeXML*);
+    void ParseRegistration(NodeXML*);
 public:
     QMap<QString, ThreadSerialPort*> SerialPorts;
     DataStore Storage;
     explicit Processor(QObject *parent = nullptr);
-    ~ Processor() {}
+    ~Processor(); // { Stop(); }
     bool Load(QString, QString);
     void Run();
     void Stop();
 signals:
     void AddRecordSignal(QByteArray);
+    void SaveFilesSignal();
 private slots:
     void RegTimerStep();
+    void DiagTimerStep();
 public slots:
     void Unpack(QString);
     void LostConnection(QString);
     void RestoreConnection(QString);
+    void querySaveToUSB(QString);
     // New:
     QJsonArray getTrevogaTotal();
     QJsonArray getTrevogaDiesel();

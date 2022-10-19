@@ -447,6 +447,7 @@ if  (cnt>6 ) { cnt = 0};
             onKnopai: { showKdr_ArhivMessage();} // сигнал о нажатии клавиши ДМ "i"  /alt+c
             onKnopaSt:{ showKdr_Reostat();     } // сигнал о нажатии клавиши ДМ "St" /alt+d
             onKnopaUD:{ showKdr_Svazi();       } // сигнал о нажатии клавиши ДМ "UD" /alt+i
+            onSaveToUSB: { ioBf.querySaveToUSB("G:/"); }  // сигнал о необходимости записи на USB (для отработки под Windows)
 
             onSwitchFoot_Exit: { go_Exit(); } // в начальное состояние
         }

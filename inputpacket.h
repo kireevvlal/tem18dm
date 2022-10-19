@@ -4,32 +4,57 @@
 #include "treexml.h"
 #include "extratypes.h"
 #include "parameter.h"
+typedef struct StaffingStruct {
+    bool FlagBegin;
+    char Checksum;
+    char LastByte;
+    int Counter;
+    int BytesLen;
+    int Offset;
+    StaffingStruct() {
+        FlagBegin = false;
+        Checksum = 0;
+        LastByte = 0;
+        Counter = 0;
+        BytesLen = 1;
+        Offset = 0;
+    }
+    void Reset() {
+        Counter = 1;           // все инициализируем исходными данными
+        FlagBegin = false;
+        Checksum = 0;
+        LastByte = 0;
+    }
+} StaffingStruct;
 
-class InputPacket
+//pedef struct StaffingStruct Staffing;
+
+class InputPacket : public QObject
 {
+    Q_OBJECT
 public:
     int Index;
     OrderType Order() { return _order; }
     void SetOrder(OrderType value) { _order = value; }
-    InputPacket();
+    InputPacket(QObject *parent = nullptr);
     void Parse(NodeXML*);
-    //QByteArray Build();
     ParameterList Parameters();
     QByteArray Data();
-    bool Decode(QByteArray);
+    void Decode(QByteArray);
     void Swap();
+    void SetProtocol(ProtocolType);
 private:
     OrderType _order;
-    bool _flag_begin;
-    char _checksum;
-    char _last_byte;
-    int _counter;
-    int _bytes_len;
-    int _offset;
+    StaffingStruct _staffing;
     int _delta; // смеещение, вызванное передачей разных пакетов (в ТИ)
     ParameterList _parameters;
+    QByteArray _buffer;
     QByteArray _data;
     int _length;
+    void (InputPacket::*DecodeFunction)(QByteArray);
+    void DecodeStaffing(QByteArray);
+signals:
+    void ReceivePacketSignal();
 };
 
 #endif // INPUTPACKET_H

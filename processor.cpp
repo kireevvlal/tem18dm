@@ -9,12 +9,33 @@ Processor::Processor(QObject *parent) : QObject(parent)
     _reg_timer = new QTimer();
     _reg_thread = new QThread();
     _registrator = new Registrator();
+    _diag_timer = new QTimer();
+    _diag_interval = 200;
+    _msec = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    _is_active = false;
+    _fswatcher = new QFileSystemWatcher;
+#ifdef Q_OS_WIN
+    _fswatcher->addPath("D:/000");
+#elif  Q_OS_UNIX
+    _fswatcher->addPath("/dev");
+#endif
+    _saver =  new Saver();
+    _saver_thread = new QThread();
+    //_diag_thread = new QThread();
+}
+//--------------------------------------------------------------------------------
+Processor::~Processor() {
+    if (_is_active)
+        Stop();
 }
 //--------------------------------------------------------------------------------
 // Load configuration from files and create objects
 bool Processor:: Load(QString startPath, QString cfgfile)
 {
     int i;
+    char data[12];
+    UnionUInt32 par;
+    // read configs
     _start_path = startPath;
     if (_tree.ReadFile(_start_path + "/" + cfgfile)) { // read start configuration file
         Parse(_tree.Root);
@@ -29,6 +50,21 @@ bool Processor:: Load(QString startPath, QString cfgfile)
         return false;
     for (QMap<QString, ThreadSerialPort*>::iterator i = SerialPorts.begin(); i != SerialPorts.end(); i++)
         Storage.FillMaps(i.value());
+    // read motoresurs
+    if (_mtr_file.open(QIODevice::ReadOnly)) {
+        _mtr_file.read(data, 12);
+        for (i = 0; i < 4; i++)
+            par.Array[i] = data[i];
+        Storage.UInt32("DIAG_Motoresurs", par.Value);
+        for (i = 0; i < 4; i++)
+            par.Array[i] = data[i + 4];
+        Storage.UInt32("DIAG_Adiz", par.Value);
+        _Adiz = (float)par.Value / 10;
+        for (i = 0; i < 4; i++)
+            par.Array[i] = data[i + 8];
+        Storage.UInt32("DIAG_Tt", par.Value);
+        _mtr_file.close();
+    }
     return true;
 }
 //--------------------------------------------------------------------------------
@@ -47,10 +83,45 @@ void Processor::Run()
     _reg_thread->start();
     connect(_reg_timer, SIGNAL(timeout()), this, SLOT(RegTimerStep()));
     _reg_timer->start(_registrator->Interval());
+    connect(_diag_timer, SIGNAL(timeout()), this, SLOT(DiagTimerStep()));
+    _diag_timer->start(_diag_interval);
+
+    connect(_fswatcher, SIGNAL(directoryChanged(QString)), this, SLOT(querySaveToUSB(QString)));
+
+    _saver->moveToThread(_saver_thread);
+    connect(this, SIGNAL(SaveFilesSignal()), _saver, SLOT(Save()));
+    _saver_thread->start();
+    _saver->Run();
+    _is_active = true;
+}
+//--------------------------------------------------------------------------------
+void Processor::querySaveToUSB(QString dir) {
+#ifdef Q_OS_WIN
+    SaveFilesSignal(); // (dir)
+#elif Q_OS_UNIX
+    // find flash usb
+#endif
 }
 //--------------------------------------------------------------------------------
 void Processor::Stop() {
+    char data[12];
+    UnionUInt32 par;
+    int i;
+    if (_mtr_file.open(QIODevice::WriteOnly)) {
+        par.Value = Storage.UInt32("DIAG_Motoresurs");
+        for (i = 0; i < 4; i++)
+            data[i] = par.Array[i];
+        par.Value = Storage.UInt32("DIAG_Adiz");
+        for (i = 0; i < 4; i++)
+            data[i + 4] = par.Array[i];
+        par.Value = Storage.UInt32("DIAG_Tt");
+        for (i = 0; i < 4; i++)
+            data[i + 8] = par.Array[i];
+        _mtr_file.write(data, 12);
+        _mtr_file.close();
+    }
     _registrator->Stop();
+    _is_active = false;
 }
 //--------------------------------------------------------------------------------
 void Processor::RegTimerStep() {
@@ -76,6 +147,7 @@ void Processor::RegTimerStep() {
     Storage.SetWordRecord(186, Storage.Int16("DIAG_PKM_BEL"));
     Storage.SetWordRecord(188, Storage.Int16("DIAG_Rplus"));
     Storage.SetWordRecord(190, Storage.Int16("DIAG_Rminus"));
+    Storage.SetWordRecord(198, Storage.Int16("DIAG_Pg"));
     // double word diagnostic
     Storage.SetDoubleWordRecord(206, Storage.UInt32("DIAG_Motoresurs"));
     Storage.SetDoubleWordRecord(210, Storage.UInt32("DIAG_Apol"));
@@ -100,6 +172,25 @@ void Processor::RegTimerStep() {
     Storage.SetByteRecord(350, Storage.Byte("DIAG_Discret_5"));
     Storage.SetByteRecord(351, Storage.Byte("DIAG_Discret_6"));
     AddRecordSignal(Storage.Record());
+}
+//--------------------------------------------------------------------------------
+void Processor::DiagTimerStep() {
+    qint64 currtime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    qint64 diff;
+    int n = Storage.Int16("USTA_N");
+    if (n >= 99) {
+        diff = currtime - _msec;
+        if (diff >= 1000) {
+            _msec = currtime;
+            Storage.UInt32("DIAG_Motoresurs", Storage.UInt32("DIAG_Motoresurs") + 1); // increment motoresurs
+            if (Storage.Byte("USTA_Inputs_2") & 64) { // КВ контроль возбуждения
+                Storage.UInt32("DIAG_Tt", Storage.UInt32("DIAG_Tt") + 1); // increment время работы в тяге
+                _Adiz += (float)Storage.Int16("DIAG_Pg") / 3600;
+                Storage.UInt32("DIAG_Adiz", _Adiz * 10); // полезная работа
+            }
+        }
+    }
+
 }
 //--------------------------------------------------------------------------------
 void Processor::LostConnection(QString alias) {
@@ -139,8 +230,11 @@ void Processor::Unpack(QString alias) {
     Storage.LoadSpData(SerialPorts[alias]);
     // update record registration
     if (alias == "USTA") {
+        // save data
         Storage.UpdateRecord(0, 80, data.mid(0, 80));  // аналоговые
         Storage.UpdateRecord(332, 6, data.mid(80, 6)); // дискретные
+        // diagnostic
+        Storage.Int16("DIAG_Pg", Storage.Float("USTA_Ug_filtr") * Storage.Float("USTA_Ig_filtr") * 0.001); // считаем мощность генератора
     }
     else if (alias == "IT") {
         int index = data[SerialPorts[alias]->InData.Index];
@@ -181,7 +275,7 @@ void Processor::ParseObjects(NodeXML *node)
             ParseSerialPorts(node->Child);
         }
         if (node->Name == "registration") {
-            _registrator->Parse(node);
+            ParseRegistration(node);
             Storage.SetRecordSize(_registrator->RecordSize());
         }
         if (node->Name == "diagnostic") {
@@ -193,6 +287,11 @@ void Processor::ParseObjects(NodeXML *node)
 //--------------------------------------------------------------------------------
 void Processor::ParseDiagnostic(NodeXML *node)
 {
+    for (int i = 0; i < node->Attributes.count(); i++) {
+        AttributeXML *attr = node->Attributes[i];
+        if (attr->Name == "interval")
+            _diag_interval = attr->Value.toInt();
+    }
     if (node->Child != nullptr) {
         node = node->Child;
         while (node != nullptr) {
@@ -200,6 +299,8 @@ void Processor::ParseDiagnostic(NodeXML *node)
                 Parameter *newPar = new Parameter;
                 newPar->Parse(node);
                 Storage.Add(newPar->Variable, newPar->Type);
+            } else if (node->Name == "path") {
+                _mtr_file.setFileName(node->Text);
             }
             node = node->Next;
         }
@@ -216,6 +317,51 @@ void Processor::ParseSerialPorts(NodeXML *node)
         }
         node = node->Next;
     }
+}
+//--------------------------------------------------------------------------------
+void Processor::ParseRegistration(NodeXML* node) {
+    int i;
+    QString path, alias, extention, drive;
+    RegistrationType regtype = RegistrationType::Record;
+    int quantity = 0, recordsize = 0, interval = 0, save_interval = 0;;
+    if (node->Child != nullptr) {
+        node = node->Child;
+        while (node != nullptr) {
+            if (node->Name == "path")
+                path = node->Text;
+            else if (node->Name == "file") {
+                alias = node->Text;
+                for (i = 0; i < node->Attributes.count(); i++) {
+                    AttributeXML *attr = node->Attributes[i];
+                    if (attr->Name == "ext")
+                        extention = attr->Value.toLower();
+                    if (attr->Name == "type")
+                        regtype = (attr->Value.toLower() == "bulk") ? RegistrationType::Bulk : ((attr->Value.toLower() == "archive") ? RegistrationType::Archive : RegistrationType::Record);
+                }
+            }
+            else if (node->Name == "records") {
+                quantity = node->Text.toInt();
+                for (i = 0; i < node->Attributes.count(); i++) {
+                    AttributeXML *attr = node->Attributes[i];
+                    if (attr->Name == "size")
+                        recordsize = attr->Value.toInt();
+                    if (attr->Name == "interval")
+                        interval = attr->Value.toInt();
+                }
+            }
+            else if (node->Name == "save") {
+                drive = node->Text;
+                for (i = 0; i < node->Attributes.count(); i++) {
+                    AttributeXML *attr = node->Attributes[i];
+                    if (attr->Name == "interval")
+                        save_interval = attr->Value.toInt();
+                }
+            }
+            node = node->Next;
+        }
+    }
+    _registrator->SetParameters(path, alias, extention, regtype, quantity, recordsize, interval);
+    _saver->SetParameters(drive, path, save_interval);
 }
 
 //------------------------------------------------------------------------------

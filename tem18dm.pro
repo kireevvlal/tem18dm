@@ -13,6 +13,7 @@ SOURCES += \
         parameter.cpp \
         processor.cpp \
         registrator.cpp \
+        saver.cpp \
         threadserialport.cpp \
         treexml.cpp
 
@@ -82,6 +83,7 @@ HEADERS += \
     parameter.h \
     processor.h \
     registrator.h \
+    saver.h \
     threadserialport.h \
     treexml.h \
     zapuso.h

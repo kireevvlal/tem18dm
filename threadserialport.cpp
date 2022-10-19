@@ -90,9 +90,9 @@ void ThreadSerialPort::Start()
 // Выполняется при старте класса
 void ThreadSerialPort::Process()
 {
-    //qDebug("Hello World in Thread!");
     connect(this, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(HandleError(QSerialPort::SerialPortError))); // подключаем проверку ошибок порта
     connect(this, SIGNAL(readyRead()), this, SLOT(Read()));//подключаем   чтение с порта по сигналу readyRead()
+    connect(&InData, SIGNAL(ReceivePacketSignal()), this, SLOT(ReceivePacket()));//подключаем  обработку по сигналу приема пакета
 }
 //--------------------------------------------------------------------------------
 //проверка ошибок при работе
@@ -139,23 +139,26 @@ void ThreadSerialPort::Write()
 void ThreadSerialPort::Read()
 {
     if (_type_protocol != ProtocolType::Unknown) {
-        if (InData.Decode(readAll())) {
-            if (!_is_exchange) {
-                _is_exchange = true;
-                RestoreExchangeSignal(Alias);
-            }
-            _watchdog = _timer.remainingTime();
-            _counter++;
-            DecodeSignal(Alias);
-            if (_type_exchange == ExchangeType::Slave)
-                Write();
-            _quality = (_quality > 1) ? _quality - 2 : 0;
-        }
+        InData.Decode(readAll());
     } else {
         QByteArray data;
         data.append(readAll());
         ReadSignal(data);
     }
+}
+//--------------------------------------------------------------------------------
+// Чтение данных из порта
+void ThreadSerialPort::ReceivePacket() {
+    if (!_is_exchange) {
+        _is_exchange = true;
+        RestoreExchangeSignal(Alias);
+    }
+    _watchdog = _timer.remainingTime();
+    _counter++;
+    DecodeSignal(Alias);
+    if (_type_exchange == ExchangeType::Slave)
+        Write();
+    _quality = (_quality > 1) ? _quality - 2 : 0;
 }
 //--------------------------------------------------------------------------------
 void ThreadSerialPort::Parse(NodeXML* node) {
@@ -189,6 +192,7 @@ void ThreadSerialPort::Parse(NodeXML* node) {
             node = node->Next;
         }
     }
+    InData.SetProtocol(_type_protocol);
     OutData.SetProtocol(_type_protocol);
 }
 //--------------------------------------------------------------------------------

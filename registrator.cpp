@@ -1,11 +1,11 @@
 #include <QStorageInfo>
-#include "qdatetime.h"
+#include <QDateTime>
 #include "registrator.h"
 
 Registrator::Registrator(QObject *parent) : QObject(parent) {
 #ifdef Q_OS_WIN
     _os = 0;
-#else
+#elif Q_OS_UNIX
     _os = 1;
 #endif
     _path = _extention = _alias = "";
@@ -49,7 +49,11 @@ void  Registrator::AddRecord(QByteArray data) {
     }
 }
 //--------------------------------------------------------------------------------
+// при остановке программы
 void  Registrator::Stop() {
+    // моторесурс
+
+    // файлы регистрации
     switch (_reg_type) {
     case RegistrationType::Record:
         _file.close();
@@ -63,6 +67,25 @@ void  Registrator::Stop() {
     case RegistrationType::Archive:
         break;
     }
+}
+//--------------------------------------------------------------------------------
+void Registrator::SetParameters(QString path, QString alias, QString extention, RegistrationType regtype, int quantity, int recordsize, int interval) {
+    _path = path;
+    _alias = alias;
+    _extention = extention;
+    _reg_type = regtype;
+    if (quantity)
+        _quantity = quantity;
+    if (recordsize)
+        _record_size = recordsize;
+    if (interval)
+        _interval = interval;
+
+    if (_reg_type == RegistrationType::Bulk) {
+        _banks[0].resize(_quantity * _record_size);
+        _banks[1].resize(_quantity * _record_size);
+    }
+    Prepare();
 }
 //--------------------------------------------------------------------------------
 void Registrator::Prepare() {
@@ -79,39 +102,4 @@ void Registrator::Prepare() {
     _file.setFileName(name);
 }
 //--------------------------------------------------------------------------------
-void Registrator::Parse(NodeXML* node) {
-    int i;
-    if (node->Child != nullptr) {
-        node = node->Child;
-        while (node != nullptr) {
-            if (node->Name == "path")
-                _path = node->Text;
-            else if (node->Name == "file") {
-                _alias = node->Text;
-                for (i = 0; i < node->Attributes.count(); i++) {
-                    AttributeXML *attr = node->Attributes[i];
-                    if (attr->Name == "ext")
-                        _extention = attr->Value.toLower();
-                    if (attr->Name == "type")
-                        _reg_type = (attr->Value.toLower() == "bulk") ? RegistrationType::Bulk : ((attr->Value.toLower() == "archive") ? RegistrationType::Archive : RegistrationType::Record);
-                }
-            }
-            else if (node->Name == "records") {
-                _quantity = node->Text.toInt();
-                for (i = 0; i < node->Attributes.count(); i++) {
-                    AttributeXML *attr = node->Attributes[i];
-                    if (attr->Name == "size")
-                        _record_size = attr->Value.toInt();
-                    if (attr->Name == "interval")
-                        _interval = attr->Value.toInt();
-                }
-            }
-            node = node->Next;
-        }
-    }
-    if (_reg_type == RegistrationType::Bulk) {
-        _banks[0].resize(_quantity * _record_size);
-        _banks[1].resize(_quantity * _record_size);
-    }
-    Prepare();
-}
+

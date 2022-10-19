@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QFile>
+#include <QJsonArray>
 #include "treexml.h"
 #include "extratypes.h"
 
@@ -28,7 +29,8 @@ public:
     explicit Registrator(QObject *parent = nullptr);
     void Stop();
     int Interval() { return _interval; }
-    void Parse(NodeXML*);           // разбор ветви дерава XML с параметрами объекта
+    void SetParameters( QString,  QString,  QString, RegistrationType, int, int, int);
+    //void Parse(NodeXML*);           // разбор ветви дерава XML с параметрами объекта
 signals:
 public slots:
     void AddRecord(QByteArray);

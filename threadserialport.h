@@ -64,6 +64,7 @@ private slots:
     void HandleError(QSerialPort::SerialPortError error);//Слот обработки ощибок
     void Read(); //Слот чтения из порта по ReadyRead
     void TimerStep();
+    void ReceivePacket();
 };
 
 #endif // THREADSERIALPORT_H
