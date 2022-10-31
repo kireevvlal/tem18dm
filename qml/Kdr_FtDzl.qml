@@ -270,7 +270,7 @@ Rectangle {
         running: kdr_FootDizel.opacity // при появлении панели - лампочки иницализируем
         onTriggered: {
 
-            var trs = ioBf.getTrevogaDizel();
+            var trs = ioBf.getTrevogaDiesel();
             err.tr1 = trs[0];
             err.tr2 = trs[1];
 

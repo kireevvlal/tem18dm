@@ -13,42 +13,18 @@ Rectangle {
         repeat: true
         running: kdr_Main_small.opacity
         onTriggered: {
-            if (indIg.value + 0.05 > indIg.maximumValue) {
-                indIg.value = 0;
-            } else
-                indIg.value = indIg.value + 0.05;
-            if (indIg.value == 0) {
-                indIg.start = 1.2;
-                indIg.finish = 1.7;
-                indIg.repaint = true;
-            } else if (indIg.value == 1.5) {
-                    indIg.start = 2.8;
-                    indIg.finish = 3;
-                    indIg.repaint = true;
-                }
+            var par = ioBf.getParamKdrSmlMain();
+            indIg.value = Math.round(par[0]) / 1000;
+            indIg.finish = par[4] / 1000;
 
-            if (indUg.value + 10 > indUg.maximumValue) {
-                indUg.value = 0;
-            } else
-                indUg.value = indUg.value + 10;
-            if (indUg.value == 0) {
-                indUg.start = 300;
-                indUg.finish = 600;
-                indUg.repaint = true;
-            } else if (indUg.value == 600) {
-                    indUg.start = 1000;
-                    indUg.finish = 1200;
-                    indUg.repaint = true;
-                }
+            indUg.value = Math.round(par[1]);
+            indUg.finish = par[5];
 
-            stb_Tvd.value++;
-            if (stb_Tvd.value > 110)
-                stb_Tvd.value = 0;
+            stb_Tvd.value = par[2];
+            stb_Tvd.barColor = (par[2] < 10) ? "red" : (par[2] < 45) ? "yellow" : (par[2] < 87) ? "#00d7d7" : "red";
 
-            stb_Tms.value++;
-            if (stb_Tms.value > 130)
-                stb_Tms.value = 0;
-
+            stb_Tms.value = par[3];
+            stb_Tms.barColor = (par[3] < 20) ? "red" : (par[3] < 45) ? "yellow" : (par[3] < 70) ? "#00d7d7" : "red";
 
 //            indT_vd.text =  ioBf.getParamDiap(150);
 //            stb_Tvd.value = indT_vd.text;
@@ -91,8 +67,8 @@ Rectangle {
         maximumValue: 3
         minimumValue: 0
         parameter: "Iг кА"
-        start: 2.5
-        finish: 3
+        start: 0
+        finish: 0
         valuePrecision: 2
     }
 
@@ -105,8 +81,8 @@ Rectangle {
         maximumValue: 1200
         minimumValue: 0
         parameter: "Uг В"
-        start: 300
-        finish: 600
+        start: 0
+        finish: 0
     }
 
 //     PrBar {
@@ -144,8 +120,9 @@ Rectangle {
         height: 200
         parameter: "В"
         name: "Т, С"
-        warningValue: 80
-        errorValue: 90
+//        warningValue: 80
+//        errorValue: 90
+        barColor: "red"
         maxValue: 150
         barWidth: 30
         visibleMinorTickmarks: false
@@ -158,8 +135,8 @@ Rectangle {
         height: 200
         visibleLabels: false
         parameter: "М"
-        warningValue: 95
-        errorValue: 110
+//        warningValue: 95
+//        errorValue: 110
         maxValue: 150
         barWidth: 30
         visibleMinorTickmarks: false

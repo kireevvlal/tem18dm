@@ -5,25 +5,6 @@ Rectangle {
     height: 197
     z: 2147483646
 
-    Timer {
-        triggeredOnStart: true
-
-        interval: 500
-        repeat: true
-        running: kdr_Mot.opacity
-        onTriggered: {
-
-            ind_Fd.value = ioBf.getParamKdrMot()[0]; //ioBf.getParam();
-            ind_MotC.value ++;
-            ind_MotM.value ++;
-            ind_MotS.value ++;
-            ind_TagC.value ++;
-            ind_TagM.value ++;
-            ind_TagS.value ++;
-            ind_Rab.value  ++;
-        }
-
-    }
     Image {
         id: image1
         z: 0
@@ -34,38 +15,47 @@ Rectangle {
         anchors.fill: parent
         source: "../Shem_TEM18DM/kdrMot_lin.png"
 
-        //        TInd {
-        //            id: ind_Fd
-        //            value: "0000"
-        //            x: 448
-        //            y: 130
-        //            width: 82
-        //            height: 31
-        //            color: "black"
-        //            txtSize: 21
-        //            txtColor: "white"
-        //        }
+    }
+
+    Timer {
+        triggeredOnStart: true
+
+        interval: 500
+        repeat: true
+        running: kdr_Mot.opacity
+        onTriggered: {
+            var par = ioBf.getParamKdrMot();
+            ind_MotC.value =Math.round(par[0] / 3600);
+            ind_MotM.value = Math.round((par[0] % 3600) / 60);
+            ind_MotS.value = Math.round(par[0] % 60);
+            ind_TagC.value = Math.round(par[1] / 3600);
+            ind_TagM.value = Math.round((par[1] % 3600) / 60);
+            ind_TagS.value = Math.round(par[1] % 60);
+            ind_Rab.value = Math.round(par[2] * 10) / 10;
+            ind_Fd.value = par[3];
+        }
     }
 
     Text {
         id: text1
-        x: 31
-        y: 8
+        x: 0
+        y: 0
         color: "#f9f8f8"
         text: "МОТОРЕСУРС"
         z: 1
         font.bold: true
         font.pixelSize: 14
     }
-
+    // motoresurs
     Text {
-        id: text2
-        x: 9
-        y: 57
-        color: "#8f8282"
-        text: qsTr("время:")
-        font.bold: true
-        font.pixelSize: 14
+           id: text_motoresurs
+           x: 9
+           y: 55
+           color: "#8f8282"
+           text: qsTr("время:")
+           font.bold: true
+           verticalAlignment: Text.AlignVCenter
+           font.pixelSize: 14
     }
 
     TInd {
@@ -77,104 +67,66 @@ Rectangle {
     }
 
     Text {
-        id: text13
-        x: 457
-        y: 113
-        color: "#080000"
-        text: qsTr("о/м")
-        font.pixelSize: 14
-        font.bold: true
-        styleColor: "#0f0c0c"
-    }
-
-    TInd {
-        id: ind_Fd
-        x: 370
-        y: 106
-        height: 26
-        color: "gray"
-        txtColor: "white"
-        txtSize: 24
-        border.color: "#00000000"
-    }
-
-    Text {
-        id: text12
-        x: 360
-        y: 108
-        color: "#080000"
-        text: qsTr("F")
-        styleColor: "#0f0c0c"
-        font.pixelSize: 14
-        font.bold: true
-    }
-
-    Text {
-        id: text11
-        x: 199
-        y: 125
-        color: "#8f8282"
-        text: qsTr("кВт * ч")
-        font.pixelSize: 14
-        font.bold: true
-    }
-
-    TInd {
-        id: ind_Rab
-        value: "000000000"
-        x: 62
-        y: 122
-        width: 134
-        height: 22
-        txtColor: "white"
-    }
-
-    Text {
-        id: text10
-        x: 9
-        y: 124
-        color: "#8f8282"
-        text: qsTr("работа:")
-        font.pixelSize: 14
-        font.bold: true
-    }
-
-    TInd {
-        id: ind_TagS
-        value: "00"
-        x: 250
-        y: 91
-        width: 65
-        height: 22
-    }
-
-    TInd {
-        id: ind_TagM
-        value: "00"
-        x: 161
-        y: 89
-        width: 65
-        height: 22
-    }
-
-    Text {
-        id: text9
-        x: 316
-        y: 92
-        color: "#8f8282"
-        text: qsTr("с")
-        font.pixelSize: 14
-        font.bold: true
-    }
-
-    Text {
-        id: text7
+        id: text_MotC
         x: 147
-        y: 91
+        y: 55
         color: "#8f8282"
         text: qsTr("ч")
-        font.pixelSize: 14
+        font.pixelSize: 16
         font.bold: true
+        verticalAlignment: Text.AlignVCenter
+    }
+
+    TInd {
+        id: ind_MotM
+        value: "00"
+        x: 156
+        y: 55
+        width: 40
+        height: 22
+    }
+
+    Text {
+        id: text_MotM
+        x: 200
+        y: 55
+        color: "#8f8282"
+        text: qsTr("м")
+        font.bold: true
+        verticalAlignment: Text.AlignVCenter
+        font.pixelSize: 16
+    }
+
+    TInd {
+        id: ind_MotS
+        value: "00"
+        x: 216
+        y: 55
+        width: 40
+        height: 22
+    }
+
+    Text {
+        id: text_MotS
+        x: 260
+        y: 55
+        color: "#8f8282"
+        text: qsTr("с")
+        font.pixelSize: 16
+        font.bold: true
+        verticalAlignment: Text.AlignVCenter
+    }
+
+    // Tyaga
+    Text {
+        id: text_Tyaga
+        x: 9
+        y: 89
+        color: "#8f8282"
+        text: qsTr("в тяге:")
+        font.pixelSize: 16
+        font.bold: true
+        verticalAlignment: Text.AlignVCenter
     }
 
     TInd {
@@ -184,73 +136,122 @@ Rectangle {
         value: "000000000"
 
     }
-
     Text {
-        id: text6
-        x: 9
-        y: 91
-        color: "#8f8282"
-        text: qsTr("в тяге:")
-        font.pixelSize: 14
-        font.bold: true
-    }
-
-    TInd {
-        id: ind_MotS
-        value: "00"
-        x: 248
-        y: 55
-        width: 65
-        height: 22
-    }
-
-    TInd {
-        id: ind_MotM
-        value: "00"
-        x: 161
-        y: 55
-        width: 65
-        height: 22
-    }
-
-    Text {
-        id: text5
-        x: 315
-        y: 57
-        color: "#8f8282"
-        text: qsTr("с")
-        font.pixelSize: 14
-        font.bold: true
-    }
-
-    Text {
-        id: text3
+        id: text_TagC
         x: 147
-        y: 57
+        y: 89
         color: "#8f8282"
         text: qsTr("ч")
-        font.pixelSize: 14
+        font.pixelSize: 16
         font.bold: true
+        verticalAlignment: Text.AlignVCenter
+    }
+
+    TInd {
+        id: ind_TagM
+        value: "00"
+        x: 156
+        y: 89
+        width: 40
+        height: 22
     }
 
     Text {
-        id: text4
-        x: 231
-        y: 57
+        id: text_TagM
+        x: 200
+        y: 89
         color: "#8f8282"
         text: qsTr("м")
         font.bold: true
-        font.pixelSize: 14
+        verticalAlignment: Text.AlignVCenter
+        font.pixelSize: 16
+    }
+
+    TInd {
+        id: ind_TagS
+        value: "00"
+        x: 216
+        y: 89
+        width: 40
+        height: 22
     }
 
     Text {
-        id: text8
-        x: 231
-        y: 91
+        id: text_TagS
+        x: 260
+        y: 89
         color: "#8f8282"
-        text: qsTr("м")
+        text: qsTr("с")
+        font.pixelSize: 16
         font.bold: true
-        font.pixelSize: 14
+        verticalAlignment: Text.AlignVCenter
+    }
+
+    // rabota
+    Text {
+        id: text_rabota
+        x: 9
+        y: 124
+        color: "#8f8282"
+        text: qsTr("работа:")
+        font.pixelSize: 16
+        font.bold: true
+        verticalAlignment: Text.AlignVCenter
+    }
+
+    TInd {
+        id: ind_Rab
+        value: "000000000"
+        x: 65
+        y: 124
+        width: 130
+        height: 22
+        txtColor: "white"
+    }
+
+    Text {
+        id: text_Rab_kWtC
+        x: 199
+        y: 124
+        color: "#8f8282"
+        text: qsTr("кВт * ч")
+        font.pixelSize: 16
+        font.bold: true
+        verticalAlignment: Text.AlignVCenter
+    }
+
+    // Fd
+    Text {
+        id: text_Fd
+        x: 360
+        y: 108
+        color: "#080000"
+        text: qsTr("F")
+        styleColor: "#0f0c0c"
+        font.pixelSize: 16
+        font.bold: true
+    }
+
+    TInd {
+        id: ind_Fd
+        x: 370
+        y: 108
+        height: 26
+        color: "gray"
+        txtColor: "white"
+        txtSize: 24
+        border.color: "#00000000"
+    }
+
+    Text {
+        id: text_obm
+        x: 457
+        y: 108
+        color: "#080000"
+        text: qsTr("о/м")
+        font.pixelSize: 16
+        font.bold: true
+        styleColor: "#0f0c0c"
     }
 }
 

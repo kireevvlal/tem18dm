@@ -5,7 +5,7 @@ Rectangle {
     height: 100
     color: "#aca6a6"                  // фон
     radius: 1
-    border.color: "#00000000"
+    border.color: "#404040"
     border.width: 0
     property  int value: 800
     property int val_max: 800

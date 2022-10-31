@@ -10,22 +10,26 @@ Rectangle {
         repeat: true
         running: kdr_Svz.opacity
         onTriggered: {
+            var params = ioBf.getParamKdrSvz();
 
-            ind_Ubs.value = ioBf.getParamKdrSvz()[0]; //ioBf.getParam();
-            led_c1.visible = ! led_c1.visible;
-            led_c2.visible = ! led_c1.visible;
-            led_c5.visible = ! led_c2.visible;
-            led_c4.visible = ! led_c5.visible;
-            led_c6.visible = ! led_c4.visible;
-            led_ASK.visible = ! led_c4.visible;
-            led_BSO.visible = ! led_c4.visible;
-            led_Tii.visible = ! led_BSO.visible;
-            led_UST.visible = ! led_BEL.visible;
-            led_BEL.visible = ! led_BEL.visible;
-
-
-
-
+            ind_Ubs.value = Math.round(params[0] * 10) / 10;
+            led_c1.visible = params[1] & 16; // АСК
+            led_c2.visible = params[1] & 1; // БЭЛ
+            led_c4.visible = params[1] & 4; // ТИ
+            led_c5.visible = params[1] & 2; // УСТА
+            led_c6.visible = params[1] & 8; // МСС
+            led_ASK.visible = params[2] & 16;
+            led_BSO.visible = params[2] & 32;
+            led_Tii.visible = params[2] & 4;
+            led_UST.visible = params[2] & 2;
+            led_BEL.visible = params[2] & 1;
+            led_MSS.visible = params[2] & 8;
+            oSKZ.value = params[3];
+            oASK.value = params[4];
+            oBSO.value = params[5];
+            oTii.value = params[6];
+            oUST.value = params[7];
+            oBEL.value = params[8];
         }
     }
 
@@ -204,7 +208,7 @@ Rectangle {
     }
 
     LedIndicator {
-        id: led_ASK1
+        id: led_MSS
         x: 290
         y: 75
         width: 14

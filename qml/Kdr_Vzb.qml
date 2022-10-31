@@ -12,15 +12,14 @@ Rectangle {
         running: kdr_Vzb.opacity
         onTriggered: {
             var par = ioBf.getParamKdrVzb();
-            ind_Ivz.value = par[0];
+            ind_Ig.value = par[0];
             ind_Ug.value = par[1];
-            ind_Ig.value = par[2];
+            ind_Ivz.value = par[2];
             ind_Sh1.value = par[3];
-//            ind_Ivz.value = ioBf.getParam();
-//            ind_Ug.value = ioBf.getParam();
-//            ind_Ig.value = ioBf.getParam();
-//            ind_Sh1.value = ioBf.getParam();
-            k_KV.visible = ! k_KV.visible;
+
+            k_KV.visible = par[4] & 1;
+            tVz.visible = xVz.visible = par[4] & 2;
+            tG.visible = xtG.visible = par[4] & 4;
         }
 
     }
@@ -36,8 +35,8 @@ Rectangle {
 
         Text {
             id: text1
-            x: 14
-            y: 8
+            x: 8
+            y: 0
             color: "#f9f8f8"
             text: qsTr("ВОЗБУЖДЕНИЕ")
             font.bold: true
@@ -106,6 +105,24 @@ Rectangle {
             color: "#00000000"
             border.width: 1
             border.color: "#f92525"
+        }
+        Text {
+            id: xVz
+            x: 0
+            y: 26
+            color: "yellow"
+            text: qsTr("Неисправна система возбуждения (ШИМ 1)")
+            font.bold: true
+            font.pixelSize: 12
+        }
+        Text {
+            id: xtG
+            x: 284
+            y: 96
+            color: "yellow"
+            text: qsTr("Неисправен генератор")
+            font.bold: true
+            font.pixelSize: 12
         }
     }
 }

@@ -15,7 +15,11 @@ Window {
 //    z: 100
 //    focus: true
     property int cnt: 0;
+    property int current_section: 0; // 1 - own, 2 - extra
+    property int current_system: 0; // 0 - not 1 - diesel, 2 - electro, 3 - links
+    property int current_subsystem: 0; // 0 - not
 
+//    signal setKdr(kdr: int);
 
     Timer {
         triggeredOnStart: true
@@ -29,44 +33,41 @@ Window {
         onTriggered: {
             cnt ++;
             var par = ioBf.getParamMain();
-            txt_time.text = par[0][0]; //ioBf.tm();
-            txt_data.text = par[0][1]; //ioBf.dt();
+//            if (indPt.value + 0.1 > indPt.maximumValue) {
+//                indPt.value = 0;
+//            }
+//            else
+//                indPt.value  = indPt.value + 0.1;
 
-            if (indPt.value + 0.1 > indPt.maximumValue) {
-                indPt.value = 0;
-            }
-            else
-                indPt.value  = indPt.value + 0.1;
+//            if (indPm.value + 0.1 > indPm.maximumValue) {
+//                indPm.value = 0;
+//            }
+//            else
+//                indPm.value  = indPm.value + 0.1;
 
-            if (indPm.value + 0.1 > indPm.maximumValue) {
-                indPm.value = 0;
-            }
-            else
-                indPm.value  = indPm.value + 0.1;
+//            if (indFd.value + 50 > indFd.maximumValue) {
+//                indFd.value = 0;
+//            } else
+//                indFd.value  =  indFd.value + 50;
 
-            if (indFd.value + 50 > indFd.maximumValue) {
-                indFd.value = 0;
-            } else
-                indFd.value  =  indFd.value + 50;
+            revers.value = par[0][0]; //ioBf.getReversor();// реверсор
+            pkm.pkms = par[0][1]; //ioBf.getPKM();         // позиция
+            regim.value = par[0][2]; //ioBf.getRegim();    // режим работы тепловоза
 
-            revers.value = par[1][0]; //ioBf.getReversor();// реверсор
-            pkm.pkms = par[1][1]; //ioBf.getPKM();         // позиция
-            regim.value = par[1][2]; //ioBf.getRegim();    // режим работы тепловоза
+//            txt_RejPro.text = par[1][0]; //ioBf.getRejPro(); // прожиг
+//            txt_RejAP.text = par[1][1]; //ioBf.getRejAP(); // автопрогрев
 
-            txt_RejPro.text = par[2][0]; //ioBf.getRejPro(); // прожиг
-            txt_RejAP.text = par[2][1]; //ioBf.getRejAP(); // автопрогрев
-
-            txt_RejPrTime.text = par[3][0]; //ioBf.getRejPrT("value");// --- косяк с разными значениями --че делать то?
-            if (/*ioBf.getRejPrT("tm")*/ par[3][1] == "2") { txt_RejPrTime.color = "yellow" ;} else  txt_RejPrTime.color = "gray";
-            if (/*ioBf.getRejPrT("ms")*/ par[3][2] == "1") { txt_RejPrT.opacity = 1;} else {txt_RejPrT.opacity = 0;}
+//            txt_RejPrTime.text = par[2][0]; //ioBf.getRejPrT("value");// --- косяк с разными значениями --че делать то?
+//            if (/*ioBf.getRejPrT("tm")*/ par[2][1] == "2") { txt_RejPrTime.color = "yellow" ;} else  txt_RejPrTime.color = "gray";
+//            if (/*ioBf.getRejPrT("ms")*/ par[2][2] == "1") { txt_RejPrT.opacity = 1;} else {txt_RejPrT.opacity = 0;}
 
             // индикация регистрации
             //img_z0.visible = ! img_z0.visible;
             //img_ind_f.visible = ! img_ind_f.visible;
 
-            prBar1.value = par[4][0]; //ioBf.getParamDiap(100);// заглушка
+            prBar1.value = par[3][0]; //ioBf.getParamDiap(100);// заглушка
 
-            pr_Mtg1.value = par[4][1]; //ioBf.getParamDiap(1500);// заглушка
+            pr_Mtg1.value = par[3][1]; //ioBf.getParamDiap(1500);// заглушка
             pr_Mtg2.value = 1500;// ioBf.getParamDiap(1500); // заглушка
 
                 img_in2BX.opacity = ! img_in2BX.opacity;// заглушка
@@ -75,11 +76,11 @@ if (cnt==1 ) {  in1OM.opacity = ! in1OM.opacity}; // отключатель мо
 if (cnt==3 ) {  in1RZ.opacity = ! in1RZ.opacity}; // реле земли
 if (cnt==4 ) {  in1OT.opacity = ! in1OT.opacity}; // обрыв тормозной магистрали
 
-            indUb0.text = par[4][2]; //ioBf.getParamDiap(100);// заглушка
-            indUb1.text = par[4][3]; //ioBf.getParamDiap(100);// заглушка
+            indUb0.text = par[3][2]; //ioBf.getParamDiap(100);// заглушка
+            indUb1.text = par[3][3]; //ioBf.getParamDiap(100);// заглушка
 
-            indIz0.text = par[4][4]; //ioBf.getParamDiap(60);// заглушка
-            indIz1.text = par[4][5]; //ioBf.getParamDiap(60);// заглушка
+            indIz0.text = par[3][4]; //ioBf.getParamDiap(60);// заглушка
+            indIz1.text = par[3][5]; //ioBf.getParamDiap(60);// заглушка
 
 if  (cnt>6 ) { cnt = 0};
        }
@@ -107,16 +108,6 @@ if  (cnt>6 ) { cnt = 0};
         y: 88
         height: 25
         value: 1
-    }
-
-    Text {
-        id: text2
-        x: 285
-        y: 6
-        color: "#d2e8fb"
-        text: qsTr("ТЭМ18ДМ  №___")
-        font.bold: true
-        font.pointSize: 13
     }
 
     Kdr_Ted {
@@ -184,46 +175,11 @@ if  (cnt>6 ) { cnt = 0};
         z: 5
     }
 
-    ExtCircularGauge {
-        id: indPt
+    Kdr_Top {
+        id: kdr_Top
         x: 128
-        y: 74
-        width: 150
-        height: 150
-        maximumValue: 1.2
-        minimumValue: 0
-        parameter: "Рт МПа"
-        start: 0.9
-        finish: 1.2
-        valuePrecision: 2
-        labelPrecision: 1
-    }
+        y: 0
 
-    ExtCircularGauge {
-        id: indPm
-        x: 292
-        y: 74
-        width: 150
-        height: 150
-        maximumValue: 1.2
-        minimumValue: 0
-        parameter: "Рм МПа"
-        start: 0.9
-        finish: 1.2
-        valuePrecision: 2
-        labelPrecision: 1
-    }
-    ExtCircularGauge {
-        id: indFd
-        x: 458
-        y: 54
-        width: 170
-        height: 170
-        maximumValue: 900
-        minimumValue: 0
-        parameter: "F об/мин"
-        start: 600
-        finish: 750
     }
 
     Kdr_Masl {
@@ -266,27 +222,6 @@ if  (cnt>6 ) { cnt = 0};
         x: 128
         y: 219
         z: 15
-    }
-
-    Text {
-        id: txt_time
-        x: 566
-        y: 8
-        color: "#d2e8fb"
-        text: qsTr("время")
-        horizontalAlignment: Text.AlignRight
-        font.pointSize: 13
-        font.bold: true
-    }
-
-    Text {
-        id: txt_data
-        x:  566
-        y: 25
-        color: "#d2e8fb"
-        text: qsTr("дата")
-        font.pointSize: 13
-        font.bold: true
     }
 
     Kdr_AvProgrev {
@@ -431,14 +366,19 @@ if  (cnt>6 ) { cnt = 0};
             focus: true
 
             onSwitchFootDizel:  { // переход на дизельное меню
-                       kdr_FootDizel.opacity = 1;
-                       kdr_FootDizel.focus = true;
-                      }
+                kdr_FootDizel.opacity = 1;
+                kdr_FootDizel.focus = true;
+                setSystem(1);
+            }
 
             onSwitchFootElektr:  { // переход на электрическое меню
                        kdr_FootElektrooborud.opacity = 1;
                        kdr_FootElektrooborud.focus = true;
+                setSystem(2);
                       }
+            onSwitchSection: function(section) {
+                setSection(section);
+            }
 
             onKnopaS: { showKdr_Nastroiki();
                      //   if (kdr_Main.color == "steelblue" ) { kdr_Main.color = "red";} // условие не читается
@@ -446,10 +386,16 @@ if  (cnt>6 ) { cnt = 0};
                                                } // сигнал о нажатии клавиши ДМ "S"  /alt+b
             onKnopai: { showKdr_ArhivMessage();} // сигнал о нажатии клавиши ДМ "i"  /alt+c
             onKnopaSt:{ showKdr_Reostat();     } // сигнал о нажатии клавиши ДМ "St" /alt+d
-            onKnopaUD:{ showKdr_Svazi();       } // сигнал о нажатии клавиши ДМ "UD" /alt+i
+            onKnopaUD: { // сигнал о нажатии клавиши ДМ "UD" /alt+i
+                showKdr_Svazi();
+                setSystem(3);
+            }
             onSaveToUSB: { ioBf.querySaveToUSB("G:/"); }  // сигнал о необходимости записи на USB (для отработки под Windows)
 
-            onSwitchFoot_Exit: { go_Exit(); } // в начальное состояние
+            onSwitchFoot_Exit: {  // в начальное состояние
+                go_Exit();
+                setSystem(0);
+            }
         }
 
 
@@ -463,11 +409,30 @@ if  (cnt>6 ) { cnt = 0};
             z: 33
             focus: false
 
-            onSwitchDzl_Cilindr: {opastyNul(); kdr_Dizl.opacity = 1;} // цилиндры
-            onSwitchDzl_Maslo:   {opastyNul(); kdr_Masl.opacity = 1;}
-            onSwitchDzl_Toplivo: {opastyNul(); kdr_Toplivo.opacity = 1;}
-            onSwitchDzl_Holod:   {opastyNul(); kdr_Ohl.opacity = 1;}
-            onSwitchDzl_Exit:    { go_Exit();  }// возврат на главный экран
+            onSwitchDzl_Cilindr: {
+                opastyNul();
+                kdr_Dizl.opacity = 1;
+                setSubsystem(6);
+            } // цилиндры
+            onSwitchDzl_Maslo:   {
+                opastyNul();
+                kdr_Masl.opacity = 1;
+                setSubsystem(7);
+            }
+            onSwitchDzl_Toplivo: {
+                opastyNul();
+                kdr_Toplivo.opacity = 1;
+                setSubsystem(8);
+            }
+            onSwitchDzl_Holod:   {
+                opastyNul();
+                kdr_Ohl.opacity = 1;
+                setSubsystem(9);
+            }
+            onSwitchDzl_Exit:    {
+                go_Exit();
+                setSubsystem(0);
+            }// возврат на главный экран
             onKnopaS: { showKdr_Nastroiki();   } // сигнал о нажатии клавиши ДМ "S"  /alt+b
             onKnopai: { showKdr_ArhivMessage();} // сигнал о нажатии клавиши ДМ "i"  /alt+c
             onKnopaSt:{ showKdr_Reostat();     } // сигнал о нажатии клавиши ДМ "St" /alt+d
@@ -484,11 +449,30 @@ if  (cnt>6 ) { cnt = 0};
             z: 34
             focus: false
 
-            onSwitchEl_Bortovay:    {opastyNul(); kdr_Bos.opacity = 1;}    // бортовая сеть
-            onSwitchEl_Vozbugdenie: {opastyNul(); kdr_Vzb.opacity = 1;}    // система возбуждения
-            onSwitchEl_Tagovie:     {opastyNul(); kdr_TED.opacity = 1;}    // тяговые двигатели
-            onSwitchEl_Motores:     {opastyNul(); kdr_Mot.opacity = 1;}    // моторесурс
-            onSwitchEl_Exit: { go_Exit();      }
+            onSwitchEl_Bortovay:    {
+                opastyNul();
+                kdr_Bos.opacity = 1;
+                setSubsystem(6);
+            }    // бортовая сеть
+            onSwitchEl_Vozbugdenie: {
+                opastyNul();
+                kdr_Vzb.opacity = 1;
+                setSubsystem(7);
+            }    // система возбуждения
+            onSwitchEl_Tagovie:     {
+                opastyNul();
+                kdr_TED.opacity = 1;
+                setSubsystem(8);
+            }    // тяговые двигатели
+            onSwitchEl_Motores:     {
+                opastyNul();
+                kdr_Mot.opacity = 1;
+                setSubsystem(9);
+            }    // моторесурс
+            onSwitchEl_Exit: {
+                go_Exit();
+                setSubsystem(0);
+            }
             onKnopaS: { showKdr_Nastroiki();   } // сигнал о нажатии клавиши ДМ "S"  /alt+b
             onKnopai: { showKdr_ArhivMessage();} // сигнал о нажатии клавиши ДМ "i"  /alt+c
             onKnopaSt:{ showKdr_Reostat();     } // сигнал о нажатии клавиши ДМ "St" /alt+d
@@ -630,35 +614,6 @@ if  (cnt>6 ) { cnt = 0};
 
         }
 
-        Text {
-            id: txt_RejPrT
-            x: 142
-            y: 27
-            color: "#f0f026"
-            text: qsTr("Длительный х.ход! Установи 8ПКМ на 10 минут")
-            font.pointSize: 10
-            font.bold: true
-        }
-
-        Text {
-            id: txt_RejAP
-            x: 142
-            y: 43
-            color: "#f0f026"
-            text: qsTr("Режим автопрогрева")
-            font.pointSize: 10
-            font.bold: true
-        }
-
-        Text {
-            id: txt_RejPro
-            x: 142
-            y: 59
-            color: "#f0f026"
-            text: qsTr("Прожиг коллектора")
-            font.pointSize: 10
-            font.bold: true
-        }
 
         Text {
             id: txt_RejPrTime
@@ -667,6 +622,7 @@ if  (cnt>6 ) { cnt = 0};
             width: 80
             color: "#6e6e63"
             text: qsTr("00:00:00")
+            font.family: "Segoe UI Black"
             clip: true
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
@@ -807,23 +763,6 @@ if  (cnt>6 ) { cnt = 0};
             source: "Pictogram/ind_box.png"
         }
 
-//     PrBar{ //   PrBar {
-//            id: pr_Mtg1
-//            x: 34
-//            y: 242
-//            width: 27
-//            height: 170
-//            color: "#000000"
-//            radius: 0
-//            val_max: 1500
-//            opacity: 1
-//            color1: "#4682b4" // #f32b2b"
-//            color2: "#b0e0e6"
-//            kind: 0
-//            value: 1500
-//            txtvzbl: true
-//        }
-
         ExtBeads {
             id: pr_Mtg1
             x: 34
@@ -836,21 +775,6 @@ if  (cnt>6 ) { cnt = 0};
             maxvalue: 1500
         }
 
-//      PrBar{ //   PrBar {
-//            id: pr_Mtg2
-//            x: 98
-//            y: 242
-//            width: 27
-//            height: 170
-//            color: "#000000"
-//            radius: 0
-//            val_max: 1500
-//            value: 1500
-//            color2: "#b0e0e6"
-//            color1: "#4682b4"
-//            kind: 0
-//            txtvzbl: true
-//      }
         ExtBeads {
             id: pr_Mtg2
             x: 98
@@ -1164,4 +1088,18 @@ if  (cnt>6 ) { cnt = 0};
             kdr_Main.focus = true;
 
     }
+        function setSection(section) {
+            current_section = section;
+            ioBf.changeKdr(current_section * 100 + current_system * 10 + current_subsystem)
+        }
+
+        function setSystem(system) {
+            current_system = system;
+            ioBf.changeKdr(current_section * 100 + current_system * 10 + current_subsystem)
+        }
+
+        function setSubsystem(subsystem) {
+            current_subsystem = subsystem;
+            ioBf.changeKdr(current_section * 100 + current_system * 10 + current_subsystem)
+        }
 }

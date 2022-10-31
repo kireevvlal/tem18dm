@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QDebug>
 #include <QIcon>
+#include <QFont>
 #include <signal.h>
 #include "processor.h"
 
@@ -42,6 +43,7 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
+
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
         if (!obj && url == objUrl)
@@ -61,5 +63,8 @@ int main(int argc, char *argv[])
     signal(SIGQUIT, handleSignals);
 #endif
     signal(SIGINT, handleSignals);
+    QFont fon("Arial");
+
+    app.setFont(fon);
     return app.exec();
 }

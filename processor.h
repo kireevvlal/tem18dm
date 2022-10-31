@@ -9,15 +9,7 @@
 #include "datastore.h"
 #include "registrator.h"
 #include "saver.h"
-
-#define nobit0 0xfe
-#define nobit1 0xfd
-#define nobit2 0xfb
-#define nobit3 0xf7
-#define nobit4 0xef
-#define nobit5 0xdf
-#define nobit6 0xbf
-#define nobit7 0x7f
+#include "control.h"
 
 class Processor : public QObject
 {
@@ -41,6 +33,7 @@ private:
     QString _start_path;
     QStringList _files;
     TreeXML _tree;
+    Control* _control;
     QFileSystemWatcher *_fswatcher;
     QJsonArray RejPrT();
     void Parse(NodeXML*);
@@ -58,7 +51,7 @@ public:
     void Run();
     void Stop();
 signals:
-    void AddRecordSignal(QByteArray);
+    void AddRecordSignal();
     void SaveFilesSignal();
 private slots:
     void RegTimerStep();
@@ -68,11 +61,14 @@ public slots:
     void LostConnection(QString);
     void RestoreConnection(QString);
     void querySaveToUSB(QString);
+    void changeKdr(int);
     // New:
     QJsonArray getTrevogaTotal();
     QJsonArray getTrevogaDiesel();
     QJsonArray getTrevogaElectr();
+    QJsonArray getParamKdrBos();
     QJsonArray getParamKdrVzb();
+    QJsonArray getParamKdrTed();
     QJsonArray getParamKdrTpl();
     QJsonArray getParamKdrSvz();
     QJsonArray getParamKdrReo();
@@ -80,8 +76,9 @@ public slots:
     QJsonArray getParamKdrMot();
     QJsonArray getParamKdrMasl();
     QJsonArray getParamKdrDizl();
-    QJsonArray getParamKdrBos();
     QJsonArray getParamKdrAvProgrev();
+    QJsonArray getParamKdrSmlMain();
+    QJsonArray getParamKdrTop();
     QJsonArray getParamMain();
     QStringList getStructAnlg(int);
     QStringList getStructDiskr(int);
@@ -98,7 +95,7 @@ public slots:
 //    QString getRejPrT(QString param);
 
 //    QString getParam();
-//    QString getParamDiap(int diapazon);
+    QString getParamDiap(int diapazon);
 //    QString getParamExt(int ext);
 //    QString tm();
 //    QString dt();

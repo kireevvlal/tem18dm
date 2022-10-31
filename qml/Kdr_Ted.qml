@@ -13,27 +13,22 @@ Rectangle {
         repeat: true
         running: kdr_TED.opacity
         onTriggered: {
-            // ind_Ig.value ++;
-            ind_Itd1.value = ioBf.getParam();
-            ind_Itd2.value = ioBf.getParam();;
-            k_KT1.visible = ! k_KT1.visible;
-            k_KT2.visible = ! k_KT2.visible;
-            k_P1.visible = ! k_P1.visible;
-            k_P2.visible = ! k_P2.visible;
-            ind_Ig.value = ind_Itd2.value;
-
-            k_KVT1.visible = !  k_KVT1.visible
-            k_KVT2.visible = !  k_KVT2.visible
+            var par = ioBf.getParamKdrTed();
+            ind_Ig.value = par[0];
+            ind_Itd1.value = par[1];
+            ind_Itd2.value = par[2];
+            k_KT1.visible = k_KT2.visible = k_KVT1.visible = k_KVT2.visible = par[3] & 1;
+            k_P1.visible = par[3] & 2;
+            k_P2.visible = par[3] & 4;
         }
-
     }
 
     Image {
         id: image1
-        anchors.rightMargin: 0
-        anchors.bottomMargin: 0
-        anchors.leftMargin: 0
-        anchors.topMargin: 0
+//        anchors.rightMargin: 0
+//        anchors.bottomMargin: 0
+//        anchors.leftMargin: 0
+//        anchors.topMargin: 0
         anchors.fill: parent
         source: "../Shem_TEM18DM/kdrTed_lin.png"
 
@@ -63,12 +58,13 @@ Rectangle {
 
         Text {
             id: name_kdr_Ted
-            x: 8
+            x: 0
+            y: 0
             color: "#f9f8f8"
             text: qsTr("ТЯГОВЫЕ ДВИГАТЕЛИ")
             transformOrigin: Item.Center
             anchors.top: parent.top
-            anchors.topMargin: 8
+            anchors.topMargin: 0
             font.bold: true
             font.pixelSize: 14
         }

@@ -98,5 +98,6 @@
         <file>qml/ExtBeadItem.qml</file>
         <file>qml/ExtBeads.qml</file>
         <file>Locomotive.ico</file>
+        <file>qml/Kdr_Top.qml</file>
     </qresource>
 </RCC>

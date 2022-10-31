@@ -15,8 +15,9 @@ Item {
     property int barWidth: 24               // ширина цветового индикатора
     property int minValue: 0                // минимальное значение
     property int maxValue: 150              // максимальное значение
-    property int warningValue: maxValue + 1               // граница, при превышении которой цвет становится warning (желтый)
-    property int errorValue: maxValue + 1                  // граница, при превышении которой цвет становится error (красный)
+    property string barColor: "lightblue"
+//    property int warningValue: maxValue + 1               // граница, при превышении которой цвет становится warning (желтый)
+//    property int errorValue: maxValue + 1                  // граница, при превышении которой цвет становится error (красный)
     onValueChanged: {
         gauge.value = value;
     }
@@ -51,7 +52,7 @@ Item {
         horizontalAlignment: Text.AlignHCenter
         font.pixelSize: 14
         //font.bold: true
-        color: isHeader ? (value > errorValue ? "red" : (value > warningValue ? "yellow" : "lightblue")) : "blue"
+        color: "#00d7d7" //isHeader ? (value > errorValue ? "red" : (value > warningValue ? "yellow" : "lightblue")) : "blue"
         text: gauge.value
     }
 
@@ -71,7 +72,7 @@ Item {
             id: gstyle
 
             valueBar: Rectangle {
-                color: value > errorValue ? ("red") : (value > warningValue ? "yellow" : "lightblue")
+                color: barColor //value > errorValue ? ("red") : (value > warningValue ? "yellow" : "lightblue")
                 implicitWidth: barWidth
             }
 

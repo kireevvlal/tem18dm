@@ -17,7 +17,8 @@ Registrator::Registrator(QObject *parent) : QObject(parent) {
     _reg_type = RegistrationType::Record;
 }
 //--------------------------------------------------------------------------------
-void  Registrator::AddRecord(QByteArray data) {
+void  Registrator::AddRecord() {
+    QByteArray data = _record;
     switch (_reg_type) {
     case RegistrationType::Record:
         if (!_counter)
@@ -78,6 +79,8 @@ void Registrator::SetParameters(QString path, QString alias, QString extention, 
         _quantity = quantity;
     if (recordsize)
         _record_size = recordsize;
+    _record.resize(_record_size);
+    _record.fill('\0');
     if (interval)
         _interval = interval;
 
@@ -102,4 +105,39 @@ void Registrator::Prepare() {
     _file.setFileName(name);
 }
 //--------------------------------------------------------------------------------
-
+bool Registrator::UpdateRecord(uint position, uint length, QByteArray buffer) {
+    if (position + length > _record.length())
+        return false;
+    _record.replace(position, length, buffer);
+//    qDebug() << QString::number(position) + " "  + QString::number(length) + " " + QString::number(_record.length());
+    return true;
+}
+//--------------------------------------------------------------------------------
+bool Registrator::SetByteRecord(uint position, quint8 value) {
+    if (position > _record.length())
+        return false;
+    _record[position] = value;
+    return true;
+}
+//--------------------------------------------------------------------------------
+bool Registrator::SetWordRecord(uint position, quint16 value) {
+    UnionUInt16 un;
+    if (position + 1 > _record.length())
+        return false;
+    un.Value = value;
+    _record[position] = un.Array[0];
+    _record[position + 1] = un.Array[1];
+    return true;
+}
+//--------------------------------------------------------------------------------
+bool Registrator::SetDoubleWordRecord(uint position, quint32 value) {
+    UnionUInt32 un;
+    if (position + 3 > _record.length())
+        return false;
+    un.Value = value;
+    _record[position] = un.Array[0];
+    _record[position + 1] = un.Array[1];
+    _record[position + 2] = un.Array[2];
+    _record[position + 3] = un.Array[3];
+    return true;
+}

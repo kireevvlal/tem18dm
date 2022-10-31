@@ -12,11 +12,12 @@ Rectangle {
     property string cltxtSelect:"#1bb7e4"; // цвет текста нажатой кнопки
     property string cltxt:"white";         // штатный цвет текста всех кнопок
 
-    property int idDisp:0;  // номер нажатой клавиши - может привязать номер секции
+    //property int idDisp:0;  // номер нажатой клавиши - может привязать номер секции
 
     signal switchFootDizel();  // переход на меню ДИЗЕЛЬ
     signal switchFootElektr(); // переход на меню ЭЛЕКТРООБОРУДОВАНИЕ
     signal switchFoot_Exit();    // переход в начало
+    signal switchSection(section: int);
 
     signal knopaS();  // сигнал о нажатии клавиши ДМ "S"
     signal knopai();  // сигнал о нажатии клавиши ДМ "i"
@@ -49,7 +50,8 @@ Rectangle {
             txt_1.color =cltxtSelect;
             txt_2.color = cltxt;
 
-            idDisp = 1;  // ?? надо подать сигнал о смене секций, а может и не надо?
+            //idDisp = 1;  // ?? надо подать сигнал о смене секций, а может и не надо?
+            switchSection(1);
             break;
         }
         case Qt.Key_2:
@@ -62,7 +64,8 @@ Rectangle {
             txt_2.color = cltxtSelect;
             txt_1.color = cltxt;
 
-            idDisp = 2;  // ?? надо подать сигнал о смене секций, а может и не надо?
+            //idDisp = 2;  // ?? надо подать сигнал о смене секций, а может и не надо?
+            switchSection(2);
             break;
         }
         case Qt.Key_3:

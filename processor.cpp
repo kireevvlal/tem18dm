@@ -4,6 +4,8 @@
 #include <QTime>
 #include <QDate>
 #endif
+//--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
 Processor::Processor(QObject *parent) : QObject(parent)
 {
     _reg_timer = new QTimer();
@@ -21,6 +23,8 @@ Processor::Processor(QObject *parent) : QObject(parent)
 #endif
     _saver =  new Saver();
     _saver_thread = new QThread();
+    _control = new Control(&Storage);
+    _control->PortsState = 0;
     //_diag_thread = new QThread();
 }
 //--------------------------------------------------------------------------------
@@ -79,7 +83,7 @@ void Processor::Run()
     }
     // start registration
     _registrator->moveToThread(_reg_thread);
-    connect(this, SIGNAL(AddRecordSignal(QByteArray)), _registrator, SLOT(AddRecord(QByteArray)));
+    connect(this, SIGNAL(AddRecordSignal()), _registrator, SLOT(AddRecord()));
     _reg_thread->start();
     connect(_reg_timer, SIGNAL(timeout()), this, SLOT(RegTimerStep()));
     _reg_timer->start(_registrator->Interval());
@@ -139,39 +143,39 @@ void Processor::RegTimerStep() {
     QDate date = dt.date();
     QTime time = dt.time();
     // word diagnostic
-    Storage.SetWordRecord(176, Storage.Int16("DIAG_CQ_BEL"));
-    Storage.SetWordRecord(178, Storage.Int16("DIAG_CQ_USTA"));
-    Storage.SetWordRecord(180, Storage.Int16("DIAG_CQ_IT"));
-    Storage.SetWordRecord(182, Storage.Int16("DIAG_CQ_MSS"));
-    Storage.SetWordRecord(184, Storage.Int16("DIAG_MESS_NUM"));
-    Storage.SetWordRecord(186, Storage.Int16("DIAG_PKM_BEL"));
-    Storage.SetWordRecord(188, Storage.Int16("DIAG_Rplus"));
-    Storage.SetWordRecord(190, Storage.Int16("DIAG_Rminus"));
-    Storage.SetWordRecord(198, Storage.Int16("DIAG_Pg"));
+    _registrator->SetWordRecord(176, Storage.Int16("DIAG_CQ_BEL"));
+    _registrator->SetWordRecord(178, Storage.Int16("DIAG_CQ_USTA"));
+    _registrator->SetWordRecord(180, Storage.Int16("DIAG_CQ_IT"));
+    _registrator->SetWordRecord(182, Storage.Int16("DIAG_CQ_MSS"));
+    _registrator->SetWordRecord(184, Storage.Int16("DIAG_MESS_NUM"));
+    _registrator->SetWordRecord(186, Storage.Int16("DIAG_PKM_BEL"));
+    _registrator->SetWordRecord(188, Storage.Int16("DIAG_Rplus"));
+    _registrator->SetWordRecord(190, Storage.Int16("DIAG_Rminus"));
+    _registrator->SetWordRecord(198, Storage.Int16("DIAG_Pg"));
     // double word diagnostic
-    Storage.SetDoubleWordRecord(206, Storage.UInt32("DIAG_Motoresurs"));
-    Storage.SetDoubleWordRecord(210, Storage.UInt32("DIAG_Apol"));
-    Storage.SetDoubleWordRecord(214, Storage.UInt32("DIAG_Tt"));
+    _registrator->SetDoubleWordRecord(206, Storage.UInt32("DIAG_Motoresurs"));
+    _registrator->SetDoubleWordRecord(210, Storage.UInt32("DIAG_Apol"));
+    _registrator->SetDoubleWordRecord(214, Storage.UInt32("DIAG_Tt"));
     // message params
-    Storage.SetByteRecord(318, 0); // hour
-    Storage.SetByteRecord(319, 0); // minute
-    Storage.SetByteRecord(320, 0); // second
-    Storage.SetByteRecord(322, 0); // index
+    _registrator->SetByteRecord(318, 0); // hour
+    _registrator->SetByteRecord(319, 0); // minute
+    _registrator->SetByteRecord(320, 0); // second
+    _registrator->SetByteRecord(322, 0); // index
     // date and time
-    Storage.SetByteRecord(326, date.day());
-    Storage.SetByteRecord(327, date.month());
-    Storage.SetByteRecord(328, date.year() % 100);
-    Storage.SetByteRecord(329, time.hour());
-    Storage.SetByteRecord(330, time.minute());
-    Storage.SetByteRecord(331, time.second());
+    _registrator->SetByteRecord(326, date.day());
+    _registrator->SetByteRecord(327, date.month());
+    _registrator->SetByteRecord(328, date.year() % 100);
+    _registrator->SetByteRecord(329, time.hour());
+    _registrator->SetByteRecord(330, time.minute());
+    _registrator->SetByteRecord(331, time.second());
     // discret diagnostic
-    Storage.SetByteRecord(346, Storage.Byte("DIAG_Connections"));
-    Storage.SetByteRecord(347, Storage.Byte("DIAG_Discret_2"));
-    Storage.SetByteRecord(348, Storage.Byte("DIAG_Discret_3"));
-    Storage.SetByteRecord(349, Storage.Byte("DIAG_Discret_4"));
-    Storage.SetByteRecord(350, Storage.Byte("DIAG_Discret_5"));
-    Storage.SetByteRecord(351, Storage.Byte("DIAG_Discret_6"));
-    AddRecordSignal(Storage.Record());
+    _registrator->SetByteRecord(346, Storage.Byte("DIAG_Connections"));
+    _registrator->SetByteRecord(347, Storage.Byte("DIAG_Discret_2"));
+    _registrator->SetByteRecord(348, Storage.Byte("DIAG_Discret_3"));
+    _registrator->SetByteRecord(349, Storage.Byte("DIAG_Discret_4"));
+    _registrator->SetByteRecord(350, Storage.Byte("DIAG_Discret_5"));
+    _registrator->SetByteRecord(351, Storage.Byte("DIAG_Discret_6"));
+    AddRecordSignal();
 }
 //--------------------------------------------------------------------------------
 void Processor::DiagTimerStep() {
@@ -190,7 +194,32 @@ void Processor::DiagTimerStep() {
             }
         }
     }
-
+    for (QMap<QString, ThreadSerialPort*>::iterator i = SerialPorts.begin(); i != SerialPorts.end(); i++)
+        if (i.key() == "BEL") {
+            if (i.value()->isOpen())
+                _control->PortsState |= 1;
+            else _control->PortsState &= nobit0;
+        } else
+            if (i.key() == "USTA") {
+                if (i.value()->isOpen())
+                    _control->PortsState |= 2;
+                else _control->PortsState &= nobit1;
+            } else
+                if (i.key() == "IT") {
+                    if (i.value()->isOpen())
+                        _control->PortsState |= 4;
+                    else _control->PortsState &= nobit2;
+                } else
+                    if (i.key() == "MSS") {
+                        if (i.value()->isOpen())
+                            _control->PortsState |= 8;
+                        else _control->PortsState &= nobit3;
+                    }
+//    _control->Execute();
+}
+//--------------------------------------------------------------------------------
+void Processor::changeKdr(int kdr) {
+    _control->KdrNum = kdr;
 }
 //--------------------------------------------------------------------------------
 void Processor::LostConnection(QString alias) {
@@ -198,16 +227,16 @@ void Processor::LostConnection(QString alias) {
     arr.fill('\0', 1024);
     if (alias == "BEL") {
         Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") & nobit0);
-        Storage.UpdateRecord(338, 8, arr.mid(0, 8)); // дискретные (+ ПКМ)
+        _registrator->UpdateRecord(338, 8, arr.mid(0, 8)); // дискретные (+ ПКМ)
     }
     else if (alias == "USTA") {
         Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") & nobit1);
-        Storage.UpdateRecord(0, 80, arr.mid(0, 80));  // аналоговые
-        Storage.UpdateRecord(332, 6, arr.mid(0, 6)); // дискретные
+        _registrator->UpdateRecord(0, 80, arr.mid(0, 80));  // аналоговые
+        _registrator->UpdateRecord(332, 6, arr.mid(0, 6)); // дискретные
     }
     if (alias == "IT") {
         Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") & nobit2);
-        Storage.UpdateRecord(80, 96, arr.mid(0, 96));
+        _registrator->UpdateRecord(80, 96, arr.mid(0, 96));
     }
     else if (alias == "MSS")
         Storage.Byte("DIAG_Connections", Storage.Byte("DIAG_Connections") & nobit3);
@@ -231,19 +260,21 @@ void Processor::Unpack(QString alias) {
     // update record registration
     if (alias == "USTA") {
         // save data
-        Storage.UpdateRecord(0, 80, data.mid(0, 80));  // аналоговые
-        Storage.UpdateRecord(332, 6, data.mid(80, 6)); // дискретные
+        _registrator->UpdateRecord(0, 80, data.mid(0, 80));  // аналоговые
+        _registrator->UpdateRecord(332, 6, data.mid(80, 6)); // дискретные
         // diagnostic
         Storage.Int16("DIAG_Pg", Storage.Float("USTA_Ug_filtr") * Storage.Float("USTA_Ig_filtr") * 0.001); // считаем мощность генератора
     }
     else if (alias == "IT") {
         int index = data[SerialPorts[alias]->InData.Index];
-        if (index < 3) // принимаются долько три пакета из четырех
-            Storage.UpdateRecord(80 + index * 32, 32, data.mid(5, 32));
+        if (index < 3) {// принимаются долько три пакета из четырех
+            _registrator->UpdateRecord(80 + index * 32, 32, data.mid(5, 32));
+            _control->CalculateTC();
+        }
     }
     else if (alias == "BEL") {
         //Storage.SetByteRecord(186, Storage.Byte("BEL_PKM")); // ???????????????????????????????????????????????
-        Storage.UpdateRecord(338, 8, data.mid(1, 8)); // дискретные (+ ПКМ)
+        _registrator->UpdateRecord(338, 8, data.mid(1, 8)); // дискретные (+ ПКМ)
     }
     qDebug() << "Unpack " + alias;
 }
@@ -276,7 +307,7 @@ void Processor::ParseObjects(NodeXML *node)
         }
         if (node->Name == "registration") {
             ParseRegistration(node);
-            Storage.SetRecordSize(_registrator->RecordSize());
+//            _registrator->SetRecordSize();
         }
         if (node->Name == "diagnostic") {
             ParseDiagnostic(node);
@@ -385,19 +416,33 @@ QJsonArray Processor::getTrevogaElectr()
     return { rand() % 2, rand() % 2, rand() % 2, rand() % 2, rand() % 2, rand() % 2 };
 }
 //------------------------------------------------------------------------------
-QJsonArray Processor::getParamKdrVzb()
+QJsonArray Processor::getParamKdrBos()
 {
-    return { rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000 };
+    _control->KdrBos();
+    return {
+       Storage.Float("USTA_Ubs_filtr"), rand() % 1000, rand() % 1000,
+       Storage.Float("USTA_Iakb"), Storage.Int16("USTA_Ucu"), Storage.Float("USTA_Ivzb_vst"),
+       Storage.Float("USTA_Ugol_uvvg"), Storage.Float("USTA_Ugol_uvvg") / 60, // ?? 60 - ?
+       _control->_kdr_bos_flags
+    };
 }
 //------------------------------------------------------------------------------
-QJsonArray Processor::getParamKdrTpl()
+QJsonArray Processor::getParamKdrVzb()
 {
-    return { rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000 };
+    _control->KdrVzb();
+    return { Storage.Float("USTA_Ig_filtr"), Storage.Float("USTA_Ug_filtr"), Storage.Float("USTA_Ivzb_gen"), Storage.Float("USTA_Ugol_uvvg"), _control->_kdr_vzb_flags };
+}
+//------------------------------------------------------------------------------
+QJsonArray Processor::getParamKdrTed()
+{
+    _control->KdrTed();
+    return { Storage.Float("USTA_Ig_filtr"), Storage.Float("USTA_Ited1_filtr"), Storage.Float("USTA_Ited2_filtr"), _control->_kdr_ted_flags };
 }
 //------------------------------------------------------------------------------
 QJsonArray Processor::getParamKdrSvz()
 {
-    return { rand() % 1000 };
+    return { Storage.Float("USTA_Ubs_filtr"),  Storage.Byte("DIAG_Connections"), _control->PortsState,
+                Storage.Byte("DIAG_CQ_MSS"), 0, 0, Storage.Byte("DIAG_CQ_IT"), Storage.Byte("DIAG_CQ_USTA"), Storage.Byte("DIAG_CQ_BEL") };
 }
 //------------------------------------------------------------------------------
 QJsonArray Processor::getParamKdrReo()
@@ -409,34 +454,37 @@ QJsonArray Processor::getParamKdrReo()
     };
 }
 //------------------------------------------------------------------------------
+QJsonArray Processor::getParamKdrMasl()
+{
+    _control->KdrMasl();
+    return { Storage.Float("USTA_Po_diz") / 10, Storage.Float("IT_TSM3"), Storage.Float("USTA_Po_mn2") / 10,
+                Storage.Float("IT_TSM4"), Storage.Int16("USTA_N"), _control->_kdr_masl_flags };
+}
+//------------------------------------------------------------------------------
+QJsonArray Processor::getParamKdrTpl() {
+    _control->KdrTpl();
+    float PiF = Storage.Float("USTA_Pf_ftot") / 10, PiD = Storage.Float("USTA_Pf_tnvd") / 10;
+    return { 0, 0, PiF, PiF - PiD, PiD, Storage.Float("IT_TSM6"), Storage.Int16("USTA_N"), _control->_kdr_tpl_flags };
+}
+//------------------------------------------------------------------------------
 QJsonArray Processor::getParamKdrOhl()
 {
-    return { rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000 };
+    _control->KdrOhl();
+    return { Storage.Float("IT_TSM9"), Storage.Float("IT_TSM8"), Storage.Float("IT_TSM10"), Storage.Float("IT_TSM6"), Storage.Int16("USTA_N"), _control->_kdr_ohl_flags };
 }
 //------------------------------------------------------------------------------
 QJsonArray Processor::getParamKdrMot()
 {
-    return { rand() % 1000 };
-}
-//------------------------------------------------------------------------------
-QJsonArray Processor::getParamKdrMasl()
-{
-    return { rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000 };
+    return { (qint32)Storage.UInt32("DIAG_Motoresurs"), (qint32)Storage.UInt32("DIAG_Tt"),(qint32)Storage.UInt32("DIAG_Adiz") / 10, Storage.Int16("USTA_N") };
 }
 //------------------------------------------------------------------------------
 QJsonArray Processor::getParamKdrDizl()
 {
-    return {
-        rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000,
-        rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000
-    };
-}
-//------------------------------------------------------------------------------
-QJsonArray Processor::getParamKdrBos()
-{
-    return {
-        rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000, rand() % 1000
-    };
+   return { Storage.Int16("USTA_N"), Storage.Float("IT_TSM1"), // N, темп хол спая
+            Storage.Int16("IT_THA19"), Storage.Int16("IT_THA21"), Storage.Int16("IT_THA23"), Storage.Int16("IT_THA12"), Storage.Int16("IT_THA10"), Storage.Int16("IT_THA8"), // ТЦ
+            Storage.Int16("IT_THA11"), Storage.Int16("IT_THA2"), // ТК
+            _control->MinTC, _control->MaxTC, _control->AvgTC,
+            _control->DeltaTC[0], _control->DeltaTC[1], _control->DeltaTC[2], _control->DeltaTC[3], _control->DeltaTC[4], _control->DeltaTC[5] };
 }
 //------------------------------------------------------------------------------
 QJsonArray Processor::getParamKdrAvProgrev()
@@ -446,6 +494,26 @@ QJsonArray Processor::getParamKdrAvProgrev()
         float(rand() % 1000), float(rand() % 1000), float(rand() % 1000), float(rand() % 1000), float(rand() % 1000), // ???
         rand() % 1000
     };
+}
+//------------------------------------------------------------------------------
+QJsonArray Processor::getParamKdrSmlMain()
+{
+    int Ig, ogrUgMax = 0, ogrIgMax = 0;
+    if ((Storage.Byte("USTA_Inputs_3") & 16) && (Storage.Byte("USTA_Inputs_3") & 32)) // Признак «Выход БЭЛ ЭДТ» и Признак «РЭТ по сх. КВТ 1,2»
+        Ig = Storage.Float("USTA_Itorm_zad");
+    else
+        Ig = Storage.Float("USTA_Ig_filtr");
+
+    if (Storage.Byte("USTA_Inputs_2") & 32) // Признак КВ
+        ogrUgMax = 800;
+    if (Storage.Byte("USTA_Inputs_2") & 32) // Признак КВ
+        ogrIgMax = 2000;
+    return {Ig, Storage.Float("USTA_Ug_filtr"), Storage.Float("IT_TSM6"), Storage.Float("IT_TSM3"), ogrIgMax, ogrUgMax };
+}
+//------------------------------------------------------------------------------
+QJsonArray Processor::getParamKdrTop()
+{
+    return { QTime::currentTime().toString("HH:mm:ss"), QDate::currentDate().toString("dd/MM/yy") };
 }
 //------------------------------------------------------------------------------
 QJsonArray Processor::getParamMain()
@@ -459,7 +527,6 @@ QJsonArray Processor::getParamMain()
     //QJsonArray rej_prt = RejPrT();
 
     return {
-        QJsonArray { QTime::currentTime().toString("HH:mm:ss"), QDate::currentDate().toString("dd/MM/yy")}, // date and time
         QJsonArray { rand() % 4,  // Reversor заглушка пока возвращем число в диапазоне от 0 до 3
         rand() % 10, // PKM заглушка
         (!(rg >= 1 && rg <= 4)) ? 0 : rg }, // Regim заглушка
@@ -798,12 +865,12 @@ QJsonArray Processor::getAnalogArray(int offset) {
 //   return v;
 //}
 
-//QString Processor::getParamDiap(int diapazon)
-//{
-//    float d = rand() % diapazon ;
-//    QString v = QString::number(d);
-//    return v;
-//}
+QString Processor::getParamDiap(int diapazon)
+{
+    float d = rand() % diapazon ;
+    QString v = QString::number(d);
+    return v;
+}
 
 //QString Processor::tm()
 //{// текущее время

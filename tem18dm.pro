@@ -6,16 +6,12 @@ QT += serialport
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        datastore.cpp \
-#        inputpacket.cpp \
+#        datastore.cpp \
+    control.cpp \
         main.cpp \
-#        outputpacket.cpp \
-#        parameter.cpp \
         processor.cpp \
         registrator.cpp \
         saver.cpp \
-#        threadserialport.cpp \
-#        treexml.cpp
 
 RESOURCES += qml.qrc
 
@@ -61,6 +57,7 @@ DISTFILES += \
     qml/Kdr_Reo.qml \
     qml/Kdr_Svz.qml \
     qml/Kdr_Ted.qml \
+    qml/Kdr_Top.qml \
     qml/Kdr_Tpl.qml \
     qml/Kdr_Tre.qml \
     qml/Kdr_Trl.qml \
@@ -76,20 +73,19 @@ DISTFILES += \
     qml/USODiskrt.qml
 
 HEADERS += \
-    datastore.h \
-#    extratypes.h \
-#    inputpacket.h \
-#    outputpacket.h \
-#    parameter.h \
+    #datastore.h \
+    control.h \
     processor.h \
     registrator.h \
     saver.h \
-#    threadserialport.h \
-#    treexml.h \
     zapuso.h
 
 win32:INCLUDEPATH += D:/Development/Qt/vktoolslib
+unix:INCLUDEPATH += /home/user/sai/develop/vktoolslib
 
-win32:LIBS+=  D:/Development/Qt/build-vktoolslib-Desktop_Qt_5_15_2_MSVC2019_64bit-Debug/debug/vktoolslib.lib
+win32:LIBS+=  D:/Development/Qt/vktoolslib/vktreexml.lib
+win32:LIBS+=  D:/Development/Qt/vktoolslib/vkserialport.lib
+win32:LIBS+=  D:/Development/Qt/vktoolslib/vkdatastore.lib
+unix:LIBS += -L/home/user/sai/build-vktoolslib-Desktop_Qt_5_7_1_GCC_64bit-Debug -lvktoolslib
 
 win32:RC_FILE = ico.rc

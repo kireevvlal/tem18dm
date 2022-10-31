@@ -19,7 +19,7 @@ Rectangle {
         font.bold: true
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
-        font.pixelSize: 0
+        font.pixelSize: txtSize
         color: txtColor
     }
 }

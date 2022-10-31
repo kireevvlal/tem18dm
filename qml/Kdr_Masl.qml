@@ -12,13 +12,16 @@ Rectangle {
         running: kdr_Masl.opacity
         onTriggered: {
             var par = ioBf.getParamKdrMasl();
-            ind_PiD.value = par[0]; //ioBf.getParam();
-            ind_TiD.value = par[1]; //ioBf.getParam();
-            ind_ToD.value = par[2]; //ioBf.getParam();
-            ind_PiD.value = par[3]; //ioBf.getParam();
-            ind_PoD.value = par[4]; //ioBf.getParam();
-            ind_Fd.value = par[5]; //ioBf.getParam();
-                    }
+            ind_PiD.value = Math.round(par[0] * 10) / 10;
+            ind_TiD.value = par[1];
+            ind_PoD.value = Math.round(par[2] * 10) / 10;
+            ind_ToD.value = par[3];
+            ind_Fd.value = par[4];
+            zPm.visible = par[5] & 1;
+            zTm.visible = par[5] & 2;
+            ind_PiD.color = (par[5] & 1) ? "red" : "black";
+            ind_TiD.color = (par[5] & 2) ? "red" : "black";
+        }
 
     }
 
@@ -33,8 +36,8 @@ Rectangle {
 
         Text {
             id: text1
-            x: 13
-            y: 8
+            x: 0
+            y: 0
             color: "#f9f8f8"
             text: qsTr("МАСЛО")
             font.bold: true
@@ -43,8 +46,8 @@ Rectangle {
 
         TInd {
             id: ind_PiD
-            x: 13
-            y: 67
+            x: 15
+            y: 98
             width: 37
             height: 13
         }
@@ -52,7 +55,7 @@ Rectangle {
         TInd {
             id: ind_TiD
             x: 119
-            y: 113
+            y: 125
             width: 37
             height: 13
         }
@@ -60,29 +63,64 @@ Rectangle {
         TInd {
             id: ind_ToD
             x: 376
-            y: 113
+            y: 125
             width: 37
             height: 13
         }
 
         TInd {
             id: ind_PoD
-            x: 457
-            y: 67
+            x: 105
+            y: 73
             width: 37
             height: 13
         }
 
         TInd {
             id: ind_Fd
-            x: 190
-            y: 131
+            x: 187
+            y: 137
+            width: 54
             height: 26
             color: "gray"
             txtColor: "white"
             txtSize: 24
             border.color: "#00000000"
         }
+
+        Text {
+            id: text2
+            x: 234
+            y: 141
+            color: "#f9f8f8"
+            text: qsTr("об/мин")
+            font.pixelSize: 12
+        }
+
+        Text {
+            id: zPm
+            x: 87
+            y: 88
+            color: "yellow"
+            text: qsTr("P масла ниже нормы")
+            font.bold: true
+            font.pixelSize: 12
+        }
+        Text {
+            id: zTm
+            x: 87
+            y: 103
+            color: "yellow"
+            text: qsTr("Запрет работы под нагрузкой (t масла < 45°C)")
+            font.bold: true
+            font.pixelSize: 12
+        }
     }
 }
 
+
+/*##^##
+Designer {
+    D{i:0;formeditorZoom:2}
+}
+##^##*/
