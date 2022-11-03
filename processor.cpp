@@ -13,7 +13,7 @@ Processor::Processor(QObject *parent) : QObject(parent)
     _registrator = new Registrator();
     _diag_timer = new QTimer();
     _diag_interval = 200;
-    _msec = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    _diagnostics = new Diagnostics(&Storage, _tr_soob);
     _is_active = false;
     _fswatcher = new QFileSystemWatcher;
 #ifdef Q_OS_WIN
@@ -23,8 +23,9 @@ Processor::Processor(QObject *parent) : QObject(parent)
 #endif
     _saver =  new Saver();
     _saver_thread = new QThread();
-    _control = new Control(&Storage);
-    _control->PortsState = 0;
+    _tr_soob.resize(TR_SOOB_SIZE);
+    _control = new Control(&Storage, _tr_soob);
+    _pkm = 0;
     //_diag_thread = new QThread();
 }
 //--------------------------------------------------------------------------------
@@ -63,7 +64,7 @@ bool Processor:: Load(QString startPath, QString cfgfile)
         for (i = 0; i < 4; i++)
             par.Array[i] = data[i + 4];
         Storage.UInt32("DIAG_Adiz", par.Value);
-        _Adiz = (float)par.Value / 10;
+        _diagnostics->Adiz((float)par.Value / 10);
         for (i = 0; i < 4; i++)
             par.Array[i] = data[i + 8];
         Storage.UInt32("DIAG_Tt", par.Value);
@@ -179,43 +180,10 @@ void Processor::RegTimerStep() {
 }
 //--------------------------------------------------------------------------------
 void Processor::DiagTimerStep() {
-    qint64 currtime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-    qint64 diff;
-    int n = Storage.Int16("USTA_N");
-    if (n >= 99) {
-        diff = currtime - _msec;
-        if (diff >= 1000) {
-            _msec = currtime;
-            Storage.UInt32("DIAG_Motoresurs", Storage.UInt32("DIAG_Motoresurs") + 1); // increment motoresurs
-            if (Storage.Byte("USTA_Inputs_2") & 64) { // КВ контроль возбуждения
-                Storage.UInt32("DIAG_Tt", Storage.UInt32("DIAG_Tt") + 1); // increment время работы в тяге
-                _Adiz += (float)Storage.Int16("DIAG_Pg") / 3600;
-                Storage.UInt32("DIAG_Adiz", _Adiz * 10); // полезная работа
-            }
-        }
-    }
-    for (QMap<QString, ThreadSerialPort*>::iterator i = SerialPorts.begin(); i != SerialPorts.end(); i++)
-        if (i.key() == "BEL") {
-            if (i.value()->isOpen())
-                _control->PortsState |= 1;
-            else _control->PortsState &= nobit0;
-        } else
-            if (i.key() == "USTA") {
-                if (i.value()->isOpen())
-                    _control->PortsState |= 2;
-                else _control->PortsState &= nobit1;
-            } else
-                if (i.key() == "IT") {
-                    if (i.value()->isOpen())
-                        _control->PortsState |= 4;
-                    else _control->PortsState &= nobit2;
-                } else
-                    if (i.key() == "MSS") {
-                        if (i.value()->isOpen())
-                            _control->PortsState |= 8;
-                        else _control->PortsState &= nobit3;
-                    }
-//    _control->Execute();
+    _diagnostics->Motoresurs();
+    _diagnostics->Connections(SerialPorts);
+    _diagnostics->RizCU(_pkm);
+    _diagnostics->APSignalization();
 }
 //--------------------------------------------------------------------------------
 void Processor::changeKdr(int kdr) {
@@ -441,7 +409,7 @@ QJsonArray Processor::getParamKdrTed()
 //------------------------------------------------------------------------------
 QJsonArray Processor::getParamKdrSvz()
 {
-    return { Storage.Float("USTA_Ubs_filtr"),  Storage.Byte("DIAG_Connections"), _control->PortsState,
+    return { Storage.Float("USTA_Ubs_filtr"),  Storage.Byte("DIAG_Connections"), _diagnostics->PortsState(),
                 Storage.Byte("DIAG_CQ_MSS"), 0, 0, Storage.Byte("DIAG_CQ_IT"), Storage.Byte("DIAG_CQ_USTA"), Storage.Byte("DIAG_CQ_BEL") };
 }
 //------------------------------------------------------------------------------
@@ -490,9 +458,9 @@ QJsonArray Processor::getParamKdrDizl()
 QJsonArray Processor::getParamKdrAvProgrev()
 {
     return {
-        rand() % 1000, rand() % 1000,
-        float(rand() % 1000), float(rand() % 1000), float(rand() % 1000), float(rand() % 1000), float(rand() % 1000), // ???
-        rand() % 1000
+        Storage.Float("USTA_Iakb"), Storage.Float("USTA_Ubs_filtr"),
+         Storage.Float("IT_TSM4"), Storage.Float("IT_TSM11"), Storage.Float("IT_TSM6"), Storage.Float("IT_TSM12"), Storage.Float("IT_TSM13"),
+        rand() % 1000 // wFdzU - и так везде, где F
     };
 }
 //------------------------------------------------------------------------------
@@ -511,12 +479,7 @@ QJsonArray Processor::getParamKdrSmlMain()
     return {Ig, Storage.Float("USTA_Ug_filtr"), Storage.Float("IT_TSM6"), Storage.Float("IT_TSM3"), ogrIgMax, ogrUgMax };
 }
 //------------------------------------------------------------------------------
-QJsonArray Processor::getParamKdrTop()
-{
-    return { QTime::currentTime().toString("HH:mm:ss"), QDate::currentDate().toString("dd/MM/yy") };
-}
-//------------------------------------------------------------------------------
-QJsonArray Processor::getParamMain()
+QJsonArray Processor::getParamFrameTop()
 {
     int rg = rand() % 4; // Regim заглушка
     int bt = rand() % 48; //= dab[0,7];
@@ -524,17 +487,21 @@ QJsonArray Processor::getParamMain()
     int dsk_iSA1 = 1;   // dsk_iSA1  = dsk[0,iSA1 ];
     int dsk_iKMv0 = 1;  // dsk_iKMv0 = dsk[0,iKMv0];
     int dsk_iDizZ = 0;  // dsk_iDizZ = dsk[0,iDizZ];
-    //QJsonArray rej_prt = RejPrT();
-
     return {
         QJsonArray { rand() % 4,  // Reversor заглушка пока возвращем число в диапазоне от 0 до 3
         rand() % 10, // PKM заглушка
         (!(rg >= 1 && rg <= 4)) ? 0 : rg }, // Regim заглушка
+        QJsonArray { QTime::currentTime().toString("HH:mm:ss"), QDate::currentDate().toString("dd/MM/yy") },
         QJsonArray { ((bt & 0x30) == 0x00) ? "" : (((bt & 0x30) == 0x10) ? "Прожиг коллектора": "Завершение прожига"), // RejPro
-        (dsk_iAPvkl1 == 00) ? "" : ((dsk_iSA1 == 01) ? "Режим АвтоПрогрева" : ((dsk_iKMv0 == 00) ? "АП: Установи ПКМ в 0" : ((dsk_iDizZ == 00) ? "АП: Запусти дизель" : ""))) }, // RejAP
-        RejPrT(), // getRejPrT
-        QJsonArray { float(rand() % 100), float(rand() % 1500), float(rand() % 100), float(rand() % 100), float(rand() % 60), float(rand() % 60) } // ??????????????
+        (dsk_iAPvkl1 == 00) ? "" : ((dsk_iSA1 == 01) ? "Режим АвтоПрогрева" : ((dsk_iKMv0 == 00) ? "АП: Установи ПКМ в 0" : ((dsk_iDizZ == 00) ? "АП: Запусти дизель" : ""))), },
+        RejPrT(), // getRejPrT// RejAP
+        rand() % 100
     };
+}
+//------------------------------------------------------------------------------
+QJsonArray Processor::getParamFrameLeft()
+{
+    return { float(rand() % 1500), float(rand() % 1500), float(rand() % 100), float(rand() % 60), float(rand() % 60), float(rand() % 60) };
 }
 //------------------------------------------------------------------------------
 QJsonArray Processor::RejPrT()
@@ -550,7 +517,7 @@ QJsonArray Processor::RejPrT()
     QString TxC= "00";
     QString capt= "00:00:00";
 
-    if (d==0) {
+    if (d == 0) {
         // TxC.Visible:=false; TxM.Visible:=false; TxS.Visible:=false; TxT.Visible:=false;
         // RejPrT.Visible:=false;
         capt= "00:00:00";
@@ -559,7 +526,7 @@ QJsonArray Processor::RejPrT()
     }
     else
     {
-        t = (d%60); // inttostr( d mod 60);  //секунды    х.х.
+        t = (d % 60); // inttostr( d mod 60);  //секунды    х.х.
         TxS.setNum(t);
 
         t = (d%3600)/60; // inttostr((d mod 3600)div 60);  //минуты

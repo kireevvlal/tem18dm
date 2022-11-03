@@ -4,16 +4,15 @@
 #include <QBitArray>
 #include "datastore.h"
 
-#define TR_SOOB_SIZE 63
-
 class Control
 {
 private:
     DataStore* _storage;
     QBitArray _tr_soob;
 public:    
+//    bool TrSoob(int index) { return _tr_soob[index]; }
+//    void TrSoob(int index, bool value) { _tr_soob[index] = value; }
     int KdrNum;
-    qint8 PortsState;  // состояние портов. побитно: 1- открыт, 0 - что-то не так
     qint8 _kdr_masl_flags;
     qint8 _kdr_tpl_flags;
     qint8 _kdr_ohl_flags;
@@ -32,7 +31,7 @@ public:
     void KdrVzb();
     void KdrTed();
     void Execute();
-    Control(DataStore* storage);
+    Control(DataStore*, QBitArray);
 };
 
 #endif // CONTROL_H

@@ -8,6 +8,7 @@ QT += serialport
 SOURCES += \
 #        datastore.cpp \
     control.cpp \
+    diagnostics.cpp \
         main.cpp \
         processor.cpp \
         registrator.cpp \
@@ -35,6 +36,8 @@ DISTFILES += \
     qml/ExtBeads.qml \
     qml/ExtCircularGauge.qml \
     qml/ExtGauge.qml \
+    qml/Frame_Left.qml \
+    qml/Frame_Top.qml \
     qml/Gauge/edit.png \
     qml/Kdr_Analog.qml \
     qml/Kdr_AvProgrev.qml \
@@ -57,7 +60,6 @@ DISTFILES += \
     qml/Kdr_Reo.qml \
     qml/Kdr_Svz.qml \
     qml/Kdr_Ted.qml \
-    qml/Kdr_Top.qml \
     qml/Kdr_Tpl.qml \
     qml/Kdr_Tre.qml \
     qml/Kdr_Trl.qml \
@@ -75,6 +77,7 @@ DISTFILES += \
 HEADERS += \
     #datastore.h \
     control.h \
+    diagnostics.h \
     processor.h \
     registrator.h \
     saver.h \

@@ -10,6 +10,10 @@
 #include "registrator.h"
 #include "saver.h"
 #include "control.h"
+#include "diagnostics.h"
+
+#define TR_SOOB_SIZE 63
+
 
 class Processor : public QObject
 {
@@ -18,9 +22,9 @@ private:
 //    QByteArray _bytes_data;
 //    QMap<QString, qint16> _int_data;
 //    QMap<QString, float> _float_data;
+    int _pkm; // вычисленная позиция ПКМ 0 - не определено 1-9 : 0-8 - т.е. реальная ПКМ + 1
+    QBitArray _tr_soob;
     bool _is_active;
-    qint64 _msec; // системное время в миллисекундах
-    float _Adiz; // полезная работа дизеля
     QFile _mtr_file; // имя и путь файла моторесурса
     QThread *_reg_thread;
     QTimer *_reg_timer;
@@ -34,6 +38,7 @@ private:
     QStringList _files;
     TreeXML _tree;
     Control* _control;
+    Diagnostics* _diagnostics;
     QFileSystemWatcher *_fswatcher;
     QJsonArray RejPrT();
     void Parse(NodeXML*);
@@ -42,6 +47,10 @@ private:
     void ParseSerialPorts(NodeXML*);
     void ParseDiagnostic(NodeXML*);
     void ParseRegistration(NodeXML*);
+//    void DiagMotoresurs();
+//    void DiagConnections();
+//    void DiagRizCU();
+//    void DiagAPSignalization();
 public:
     QMap<QString, ThreadSerialPort*> SerialPorts;
     DataStore Storage;
@@ -78,8 +87,8 @@ public slots:
     QJsonArray getParamKdrDizl();
     QJsonArray getParamKdrAvProgrev();
     QJsonArray getParamKdrSmlMain();
-    QJsonArray getParamKdrTop();
-    QJsonArray getParamMain();
+    QJsonArray getParamFrameTop();
+    QJsonArray getParamFrameLeft();
     QStringList getStructAnlg(int);
     QStringList getStructDiskr(int);
     QJsonArray getDiskretArray(int);

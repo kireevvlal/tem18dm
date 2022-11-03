@@ -7,6 +7,7 @@ Window {
     height: 480
     visible: true
     color: "black"
+    property alias kdr_Masl: kdr_Masl
 //    flags: Qt.FramelessWindowHint | Qt.Window
     title: qsTr("TEM18DM Bi05-04 640x480")
 
@@ -31,83 +32,31 @@ Window {
             go_Exit(); // KVA Fix screen blink
         }
         onTriggered: {
-            cnt ++;
-            var par = ioBf.getParamMain();
-//            if (indPt.value + 0.1 > indPt.maximumValue) {
-//                indPt.value = 0;
-//            }
-//            else
-//                indPt.value  = indPt.value + 0.1;
 
-//            if (indPm.value + 0.1 > indPm.maximumValue) {
-//                indPm.value = 0;
-//            }
-//            else
-//                indPm.value  = indPm.value + 0.1;
-
-//            if (indFd.value + 50 > indFd.maximumValue) {
-//                indFd.value = 0;
-//            } else
-//                indFd.value  =  indFd.value + 50;
-
-            revers.value = par[0][0]; //ioBf.getReversor();// реверсор
-            pkm.pkms = par[0][1]; //ioBf.getPKM();         // позиция
-            regim.value = par[0][2]; //ioBf.getRegim();    // режим работы тепловоза
-
-//            txt_RejPro.text = par[1][0]; //ioBf.getRejPro(); // прожиг
-//            txt_RejAP.text = par[1][1]; //ioBf.getRejAP(); // автопрогрев
-
-//            txt_RejPrTime.text = par[2][0]; //ioBf.getRejPrT("value");// --- косяк с разными значениями --че делать то?
-//            if (/*ioBf.getRejPrT("tm")*/ par[2][1] == "2") { txt_RejPrTime.color = "yellow" ;} else  txt_RejPrTime.color = "gray";
-//            if (/*ioBf.getRejPrT("ms")*/ par[2][2] == "1") { txt_RejPrT.opacity = 1;} else {txt_RejPrT.opacity = 0;}
-
-            // индикация регистрации
-            //img_z0.visible = ! img_z0.visible;
-            //img_ind_f.visible = ! img_ind_f.visible;
-
-            prBar1.value = par[3][0]; //ioBf.getParamDiap(100);// заглушка
-
-            pr_Mtg1.value = par[3][1]; //ioBf.getParamDiap(1500);// заглушка
-            pr_Mtg2.value = 1500;// ioBf.getParamDiap(1500); // заглушка
-
-                img_in2BX.opacity = ! img_in2BX.opacity;// заглушка
-if (cnt==2 ) {  in1DR.opacity = ! in1DR.opacity}; // ДРУ уровень воды
-if (cnt==1 ) {  in1OM.opacity = ! in1OM.opacity}; // отключатель моторов
-if (cnt==3 ) {  in1RZ.opacity = ! in1RZ.opacity}; // реле земли
-if (cnt==4 ) {  in1OT.opacity = ! in1OT.opacity}; // обрыв тормозной магистрали
-
-            indUb0.text = par[3][2]; //ioBf.getParamDiap(100);// заглушка
-            indUb1.text = par[3][3]; //ioBf.getParamDiap(100);// заглушка
-
-            indIz0.text = par[3][4]; //ioBf.getParamDiap(60);// заглушка
-            indIz1.text = par[3][5]; //ioBf.getParamDiap(60);// заглушка
-
-if  (cnt>6 ) { cnt = 0};
        }
 }
 
 // расставляем компоненты
 
-    TRevers {
-        id: revers
-        x: 24
-        y: 46
+    Frame_Top {
+        id: frame_Top
+        x: 0
+        y: 0
+
     }
 
-    TPKM {
-        id: pkm
-        x: 24
-        y: 15
-        width: 64
-        color: "#000000"
-        pkms: 5
+    Frame_Left {
+        id: frame_Left
+        x: 0
+        y: 182
+
     }
-    TRegm {
-        id: regim
-        x: 16
-        y: 88
-        height: 25
-        value: 1
+
+    Kdr_smlMain {
+        id: kdr_Main_small
+        x: 128
+        y: 219
+        z: 99
     }
 
     Kdr_Ted {
@@ -120,7 +69,7 @@ if  (cnt>6 ) { cnt = 0};
     Kdr_Tre {
         id: kdr_Tre
         x: 0
-        y: 415
+        y: 416
         width: 640
         height: 64
         z: -1
@@ -173,13 +122,6 @@ if  (cnt>6 ) { cnt = 0};
         x: 128
         y: 219
         z: 5
-    }
-
-    Kdr_Top {
-        id: kdr_Top
-        x: 128
-        y: 0
-
     }
 
     Kdr_Masl {
@@ -613,368 +555,6 @@ if  (cnt>6 ) { cnt = 0};
             onKnopaUD:{ showKdr_Svazi();       } // сигнал о нажатии клавиши ДМ "UD" /alt+i
 
         }
-
-
-        Text {
-            id: txt_RejPrTime
-            x: 16
-            y: 118
-            width: 80
-            color: "#6e6e63"
-            text: qsTr("00:00:00")
-            font.family: "Segoe UI Black"
-            clip: true
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
-            font.bold: true
-            font.pointSize: 12
-            visible: true
-        }
-
-        Image {
-            id: img_ind_f
-            x: 16
-            y: 138
-            width: 22
-            height: 40
-            clip: false
-            source: "Pictogram/flesh1.png"
-            visible: true
-        }
-
-        Image {
-            id: img_z0
-            x: 39
-            y: 147
-            width: 35
-            height: 19
-            clip: true
-            source: "Pictogram/flesh zapis1.png"
-            visible: true
-
-        }
-
-        PrBar {
-            id: prBar1
-            x: 75
-            y: 148
-            width: 61
-            height: 14
-            clip: true
-            kind: 1
-            val_max: 100
-            value: 0
-            visible: true
-        }
-
-        Text {
-            id: indUb0
-            x: 42
-            y: 185
-            width: 23
-            height: 17
-            color: "#d2e8fb"
-            text: qsTr("0")
-            horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: 14
-            font.bold: true
-        }
-
-        Text {
-            id: indUb1
-            x: 73
-            y: 185
-            width: 23
-            height: 17
-            color: "#d2e8fb"
-            text: qsTr("0")
-            horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: 14
-            font.bold: true
-        }
-
-        Text {
-            id: txtUb
-            x: 8
-            y: 182
-            width: 23
-            height: 17
-            color: "#acb3b3"
-            text: qsTr("Uб:")
-            horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: 14
-            font.bold: true
-        }
-
-        Text {
-            id: txtUb1
-            x: 8
-            y: 198
-            width: 23
-            height: 18
-            color: "#acb3b3"
-            text: qsTr("Iз:")
-            horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: 14
-            font.bold: true
-        }
-
-        Text {
-            id: indIz0
-            x: 42
-            y: 204
-            width: 23
-            height: 17
-            color: "#d2e8fb"
-            text: qsTr("0")
-            horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: 14
-            font.bold: true
-        }
-
-        Text {
-            id: indIz1
-            x: 73
-            y: 204
-            width: 23
-            height: 17
-            color: "#d2e8fb"
-            text: qsTr("0")
-            horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: 14
-            font.bold: true
-        }
-
-        Image {
-            id: img_in1BX
-            x: 3
-            y: 225
-            width: 28
-            height: 28
-            source: "Pictogram/ind_box.png"
-        }
-
-        Image {
-            id: img_in2BX
-            x: 67
-            y: 225
-            width: 28
-            height: 28
-            source: "Pictogram/ind_box.png"
-        }
-
-        ExtBeads {
-            id: pr_Mtg1
-            x: 34
-            y: 230
-            height: 180
-            width: 28
-            cntitems: 15
-            colors: ["#f01f00", "#f02f00", "#f03f00", "#f04f00", "#f05f00", "#f06f00", "#f07f00", "#f08f00", "#f09f99", "#f0afaa", "#f0bfbb", "#f0cfcc", "#f0dfdd", "#f0efee", "#f0ffff"]
-            value: 0
-            maxvalue: 1500
-        }
-
-        ExtBeads {
-            id: pr_Mtg2
-            x: 98
-            y: 230
-            height: 180
-            width: 28
-            cntitems: 15
-            colors: ["#f01f00", "#f02f00", "#f03f00", "#f04f00", "#f05f00", "#f06f00", "#f07f00", "#f08f00", "#f09f99", "#f0afaa", "#f0bfbb", "#f0cfcc", "#f0dfdd", "#f0efee", "#f0ffff"]
-            value: 1500
-            maxvalue: 1500
-        }
-
-      TInd {
-          id: in1DR
-          x: 1
-          y: 297
-          width: 30
-          height: 30
-          color: "#160000"
-          radius: 2
-            txtSize: 15
-            txtColor: "red"
-            border.width: 2
-            border.color: "red"
-            value: "ДРУ"
-            gradient: Gradient{
-                GradientStop {position:0.0; color: "silver"}
-                GradientStop {position:0.3; color: "black"}
-                GradientStop {position:0.7; color: "black"}
-                GradientStop {position:1; color: "silver"}
-            }
-        }
-
-        TInd {
-            id: in2DR
-            x: 65
-            y: 297
-            width: 30
-            height: 30
-            radius: 2
-            txtSize: 15
-            txtColor: "red"
-            value: "ДРУ"
-            border.width: 2
-            border.color: "red"
-            gradient: Gradient{
-                GradientStop {position:0.0; color: "silver"}
-                GradientStop {position:0.3; color: "black"}
-                GradientStop {position:0.7; color: "black"}
-                GradientStop {position:1; color: "silver"}
-            }
-
-        }
-
-        TInd {
-            id: in1RZ
-            x: 1
-            y: 338
-            width: 30
-            height: 30
-            radius: 2
-            txtSize: 18
-            txtColor: "yellow"
-            value: "РЗ"
-            border.width: 2
-            border.color: "yellow"
-            gradient: Gradient{
-                GradientStop {position:0.0; color: "silver"}
-                GradientStop {position:0.3; color: "black"}
-                GradientStop {position:0.7; color: "black"}
-                GradientStop {position:1; color: "silver"}
-            }
-
-        }
-
-        TInd {
-            id: in2RZ
-            x: 65
-            y: 338
-            width: 30
-            height: 30
-            radius: 2
-            txtSize: 18
-            txtColor: "#ffff00"
-            value: "РЗ"
-            border.width: 2
-            border.color: "#ffff00"
-            gradient: Gradient{
-                GradientStop {position:0.0; color: "silver"}
-                GradientStop {position:0.3; color: "black"}
-                GradientStop {position:0.7; color: "black"}
-                GradientStop {position:1; color: "silver"}
-            }
-
-        }
-
-        TInd {
-            id: in1OT
-            x: 1
-            y: 379
-            width: 30
-            height: 30
-            radius: 2
-            gradient: Gradient {
-                GradientStop { position: 0; color: "#ffff00"}
-                GradientStop {position: 0.5;color: "#ffffff"}
-                GradientStop {position: 1;color: "#ffff00"}
-            }
-            txtSize: 15
-            txtColor: "#000000"
-            value: "ОТМ"
-            border.width: 0
-            border.color: "#ffff00"
-        }
-
-        TInd {
-            id: in1OM
-            x: 1
-            y: 258
-            width: 30
-            height: 30
-            radius: 2
-            gradient: Gradient {
-                GradientStop {position: 0;color: "#aca6a6"}
-                GradientStop {position: 0.5; color: "#e4d6d6"}
-                GradientStop {position: 1;color: "#aca6a6"}
-            }
-            txtSize: 16
-            txtColor: "#000000"
-            value: "ОМ"
-            border.width: 0
-            border.color: "#e4d6d6"
-        }
-
-        TInd {
-            id: in2OM
-            x: 65
-            y: 258
-            width: 30
-            height: 30
-            radius: 2
-            txtSize: 16
-            gradient: Gradient {
-                GradientStop {
-                    position: 0
-                    color: "#aca6a6"
-                }
-
-                GradientStop {
-                    position: 0.531
-                    color: "#e4d6d6"
-                }
-
-                GradientStop {
-                    position: 1 //1.033
-                    color: "#aca6a6"
-                }
-            }
-            txtColor: "#000000"
-            value: "ОМ"
-            border.width: 0
-            border.color: "#e4d6d6"
-        }
-
-        TInd {
-            id: in2OT
-            x: 65
-            y: 379
-            width: 30
-            height: 30
-            radius: 2
-            txtSize: 15
-            gradient: Gradient {
-                GradientStop {
-                    position: 0
-                    color: "#ffff00"
-                }
-
-                GradientStop {
-                    position: 0.498
-                    color: "#ffffff"
-                }
-
-                GradientStop {
-                    position: 1
-                    color: "#ffff00"
-                }
-            }
-            txtColor: "#000000"
-            value: "ОТМ"
-            border.width: 0
-            border.color: "#ffff00"
-        }
-
-    Kdr_smlMain {
-        id: kdr_Main_small
-        x: 128
-        y: 219
-        z: 99
-    }
 
     function  showKdr_Nastroiki()    // сигнал о нажатии клавиши ДМ "S"  /alt+b
     {

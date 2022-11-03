@@ -50,8 +50,8 @@ Rectangle {
             ind_D5.value = par[17];
             ind_D6.value = par[18];
 
-            rct_trTT1.visible = ! rct_trTT1.visible;
-            rct_trTT2.visible = ! rct_trTT2.visible;
+//            rct_trTT1.visible = ! rct_trTT1.visible;
+//            rct_trTT2.visible = ! rct_trTT2.visible;
 
             txt_Trb.visible = ! txt_Trb.visible;
             txt_Zyl.visible = true;

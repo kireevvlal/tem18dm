@@ -1,10 +1,10 @@
 #include "control.h"
 #include "vktoolstypes.h"
 
-Control::Control(DataStore* storage)
+Control::Control(DataStore* storage, QBitArray trsoob)
 {
     _storage = storage;
-    _tr_soob.resize(TR_SOOB_SIZE);
+    _tr_soob = trsoob;
     KdrNum = 0;
     MinTC = MaxTC = AvgTC = 0;
     _kdr_masl_flags = _kdr_tpl_flags = _kdr_ohl_flags = _kdr_bos_flags = _kdr_vzb_flags = _kdr_ted_flags = 0;
