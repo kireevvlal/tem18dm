@@ -14,17 +14,30 @@ Rectangle {
         running: kdr_Main_small.opacity
         onTriggered: {
             var par = ioBf.getParamKdrSmlMain();
-            indIg.value = Math.round(par[0]) / 1000;
-            indIg.finish = par[4] / 1000;
+            indIg.value = Math.round(par[1]) / 1000;
+            var finish = par[5] / 1000;
+            if (indIg.finish != finish) {
+                indIg.finish = finish;
+                indIg.repaint = true;
+            }
 
-            indUg.value = Math.round(par[1]);
-            indUg.finish = par[5];
+            indUg.value = Math.round(par[2]);
+            finish = par[6];
+            if (indUg.finish != finish) {
+                indUg.finish = finish;
+                indUg.repaint = true;
+            }
+            stb_Tvd.value = par[3];
+            stb_Tvd.barColor = (par[3] < 10) ? "red" : (par[3] < 45) ? "yellow" : (par[3] < 87) ? "#00d7d7" : "red";
 
-            stb_Tvd.value = par[2];
-            stb_Tvd.barColor = (par[2] < 10) ? "red" : (par[2] < 45) ? "yellow" : (par[2] < 87) ? "#00d7d7" : "red";
+            stb_Tms.value = par[4];
+            stb_Tms.barColor = (par[4] < 20) ? "red" : (par[4] < 45) ? "yellow" : (par[4] < 70) ? "#00d7d7" : "red";
 
-            stb_Tms.value = par[3];
-            stb_Tms.barColor = (par[3] < 20) ? "red" : (par[3] < 45) ? "yellow" : (par[3] < 70) ? "#00d7d7" : "red";
+            vh1.visible = (par[7] & 1) && par[0][1]; // ??? добавил наличие связи в условии
+            vh2.visible = (par[7] & 2) && par[0][1]; // ??? добавил наличие связи в условии
+
+            indIg.visible =  indUg.visible = par[0][0]; // usta connection
+            stb_Tvd.visible = stb_Tms.visible = par[0][1]; // ti connection
 
 //            indT_vd.text =  ioBf.getParamDiap(150);
 //            stb_Tvd.value = indT_vd.text;
@@ -37,7 +50,7 @@ Rectangle {
     }
 
     Text {
-        id: text3
+        id: vh1
         x: 198
         y: 133
         width: 8
@@ -49,7 +62,7 @@ Rectangle {
     }
 
     Text {
-        id: text4
+        id: vh2
         x: 198
         y: 162
         color: "#fbfcff"

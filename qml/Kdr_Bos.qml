@@ -13,14 +13,14 @@ Rectangle {
         running: kdr_Bos.opacity // вкл как только кадр становится видимым
         onTriggered: {
             var par = ioBf.getParamKdrBos();
-            ind_Ubs.value = Math.round(par[0]);
+            ind_Ubs.value = par[0].toFixed(0);
             ind_Rp.value = par[1];
             ind_Rm.value = par[2];
-            ind_Iz.value = Math.round(par[3]);
+            ind_Iz.value = par[3].toFixed(0);
             ind_Uzu.value = par[4];
-            ind_Ivst.value = Math.round(par[5]);
-            ind_Sh2.value = Math.round(par[6]);
-            ind_Sh2p.value = Math.round(par[7]);
+            ind_Ivst.value = par[5].toFixed(0);
+            ind_Sh2.value = par[6].toFixed(0);
+            ind_Sh2p.value = par[7].toFixed(0);
             k_RSIm.visible = par[8] & 1;
             k_RSIp.visible = par[8] & 2;
             ind_Iz.color = (par[8] & 4) ? "red" : "black";

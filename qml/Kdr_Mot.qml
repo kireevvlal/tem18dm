@@ -31,7 +31,7 @@ Rectangle {
             ind_TagC.value = Math.round(par[1] / 3600);
             ind_TagM.value = Math.round((par[1] % 3600) / 60);
             ind_TagS.value = Math.round(par[1] % 60);
-            ind_Rab.value = Math.round(par[2] * 10) / 10;
+            ind_Rab.value = par[2].toFixed(1);
             ind_Fd.value = par[3];
         }
     }

@@ -7,7 +7,7 @@ Rectangle {
     height: 22
     color: "black"
     border.width: 0
-    property int txtSize: 17
+    property int txtSize: 16
     property color txtColor: "cyan"
 
 

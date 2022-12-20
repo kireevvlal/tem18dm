@@ -169,7 +169,7 @@ Rectangle {
     Timer { // надписи
         id: timer_text
         triggeredOnStart: false // true - запускается сразу и по repet(т.е.срабатывает два раза)
-        repeat:false            // и еще разок вывели и успокоились
+        repeat: false            // и еще разок вывели и успокоились
         interval: 100
         running: true
         onTriggered: {
@@ -181,19 +181,7 @@ Rectangle {
                 usoTxtDiskr(0, i, strarr);
                 strarr = ioBf.getStructDiskr(i + offset + cntRowTabl);
                 usoTxtDiskr(1, i, strarr);
-//                str_r = ioBf.getStructDiskr_r(i+offset);
-//                str_n = ioBf.getStructDiskr_n(i+offset);
-//                str_o = ioBf.getStructDiskr_o(i+offset);
-//                str_i = ioBf.getStructDiskr_i(i+offset);
-//                usoTxtDiskr1(i, str_r, str_n, str_o, str_i);
-
-//                str_r = ioBf.getStructDiskr_r(i +offset+ cntRowTabl);
-//                str_n = ioBf.getStructDiskr_n(i +offset + cntRowTabl);
-//                str_o = ioBf.getStructDiskr_o(i +offset + cntRowTabl);
-//                str_i = ioBf.getStructDiskr_i(i +offset + cntRowTabl);
-//                usoTxtDiskr2(i, str_r, str_n, str_o, str_i);
             }
-            // console.log(offset);
         }
     }
 
@@ -204,16 +192,19 @@ Rectangle {
         triggeredOnStart: true
         repeat:true
         interval: 500
-        running: true // включается по usoview.opacity
+        running: kdr_USTA_DskrVihodi.opacity || kdr_USTA_DskrVh.opacity || kdr_BEL_DskrVihodi.opacity || kdr_BEL_DskrVh.opacity //true // включается по usoview.opacity
         property int j:0;
         onTriggered: {
-             var i;
-            var values = ioBf.getDiskretArray(offset);
-             for (i = 0;i < cntRowTabl; i++) {
-                // значения сигналов
-                 // !!!!! дописать  ioBf
-                 usoModelDiskr.setProperty(i, "Dscrt_val1", values[i].toString()); //(offset +i ).toString());            // лево
-                 usoModelDiskr.setProperty(i, "Dscrt_val2", values[i + cntRowTabl].toString()); //(offset + i + cntRowTabl).toString());// право
+            var i;
+            if ((kdr_USTA_DskrVihodi.opacity && offset == 48) || (kdr_USTA_DskrVh.opacity && offset == 72) ||
+                    (kdr_BEL_DskrVihodi.opacity && offset == 0) || (kdr_BEL_DskrVh.opacity && offset == 24)) {
+                var values = ioBf.getDiskretArray(offset);
+                for (i = 0;i < cntRowTabl; i++) {
+                    // значения сигналов
+                    // !!!!! дописать  ioBf
+                    usoModelDiskr.setProperty(i, "Dscrt_val1", values[i] ? "1" : "0"); //(offset +i ).toString());            // лево
+                    usoModelDiskr.setProperty(i, "Dscrt_val2", values[i + cntRowTabl] ? "1" : "0"); //(offset + i + cntRowTabl).toString());// право
+                }
             }
         }
     }

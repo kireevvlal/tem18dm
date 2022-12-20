@@ -6,13 +6,13 @@ QT += serialport
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-#        datastore.cpp \
     control.cpp \
     diagnostics.cpp \
         main.cpp \
         processor.cpp \
         registrator.cpp \
         saver.cpp \
+    slave.cpp
 
 RESOURCES += qml.qrc
 
@@ -75,20 +75,23 @@ DISTFILES += \
     qml/USODiskrt.qml
 
 HEADERS += \
-    #datastore.h \
     control.h \
     diagnostics.h \
     processor.h \
     registrator.h \
     saver.h \
+    slave.h \
+    tem18dm.h \
     zapuso.h
 
 win32:INCLUDEPATH += D:/Development/Qt/vktoolslib
-unix:INCLUDEPATH += /home/user/sai/develop/vktoolslib
+unix:INCLUDEPATH += /home/user/develop/vktoolslib
 
 win32:LIBS+=  D:/Development/Qt/vktoolslib/vktreexml.lib
 win32:LIBS+=  D:/Development/Qt/vktoolslib/vkserialport.lib
 win32:LIBS+=  D:/Development/Qt/vktoolslib/vkdatastore.lib
-unix:LIBS += -L/home/user/sai/build-vktoolslib-Desktop_Qt_5_7_1_GCC_64bit-Debug -lvktoolslib
+unix:LIBS += -L/home/user/develop/vktoolslib -lvktreexml
+unix:LIBS += -L/home/user/develop/vktoolslib -lvkserialport
+unix:LIBS += -L/home/user/develop/vktoolslib -lvkdatastore
 
 win32:RC_FILE = ico.rc

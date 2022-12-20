@@ -286,7 +286,7 @@ Rectangle {
         running: kdr_FootElektrooborud.opacity // при появлении панели - лампочки иницализируем
         onTriggered: {
 
-            var trs = ioBf.getTrevogaElectr();
+            var trs = ioBf.getParamKdrFtElektr();
             err.tr1 = trs[0];
             err.tr2 = trs[1];
 

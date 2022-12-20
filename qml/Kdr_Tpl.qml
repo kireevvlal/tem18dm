@@ -13,9 +13,9 @@ Rectangle {
             var par = ioBf.getParamKdrTpl();
             ind_Oby.value = par[0];
             ind_Mss.value = par[1];
-            ind_PiF.value = Math.round(par[2] * 100) / 100;
-            ind_dP.value = Math.round(Math.abs(par[3]) * 100) / 100;
-            ind_PiD.value = Math.round(par[4] * 100) / 100;
+            ind_PiF.value = par[2].toFixed(2);
+            ind_dP.value = Math.abs(par[3]).toFixed(2);
+            ind_PiD.value = par[4].toFixed(2);
             ind_Ttn.value = par[5];
             ind_Fd.value = par[6];
             ind_PiF.color = ind_PiD.color = (par[7] & 1) ? "red" : "black";

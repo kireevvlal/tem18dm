@@ -13,51 +13,49 @@ Rectangle {
         onTriggered: {
             var par = ioBf.getParamKdrDizl();
 
-            ind_Fd.value = par[0];
-            ind_TSP.value = par[1];
+            f_d.value = par[1];
+            t_hsp.value = par[2];
 
+            t1.value = g1.value = par[3][0];
+            t2.value = g2.value = par[3][1];
+            t3.value = g3.value = par[3][2];
+            t4.value = g4.value = par[3][3];
+            t5.value = g5.value = par[3][4];
+            t6.value = g6.value = par[3][5];
 
-            ind_T1.value = par[2];
-            stolbik1.value = ind_T1.value;
+            tk1.value = par[4][0];
+            tk2.value = par[4][1];
 
-            ind_T2.value = par[3];
-            stolbik2.value = ind_T2.value;
+            t_max.value = par[5];
+            t_min.value = par[6];
+            t_sr.value = par[7];
 
-            ind_T3.value = par[4];
-            stolbik3.value =ind_T3.value ;
+            d1.value = par[8][0];
+            d2.value = par[8][1];
+            d3.value = par[8][2];
+            d4.value = par[8][3];
+            d5.value = par[8][4];
+            d6.value = par[8][5];
 
-            ind_T4.value = par[5];
-            stolbik4.value = ind_T4.value;
+            t1.visible = g1.visible = d1.visible = par[0] && (t1.value <= 990);
+            t2.visible = g2.visible = d2.visible = par[0] && (t2.value <= 990);
+            t3.visible = g3.visible = d3.visible = par[0] && (t3.value <= 990);
+            t4.visible = g4.visible = d4.visible = par[0] && (t4.value <= 990);
+            t5.visible = g5.visible = d5.visible = par[0] && (t5.value <= 990);
+            t6.visible = g6.visible = d6.visible = par[0] && (t6.value <= 990);
+            tk1.visible = par[0] && (tk1.value <= 990);
+            tk2.visible = par[0] && (tk2.value <= 990);
+            t_hsp.visible = t_max.visible = t_min.visible = t_sr.visible = par[0];
 
-            ind_T5.value = par[6];
-            stolbik5.value = ind_T5.value;
-
-            ind_T6.value = par[7];
-            stolbik6.value = ind_T6.value;
-
-
-            ind_Ttk1.value = par[8];
-            ind_Ttk2.value = par[9];
-
-            ind_Tmx.value = par[10];
-            ind_Tmn.value = par[11];
-            ind_Tsr.value = par[12];
-
-            ind_D1.value = par[13];
-            ind_D2.value = par[14];
-            ind_D3.value = par[15];
-            ind_D4.value = par[16];
-            ind_D5.value = par[17];
-            ind_D6.value = par[18];
-
+            // дискретные сигналы не используются:
 //            rct_trTT1.visible = ! rct_trTT1.visible;
 //            rct_trTT2.visible = ! rct_trTT2.visible;
 
-            txt_Trb.visible = ! txt_Trb.visible;
-            txt_Zyl.visible = true;
-            txt_Rej.visible = ! txt_Rej.visible;
+//            txt_Trb.visible = ! txt_Trb.visible;
+//            txt_Zyl.visible = true;
+//            txt_Rej.visible = ! txt_Rej.visible;
 
-            ioBf.getParamDiap(200); // ??????????????????????????????
+//            ioBf.getParamDiap(200); // ??????????????????????????????
 
         }
 
@@ -86,7 +84,7 @@ Rectangle {
         }
 
         TInd {
-            id: ind_TSP
+            id: t_hsp
             x: 34
             y: 32
             width: 31
@@ -180,7 +178,7 @@ Rectangle {
 
 
         PrBar {
-            id: stolbik1
+            id: g1
             x: 133
             y: 16
             width: 21
@@ -192,7 +190,7 @@ Rectangle {
         }
 
         PrBar {
-            id: stolbik2
+            id: g2
             x: 164
             y: 16
             width: 21
@@ -202,7 +200,7 @@ Rectangle {
         }
 
         PrBar {
-            id: stolbik3
+            id: g3
             x: 195
             y: 16
             width: 21
@@ -212,7 +210,7 @@ Rectangle {
         }
 
         PrBar {
-            id: stolbik4
+            id: g4
             x: 226
             y: 16
             width: 21
@@ -222,7 +220,7 @@ Rectangle {
         }
 
         PrBar{
-            id: stolbik5
+            id: g5
             x: 257
             y: 16
             width: 21
@@ -232,7 +230,7 @@ Rectangle {
         }
 
         PrBar {
-            id: stolbik6
+            id: g6
             x: 288
             y: 16
             width: 21
@@ -242,7 +240,7 @@ Rectangle {
         }
 
         TInd {
-            id: ind_T1
+            id: t1
             x: 129
             y: 128
             width: 31
@@ -253,7 +251,7 @@ Rectangle {
         }
 
         TInd {
-            id: ind_T2
+            id: t2
             x: 160
             y: 128
             width: 31
@@ -264,7 +262,7 @@ Rectangle {
         }
 
         TInd {
-            id: ind_T3
+            id: t3
             x: 191
             y: 128
             width: 31
@@ -275,7 +273,7 @@ Rectangle {
         }
 
         TInd {
-            id: ind_T4
+            id: t4
             x: 222
             y: 128
             width: 31
@@ -286,7 +284,7 @@ Rectangle {
         }
 
         TInd {
-            id: ind_T5
+            id: t5
             x: 253
             y: 128
             width: 31
@@ -297,7 +295,7 @@ Rectangle {
         }
 
         TInd {
-            id: ind_T6
+            id: t6
             x: 284
             y: 128
             width: 31
@@ -308,7 +306,7 @@ Rectangle {
         }
 
         TInd {
-            id: ind_D1
+            id: d1
             x: 129
             y: 144
             width: 31
@@ -320,7 +318,7 @@ Rectangle {
         }
 
         TInd {
-            id: ind_D2
+            id: d2
             x: 160
             y: 144
             width: 31
@@ -332,7 +330,7 @@ Rectangle {
         }
 
         TInd {
-            id: ind_D3
+            id: d3
             x: 191
             y: 144
             width: 31
@@ -344,7 +342,7 @@ Rectangle {
         }
 
         TInd {
-            id: ind_D4
+            id: d4
             x: 222
             y: 144
             width: 31
@@ -356,7 +354,7 @@ Rectangle {
         }
 
         TInd {
-            id: ind_D5
+            id: d5
             x: 253
             y: 144
             width: 31
@@ -368,7 +366,7 @@ Rectangle {
         }
 
         TInd {
-            id: ind_D6
+            id: d6
             x: 284
             y: 144
             width: 31
@@ -380,7 +378,7 @@ Rectangle {
         }
         // max, min, average
         TInd {
-            id: ind_Tmx
+            id: t_max
             value: "000"
             x: 12
             y: 128
@@ -392,7 +390,7 @@ Rectangle {
         }
 
         TInd {
-            id: ind_Tmn
+            id: t_min
             x: 44
             y: 128
             width: 31
@@ -404,7 +402,7 @@ Rectangle {
         }
 
         TInd {
-            id: ind_Tsr
+            id: t_sr
             x: 76
             y: 128
             width: 31
@@ -467,7 +465,7 @@ Rectangle {
 
 
         TInd {
-            id: ind_Ttk1
+            id: tk1
             x: 129
             y: 160
             width: 31
@@ -479,7 +477,7 @@ Rectangle {
         }
 
         TInd {
-            id: ind_Ttk2
+            id: tk2
             x: 129
             y: 176
             width: 31
@@ -536,7 +534,7 @@ Rectangle {
             }
 
             TInd {
-                id: ind_Fd
+                id: f_d
                 x: 357
                 y: 102
                 width: 56
@@ -558,19 +556,6 @@ Rectangle {
                 font.pixelSize: 16
             }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
 

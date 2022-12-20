@@ -130,15 +130,7 @@ Rectangle {// Экран отображения аналоговых сигна�
             for (i=0;i<cntRowTabl;i++) {
                 strarr = ioBf.getStructAnlg(i + offset);
                 usoTxtAng(i, strarr);
-//                str_r = ioBf.getStructAnlg_r(i+offset);
-//                str_n = ioBf.getStructAnlg_n(i+offset);
-//                str_o = ioBf.getStructAnlg_o(i+offset);
-//                str_i = ioBf.getStructAnlg_i(i+offset);
-//                str_a = ioBf.getStructAnlg_a(i+offset);
-
-//                usoTxtAng(i, str_r, str_n, str_o, str_i, str_a);
             }
-
         }
     }
     //
@@ -147,18 +139,18 @@ Rectangle {// Экран отображения аналоговых сигна�
         triggeredOnStart: true
         repeat:true
         interval: 500
-        running: true // включается по usoview.opacity
+        running: kdr_USTA_Analog.opacity || kdr_TI_TXA.opacity || kdr_TI_TCM.opacity || kdr_BEL_Analog.opacity //true // включается по usoview.opacity
         property int j:0;
         onTriggered: {
             var i;
-            var values = ioBf.getAnalogArray(offset);
-            var precition = values[0];
-            for (i = 0;i < cntRowTabl; i++) {
-                 // значения сигналов
-                 // !!!!! дописать ioBf смещение по массиву в зависимости от offset
-                  //  j ++ ; отладка
-                 usoModelAnalog.setProperty(i, "Anlg_val", precition ? values[i + 1].toFixed(precition) : values[i + 1].toString()); //(offset+j).toString());
-             }
+            if ((kdr_USTA_Analog.opacity && offset < 40) || (kdr_BEL_Analog.opacity && offset == 40) ||
+                    (kdr_TI_TXA.opacity && offset >=80) ||(kdr_TI_TCM.opacity && offset >= 50 && offset <= 70)) {
+                var values = ioBf.getAnalogArray(offset);
+                var precision = values[0];
+                for (i = 0;i < cntRowTabl; i++) {
+                    usoModelAnalog.setProperty(i, "Anlg_val", precision ? values[i + 1].toFixed(precision) : values[i + 1].toString()); //(offset+j).toString());
+                }
+            }
         }
     }
 

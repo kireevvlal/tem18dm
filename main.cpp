@@ -40,6 +40,12 @@ int main(int argc, char *argv[])
     Processor ioBf(&app);
     pProcessor = &ioBf;
     qmlRegisterType<Processor>("ConnectorModule", 1, 0, "Connector");
+    if (ioBf.Load(/*"D:\\Development\\Qt\\tem18dm*/qApp->applicationDirPath(), "config.xml")) {
+        qDebug() << "Config readed!";
+        ioBf.Run();
+    } else
+        qDebug() << "Config read error.";
+
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
@@ -51,11 +57,11 @@ int main(int argc, char *argv[])
     }, Qt::QueuedConnection);
     engine.load(url);
     engine.rootContext()->setContextProperty("ioBf", &ioBf);
-    if (ioBf.Load(/*"D:\\Development\\Qt\\tem18dm*/qApp->applicationDirPath(), "config.xml")) {
-        qDebug() << "Config readed!";
-        ioBf.Run();
-    } else
-        qDebug() << "Config read error.";
+//    if (ioBf.Load(/*"D:\\Development\\Qt\\tem18dm*/qApp->applicationDirPath(), "config.xml")) {
+//        qDebug() << "Config readed!";
+//        ioBf.Run();
+//    } else
+//        qDebug() << "Config read error.";
 
     signal(SIGTERM, handleSignals);
 #ifndef Q_OS_WIN

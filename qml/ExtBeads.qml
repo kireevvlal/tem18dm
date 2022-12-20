@@ -53,7 +53,7 @@ Rectangle {
             for (var i = 0, tmp = 0; i < cntitems; i++) {
                 if (value > step * i) {
                     result = true;
-                    if (value >= step * (i + 1))
+                    if (value > step * (i + 1))
                         if (i < cntitems - 1)
                             text = false;
                         else

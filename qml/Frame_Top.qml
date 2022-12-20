@@ -10,30 +10,69 @@ Item {
         running: true
         onTriggered: {
             var par = ioBf.getParamFrameTop();
-            revers.value = par[0][0]; //ioBf.getReversor();// реверсор
-            pkm.pkms = par[0][1]; //ioBf.getPKM();         // позиция
-            regim.value = par[0][2]; //ioBf.getRegim();    // режим работы тепловоза
-            txt_time.text = par[1][0];
-            txt_data.text = par[1][1];
-            txt_RejPro.text = par[2][0]; // прожиг
-            txt_RejAP.text = par[2][1]; // автопрогрев
-            txt_RejPrTime.text = par[3][0]; //ioBf.getRejPrT("value");// --- косяк с разными значениями --че делать то?
-            txt_RejPrTime.color = (par[3][1] == "2") ?  "yellow" : "gray";
-            txt_RejPrT.opacity = (par[3][2] == "1") ? 1 : 0;
-            prBar1.value = par[4]; //ioBf.getParamDiap(100);// заглушка
+            pkm.pkms = par[1][0];
+            revers.value = par[1][1];
+            regim.value = par[1][2]; // режим работы тепловоза
+
+            txt_time.text = par[2][0];
+            txt_data.text = par[2][1];
+            txt_RejPrT.text = par[3][0];
+            txt_RejPro.text = par[3][1]; // прожиг
+            txt_RejAP.text = par[3][2]; // автопрогрев
+            txt_RejPrTime.text = par[4][0]; //ioBf.getRejPrT("value");// --- косяк с разными значениями --че делать то?
+            txt_RejPrTime.color = (par[4][1] == "2") ?  "yellow" : "gray";
+            txt_RejPrT.opacity = (par[4][2] == "1") ? 1 : 0;
+
+            prBar1.value = par[5]; //ioBf.getParamDiap(100);// заглушка
+
+            indPt.value = par[6][0];
+            var start = par[6][1];
+            var finish = par[6][2];
+            if (indPt.start != start) {
+                indPt.start = start;
+                indPt.repaint = true;
+            }
+            if (indPt.finish != finish) {
+                indPt.finish = finish;
+                indPt.repaint = true;
+            }
+            indPm.value = par[6][3];
+            start = par[6][4];
+            finish = par[6][5];
+            if (indPm.start != start) {
+                indPm.start = start;
+                indPm.repaint = true;
+            }
+            if (indPm.finish != finish) {
+                indPm.finish = finish;
+                indPm.repaint = true;
+            }
+            indFd.value = par[6][6];
+            start = par[6][7];
+            finish = par[6][8];
+            if (indFd.start != start) {
+                indFd.start = start;
+                indFd.repaint = true;
+            }
+            if (indFd.finish != finish) {
+                indFd.finish = finish;
+                indFd.repaint = true;
+            }
+
+            indPt.visible = indPm.visible = indFd.visible = par[0];
         }
 
     }
 
     TRevers {
         id: revers
-        x: 24
+        x: 10
         y: 46
     }
 
     TPKM {
         id: pkm
-        x: 24
+        x: 10
         y: 15
         width: 64
         color: "#000000"
@@ -42,7 +81,7 @@ Item {
 
     TRegm {
         id: regim
-        x: 16
+        x: 4
         y: 88
         height: 25
         value: 1
@@ -50,23 +89,23 @@ Item {
 
     Text {
         id: txt_RejPrTime
-        x: 16
+        x: 4
         y: 118
         width: 80
         color: "#6e6e63"
         text: qsTr("00:00:00")
-        font.family: "Segoe UI Black"
+        font.family: "Segoe UI Emoji"
         clip: true
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
         font.bold: true
         font.pointSize: 12
-        visible: true
+        visible: false // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
 
     Image {
         id: img_ind_f
-        x: 16
+        x: 4
         y: 138
         width: 22
         height: 40
@@ -77,7 +116,7 @@ Item {
 
     Image {
         id: img_z0
-        x: 39
+        x: 26
         y: 147
         width: 35
         height: 19
@@ -89,7 +128,7 @@ Item {
 
     PrBar {
         id: prBar1
-        x: 75
+        x: 61
         y: 148
         width: 61
         height: 14
@@ -108,6 +147,38 @@ Item {
         text: qsTr("ТЭМ18ДМ  №___")
         font.bold: true
         font.pointSize: 13
+    }
+
+    Text {
+        id: txt_RejPrT
+        x: 128
+        y: 27
+        color: "#f0f026"
+        text: qsTr("Длительный х.ход! Установи 8 ПКМ на 10 минут")
+        font.pointSize: 10
+        font.bold: true
+    }
+
+    Text {
+        id: txt_RejPro
+        x: 128
+        y: 43
+        color: "#f0f026"
+        text: qsTr("Прожиг коллектора")
+        font.pointSize: 10
+        font.bold: true
+        style: Text.Outline
+    }
+
+    Text {
+        id: txt_RejAP
+        x: 128
+        y: 59
+        color: "#f0f026"
+        text: qsTr("Режим автопрогрева")
+        font.family: "Segoe UI Historic"
+        font.pointSize: 10
+        font.bold: true
     }
 
     Text {
@@ -172,37 +243,5 @@ Item {
         parameter: "F об/мин"
         start: 600
         finish: 750
-    }
-
-    Text {
-        id: txt_RejPrT
-        x: 128
-        y: 27
-        color: "#f0f026"
-        text: qsTr("Длительный х.ход! Установи 8 ПКМ на 10 минут")
-        font.pointSize: 10
-        font.bold: true
-    }
-
-    Text {
-        id: txt_RejAP
-        x: 128
-        y: 43
-        color: "#f0f026"
-        text: qsTr("Режим автопрогрева")
-        font.family: "Segoe UI Historic"
-        font.pointSize: 10
-        font.bold: true
-    }
-
-    Text {
-        id: txt_RejPro
-        x: 128
-        y: 59
-        color: "#f0f026"
-        text: qsTr("Прожиг коллектора")
-        font.pointSize: 10
-        font.bold: true
-        style: Text.Outline
     }
 }

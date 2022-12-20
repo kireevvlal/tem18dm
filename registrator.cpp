@@ -5,7 +5,8 @@
 Registrator::Registrator(QObject *parent) : QObject(parent) {
 #ifdef Q_OS_WIN
     _os = 0;
-#elif Q_OS_UNIX
+#endif
+#ifdef Q_OS_UNIX
     _os = 1;
 #endif
     _path = _extention = _alias = "";

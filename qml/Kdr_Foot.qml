@@ -254,7 +254,7 @@ Rectangle {
         repeat: true
         running: kdr_Foot.opacity // при появлении панели - лампочки иницализируем
         onTriggered: {
-            var trs = ioBf.getTrevogaTotal();
+            var trs = ioBf.getParamKdrFoot();
             err.tr1 = trs[0]; // 0
             err.tr2 = trs[1]; // 1
             err.tr8 = trs[2]; // 7

@@ -16,7 +16,7 @@ Window {
 //    z: 100
 //    focus: true
     property int cnt: 0;
-    property int current_section: 0; // 1 - own, 2 - extra
+    property int current_section: 1; // 1 - own, 2 - extra
     property int current_system: 0; // 0 - not 1 - diesel, 2 - electro, 3 - links
     property int current_subsystem: 0; // 0 - not
 
@@ -195,6 +195,7 @@ Window {
             bazaoffset: 80
             z: 77 //24
             namePage: qsTr("параметры ТИ");
+            opacity: 0
         }
 
     Kdr_Analog {
@@ -208,6 +209,7 @@ Window {
             bazaoffset: 50
             z: 25
             namePage: qsTr("параметры ТИ");
+            opacity: 0
         }
 
     Kdr_Dskrt {
@@ -221,7 +223,7 @@ Window {
             namePage: qsTr("УСТА: дискретные выходы");
             offset: 48
             bazaoffset: 48
-
+            opacity: 0
         }
 
     Kdr_Dskrt {
@@ -235,7 +237,7 @@ Window {
             namePage: qsTr("УСТА: дискретные входы");
             offset: 72
             bazaoffset: 72
-
+            opacity: 0
         }
 
     Kdr_Analog {
@@ -249,6 +251,7 @@ Window {
             offset: 0
             bazaoffset: 0
             z: 77 //29
+            opacity: 0
         }
 
     Kdr_Dskrt {
@@ -262,6 +265,7 @@ Window {
             bazaoffset: 0
             namePage: qsTr("БЭЛ: дискретные выходы");
             z: 77// 30
+            opacity: 0
         }
 
     Kdr_Dskrt {
@@ -275,6 +279,7 @@ Window {
             offset: 24
             bazaoffset: 24
             z: 77// 31
+            opacity: 0
         }
 
     Kdr_Analog {
@@ -283,12 +288,12 @@ Window {
             y: 219
            // width: 512
             height: 197
-            opacity: 1
+            opacity: 0
             visible: true
             cntPage: 1
             offset: 40
             bazaoffset: 40
-             namePage: qsTr("параметры БЭЛ");
+            namePage: qsTr("параметры БЭЛ");
             z: 77 //32
     }
 

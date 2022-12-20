@@ -22,25 +22,25 @@ Rectangle {
             ind_Ttk1.value = par[6]; //ioBf.getParam();
             ind_Ttk2.value = par[7]; //ioBf.getParam();
 
+            ind_Fu.value = par[8].toFixed(0); //ioBf.getParam();
+            ind_Mg.value = par[9].toFixed(0); //ioBf.getParam();
+            ind_Mz.value = par[10].toFixed(0); //ioBf.getParam();
+            ind_Ug.value = par[11].toFixed(0); //ioBf.getParam();
+            ind_Uz.value = par[12].toFixed(0); //ioBf.getParam();
+            ind_Ig.value = par[13].toFixed(0); //ioBf.getParam();
+            ind_I1.value = par[14].toFixed(0); //ioBf.getParam();
+            ind_I2.value = par[15].toFixed(0); //ioBf.getParam();
+            ind_Iv.value = par[16].toFixed(0); //ioBf.getParam();
+            ind_Iz.value = par[17].toFixed(0); //ioBf.getParam();
+            ind_Ubs.value = par[18].toFixed(0); //ioBf.getParam();
 
-            ind_Mg.value = par[8]; //ioBf.getParam();
-            ind_Mz.value = par[9]; //ioBf.getParam();
-            ind_Ug.value = par[10]; //ioBf.getParam();
-            ind_Uz.value = par[11]; //ioBf.getParam();
-            ind_Ubs.value = par[12]; //ioBf.getParam();
-            ind_Ig.value = par[13]; //ioBf.getParam();
-            ind_I1.value = par[14]; //ioBf.getParam();
-            ind_I2.value = par[15]; //ioBf.getParam();
-            ind_Iv.value = par[16]; //ioBf.getParam();
-            ind_Iz.value = par[17]; //ioBf.getParam();
+            ind_Lz.value = par[19].toFixed(0); //ioBf.getParam();
+            ind_Lv.value = par[20].toFixed(0); //ioBf.getParam();
+            ind_Pm.value = par[21].toFixed(2); //ioBf.getParam();
+            ind_Pt.value = par[22].toFixed(2); //ioBf.getParam();
+            ind_Tv.value = par[23].toFixed(2); //ioBf.getParam();
+            ind_Tm.value = par[24].toFixed(2); //ioBf.getParam();
 
-            ind_Pm.value = par[18]; //ioBf.getParam();
-            ind_Pt.value = par[19]; //ioBf.getParam();
-            ind_Tv.value = par[20]; //ioBf.getParam();
-            ind_Tm.value = par[21]; //ioBf.getParam();
-            ind_Fu.value = par[22]; //ioBf.getParam();
-            ind_Lz.value = par[23]; //ioBf.getParam();
-            ind_Lv.value = par[24]; //ioBf.getParam();
             ind_O1.value = par[25]; //ioBf.getParam();
             ind_O2.value = par[26]; //ioBf.getParam();
 

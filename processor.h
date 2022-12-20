@@ -11,19 +11,30 @@
 #include "saver.h"
 #include "control.h"
 #include "diagnostics.h"
+#include "slave.h"
 
-#define TR_SOOB_SIZE 63
-
+//#define TR_SOOB_SIZE 64
+// структура тревожного сообщения
+struct TrMess {
+    int delay; // z
+    int output; // o
+    int system; // i
+    int repair; // v
+    QString text; // s
+    TrMess() { delay = output = system = repair = 0; text = ""; }
+};
 
 class Processor : public QObject
 {
     Q_OBJECT
 private:
-//    QByteArray _bytes_data;
-//    QMap<QString, qint16> _int_data;
-//    QMap<QString, float> _float_data;
-    int _pkm; // вычисленная позиция ПКМ 0 - не определено 1-9 : 0-8 - т.е. реальная ПКМ + 1
-    QBitArray _tr_soob;
+    int _section; // 0 - тепловоз, 1 - дополнительная секеция
+    QMap<int, TrMess*> _tr_messages;
+    float _pt_max; // макимальное значение давления топлива
+    DataStore* _storage[2];
+    QMap<QString, ThreadSerialPort*> _serial_ports;
+    DataStore _mainstore;
+    SlaveLcm _slave; // additional section
     bool _is_active;
     QFile _mtr_file; // имя и путь файла моторесурса
     QThread *_reg_thread;
@@ -47,13 +58,12 @@ private:
     void ParseSerialPorts(NodeXML*);
     void ParseDiagnostic(NodeXML*);
     void ParseRegistration(NodeXML*);
-//    void DiagMotoresurs();
-//    void DiagConnections();
-//    void DiagRizCU();
-//    void DiagAPSignalization();
+    void ParseTrMess(NodeXML*);
+    void SetAddSectionData();
+#ifdef Q_OS_UNIX
+    void GPIO();
+#endif
 public:
-    QMap<QString, ThreadSerialPort*> SerialPorts;
-    DataStore Storage;
     explicit Processor(QObject *parent = nullptr);
     ~Processor(); // { Stop(); }
     bool Load(QString, QString);
@@ -72,9 +82,9 @@ public slots:
     void querySaveToUSB(QString);
     void changeKdr(int);
     // New:
-    QJsonArray getTrevogaTotal();
-    QJsonArray getTrevogaDiesel();
-    QJsonArray getTrevogaElectr();
+    QJsonArray getParamKdrFoot();
+    QJsonArray getParamKdrFtDzl();
+    QJsonArray getParamKdrFtElektr();
     QJsonArray getParamKdrBos();
     QJsonArray getParamKdrVzb();
     QJsonArray getParamKdrTed();
@@ -104,7 +114,7 @@ public slots:
 //    QString getRejPrT(QString param);
 
 //    QString getParam();
-    QString getParamDiap(int diapazon);
+//    QString getParamDiap(int diapazon);
 //    QString getParamExt(int ext);
 //    QString tm();
 //    QString dt();

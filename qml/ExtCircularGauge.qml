@@ -55,7 +55,7 @@ CircularGauge {
             if (begin !== end) {
             ctx.beginPath();
             ctx.lineWidth =  tickmarkInset - 2;
-            ctx.strokeStyle = "red";
+            ctx.strokeStyle = "gray";
             var sAngle = valueToAngle(begin) - 90;
             var eAngle = valueToAngle(end) - 90;
             ctx.arc(outerRadius, outerRadius, outerRadius - ctx.lineWidth / 2 - 1, degreesToRadians(sAngle), degreesToRadians(eAngle));
@@ -66,14 +66,21 @@ CircularGauge {
         background: Canvas {
             id: gaugecanvas
             property real value: ecgauge.value
-
+//            property bool repaint: ecgauge.repaint
             anchors.fill: parent
             onValueChanged: {
                 if (ecgauge.repaint) {
                     requestPaint();
-                    repaint = false;
+                    ecgauge.repaint = false;
                 }
             }
+
+//            onRepaintChanged: {
+//                if (ecgauge.repaint) {
+//                    requestPaint();
+//                    ecgauge.repaint = repaint = false;
+//                }
+//            }
 
             onPaint: {
                 var ctx = getContext("2d");

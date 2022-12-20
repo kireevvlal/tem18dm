@@ -14,8 +14,8 @@ Rectangle {
             var par = ioBf.getParamKdrVzb();
             ind_Ig.value = par[0];
             ind_Ug.value = par[1];
-            ind_Ivz.value = par[2];
-            ind_Sh1.value = par[3];
+            ind_Ivz.value = par[2].toFixed(1);
+            ind_Sh1.value = par[3].toFixed(1);
 
             k_KV.visible = par[4] & 1;
             tVz.visible = xVz.visible = par[4] & 2;

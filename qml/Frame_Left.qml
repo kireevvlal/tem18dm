@@ -9,58 +9,35 @@ Item {
         repeat: true
         running: true
         onTriggered: {
-            cnt ++;
             var par = ioBf.getParamFrameLeft();
 
-            // индикация регистрации
-            //img_z0.visible = ! img_z0.visible;
-            //img_ind_f.visible = ! img_ind_f.visible;
+            pr_Mtg1.value = par[1].toFixed(0); //ioBf.getParamDiap(1500);// заглушка
+            pr_Mtg2.value = par[2].toFixed(0);// ioBf.getParamDiap(1500); // заглушка
 
-            //            prBar1.value = par[0]; //ioBf.getParamDiap(100);// заглушка
+            indUb0.text = par[3].toFixed(0); //ioBf.getParamDiap(100);// заглушка
+            indUb1.text = par[4].toFixed(0); //ioBf.getParamDiap(100);// заглушка
 
-            pr_Mtg1.value = par[0]; //ioBf.getParamDiap(1500);// заглушка
-            pr_Mtg2.value = par[1];// ioBf.getParamDiap(1500); // заглушка
+            indIz0.text = par[5].toFixed(0); //ioBf.getParamDiap(60);// заглушка
+            indIz1.text = par[6].toFixed(0); //ioBf.getParamDiap(60);// заглушка
 
-            img_in2BX.opacity = ! img_in2BX.opacity;// заглушка
-            if (cnt==2 ) {  in1DR.opacity = ! in1DR.opacity}; // ДРУ уровень воды
-            if (cnt==1 ) {  in1OM.opacity = ! in1OM.opacity}; // отключатель моторов
-            if (cnt==3 ) {  in1RZ.opacity = ! in1RZ.opacity}; // реле земли
-            if (cnt==4 ) {  in1OT.opacity = ! in1OT.opacity}; // обрыв тормозной магистрали
+            in1OM1.visible = par[7][0] && par[0][0];
+            in1OM2.visible = par[7][1] && par[0][0];
+            in1BX.visible = par[7][2] && par[0][0];
+            in1DR.visible = par[7][3] && par[0][0];
+            in1RZ.visible = par[7][4] && par[0][0];
+            in1OT.visible = par[7][5] && par[0][0];
 
-            indUb0.text = par[2]; //ioBf.getParamDiap(100);// заглушка
-            indUb1.text = par[3]; //ioBf.getParamDiap(100);// заглушка
+            in2OM1.visible = par[8][0] && par[0][1];
+            in2OM2.visible = par[8][1] && par[0][1];
+            in2BX.visible = par[8][2] && par[0][1];
+            in2DR.visible = par[8][3] && par[0][1];
+            in2RZ.visible = par[8][4] && par[0][1];
+            in2OT.visible = par[8][5] && par[0][1];
 
-            indIz0.text = par[4]; //ioBf.getParamDiap(60);// заглушка
-            indIz1.text = par[5]; //ioBf.getParamDiap(60);// заглушка
-
-            if  (cnt>6 ) { cnt = 0};
+            indUb0.visible = indIz0.visible = pr_Mtg1.visible = par[0][0];
+            indUb1.visible = indIz1.visible = pr_Mtg2.visible = par[0][1];
+            txtUb.visible = txtV.visible = txtIz.visible = txtA.visible = par[0][0] || par[0][1];
         }
-    }
-
-    Text {
-        id: indUb0
-        x: 42
-        y: 3
-        width: 23
-        height: 17
-        color: "#d2e8fb"
-        text: qsTr("0")
-        horizontalAlignment: Text.AlignHCenter
-        font.pixelSize: 14
-        font.bold: true
-    }
-
-    Text {
-        id: indUb1
-        x: 73
-        y: 3
-        width: 23
-        height: 17
-        color: "#d2e8fb"
-        text: qsTr("0")
-        horizontalAlignment: Text.AlignHCenter
-        font.pixelSize: 14
-        font.bold: true
     }
 
     Text {
@@ -77,7 +54,49 @@ Item {
     }
 
     Text {
-        id: txtUb1
+        id: indUb0
+        x: 40
+        y: 0
+        width: 23
+        height: 17
+        color: "#d2e8fb"
+        text: qsTr("0")
+        horizontalAlignment: Text.AlignHCenter
+        font.pixelSize: 14
+        font.bold: true
+    }
+
+    Text {
+        id: txtV
+        x: 78
+        y: 0
+        width: 23
+        height: 17
+        color: "#acb3b3"
+        text: qsTr("В")
+        horizontalAlignment: Text.AlignHCenter
+        font.pixelSize: 14
+        font.bold: true
+    }
+
+    Text {
+        id: indUb1
+        x: 104
+        y: 0
+        width: 23
+        height: 17
+        color: "#d2e8fb"
+        text: qsTr("0")
+        font.family: "Segoe UI Black"
+        horizontalAlignment: Text.AlignHCenter
+        font.pixelSize: 14
+        font.bold: true
+    }
+
+
+
+    Text {
+        id: txtIz
         x: 8
         y: 16
         width: 23
@@ -91,8 +110,8 @@ Item {
 
     Text {
         id: indIz0
-        x: 42
-        y: 22
+        x: 40
+        y: 16
         width: 23
         height: 17
         color: "#d2e8fb"
@@ -103,9 +122,22 @@ Item {
     }
 
     Text {
+        id: txtA
+        x: 78
+        y: 16
+        width: 23
+        height: 18
+        color: "#acb3b3"
+        text: qsTr("А")
+        horizontalAlignment: Text.AlignHCenter
+        font.pixelSize: 14
+        font.bold: true
+    }
+
+    Text {
         id: indIz1
-        x: 73
-        y: 22
+        x: 104
+        y: 16
         width: 23
         height: 17
         color: "#d2e8fb"
@@ -115,29 +147,12 @@ Item {
         font.bold: true
     }
 
-    Image {
-        id: img_in1BX
-        x: 3
-        y: 43
-        width: 28
-        height: 28
-        source: "../Pictogram/ind_box.png"
-    }
-
-    Image {
-        id: img_in2BX
-        x: 67
-        y: 43
-        width: 28
-        height: 28
-        source: "../Pictogram/ind_box.png"
-    }
 
     ExtBeads {
         id: pr_Mtg1
-        x: 34
-        y: 48
-        height: 180
+        x: 38
+        y: 35
+        height: 195
         width: 28
         cntitems: 15
         colors: ["#f01f00", "#f02f00", "#f03f00", "#f04f00", "#f05f00", "#f06f00", "#f07f00", "#f08f00", "#f09f99", "#f0afaa", "#f0bfbb", "#f0cfcc", "#f0dfdd", "#f0efee", "#f0ffff"]
@@ -147,9 +162,9 @@ Item {
 
     ExtBeads {
         id: pr_Mtg2
-        x: 98
-        y: 48
-        height: 180
+        x: 102
+        y: 35
+        height: 195
         width: 28
         cntitems: 15
         colors: ["#f01f00", "#f02f00", "#f03f00", "#f04f00", "#f05f00", "#f06f00", "#f07f00", "#f08f00", "#f09f99", "#f0afaa", "#f0bfbb", "#f0cfcc", "#f0dfdd", "#f0efee", "#f0ffff"]
@@ -157,10 +172,57 @@ Item {
         maxvalue: 1500
     }
 
+    TInd {
+        id: in1OM1
+        x: 5
+        y: 35
+        width: 30
+        height: 30
+        radius: 2
+        gradient: Gradient {
+            GradientStop {position: 0;color: "#aca6a6"}
+            GradientStop {position: 0.5; color: "#e4d6d6"}
+            GradientStop {position: 1;color: "#aca6a6"}
+        }
+        txtSize: 16
+        txtColor: "#000000"
+        value: "ОМ"
+        border.width: 0
+        border.color: "#e4d6d6"
+    }
+
+    TInd {
+        id: in1OM2
+        x: 5
+        y: 68
+        width: 30
+        height: 30
+        radius: 2
+        gradient: Gradient {
+            GradientStop {position: 0;color: "#aca6a6"}
+            GradientStop {position: 0.5; color: "#e4d6d6"}
+            GradientStop {position: 1;color: "#aca6a6"}
+        }
+        txtSize: 16
+        txtColor: "#000000"
+        value: "ОМ"
+        border.width: 0
+        border.color: "#e4d6d6"
+    }
+
+    Image {
+        id: in1BX
+        x: 5
+        y: 101
+        width: 30
+        height: 30
+        source: "../Pictogram/ind_box.png"
+    }
+
   TInd {
       id: in1DR
-      x: 1
-      y: 115
+      x: 5
+      y: 134
       width: 30
       height: 30
       color: "#160000"
@@ -178,31 +240,11 @@ Item {
         }
     }
 
-    TInd {
-        id: in2DR
-        x: 65
-        y: 115
-        width: 30
-        height: 30
-        radius: 2
-        txtSize: 15
-        txtColor: "red"
-        value: "ДРУ"
-        border.width: 2
-        border.color: "red"
-        gradient: Gradient{
-            GradientStop {position:0.0; color: "silver"}
-            GradientStop {position:0.3; color: "black"}
-            GradientStop {position:0.7; color: "black"}
-            GradientStop {position:1; color: "silver"}
-        }
-
-    }
 
     TInd {
         id: in1RZ
-        x: 1
-        y: 156
+        x: 5
+        y: 167
         width: 30
         height: 30
         radius: 2
@@ -221,30 +263,9 @@ Item {
     }
 
     TInd {
-        id: in2RZ
-        x: 65
-        y: 156
-        width: 30
-        height: 30
-        radius: 2
-        txtSize: 18
-        txtColor: "#ffff00"
-        value: "РЗ"
-        border.width: 2
-        border.color: "#ffff00"
-        gradient: Gradient{
-            GradientStop {position:0.0; color: "silver"}
-            GradientStop {position:0.3; color: "black"}
-            GradientStop {position:0.7; color: "black"}
-            GradientStop {position:1; color: "silver"}
-        }
-
-    }
-
-    TInd {
         id: in1OT
-        x: 1
-        y: 197
+        x: 5
+        y: 200
         width: 30
         height: 30
         radius: 2
@@ -260,29 +281,12 @@ Item {
         border.color: "#ffff00"
     }
 
-    TInd {
-        id: in1OM
-        x: 1
-        y: 76
-        width: 30
-        height: 30
-        radius: 2
-        gradient: Gradient {
-            GradientStop {position: 0;color: "#aca6a6"}
-            GradientStop {position: 0.5; color: "#e4d6d6"}
-            GradientStop {position: 1;color: "#aca6a6"}
-        }
-        txtSize: 16
-        txtColor: "#000000"
-        value: "ОМ"
-        border.width: 0
-        border.color: "#e4d6d6"
-    }
+
 
     TInd {
-        id: in2OM
-        x: 65
-        y: 76
+        id: in2OM1
+        x: 69
+        y: 35
         width: 30
         height: 30
         radius: 2
@@ -310,9 +314,89 @@ Item {
     }
 
     TInd {
+        id: in2OM2
+        x: 69
+        y: 68
+        width: 30
+        height: 30
+        radius: 2
+        txtSize: 16
+        gradient: Gradient {
+            GradientStop {
+                position: 0
+                color: "#aca6a6"
+            }
+
+            GradientStop {
+                position: 0.531
+                color: "#e4d6d6"
+            }
+
+            GradientStop {
+                position: 1 //1.033
+                color: "#aca6a6"
+            }
+        }
+        txtColor: "#000000"
+        value: "ОМ"
+        border.width: 0
+        border.color: "#e4d6d6"
+    }
+
+    Image {
+        id: in2BX
+        x: 69
+        y: 101
+        width: 30
+        height: 30
+        source: "../Pictogram/ind_box.png"
+    }
+
+    TInd {
+        id: in2DR
+        x: 69
+        y: 134
+        width: 30
+        height: 30
+        radius: 2
+        txtSize: 15
+        txtColor: "red"
+        value: "ДРУ"
+        border.width: 2
+        border.color: "red"
+        gradient: Gradient{
+            GradientStop {position:0.0; color: "silver"}
+            GradientStop {position:0.3; color: "black"}
+            GradientStop {position:0.7; color: "black"}
+            GradientStop {position:1; color: "silver"}
+        }
+    }
+
+    TInd {
+        id: in2RZ
+        x: 69
+        y: 167
+        width: 30
+        height: 30
+        radius: 2
+        txtSize: 18
+        txtColor: "#ffff00"
+        value: "РЗ"
+        border.width: 2
+        border.color: "#ffff00"
+        gradient: Gradient{
+            GradientStop {position:0.0; color: "silver"}
+            GradientStop {position:0.3; color: "black"}
+            GradientStop {position:0.7; color: "black"}
+            GradientStop {position:1; color: "silver"}
+        }
+
+    }
+
+    TInd {
         id: in2OT
-        x: 65
-        y: 197
+        x: 69
+        y: 200
         width: 30
         height: 30
         radius: 2
@@ -339,3 +423,9 @@ Item {
         border.color: "#ffff00"
     }
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/
