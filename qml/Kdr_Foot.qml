@@ -12,12 +12,9 @@ Rectangle {
     property string cltxtSelect:"#1bb7e4"; // цвет текста нажатой кнопки
     property string cltxt:"white";         // штатный цвет текста всех кнопок
 
-    //property int idDisp:0;  // номер нажатой клавиши - может привязать номер секции
-
     signal switchFootDizel();  // переход на меню ДИЗЕЛЬ
     signal switchFootElektr(); // переход на меню ЭЛЕКТРООБОРУДОВАНИЕ
     signal switchFoot_Exit();    // переход в начало
-    signal switchSection(section: int);
 
     signal knopaS();  // сигнал о нажатии клавиши ДМ "S"
     signal knopai();  // сигнал о нажатии клавиши ДМ "i"
@@ -32,40 +29,39 @@ Rectangle {
 
         case Qt.Key_0:
         {
-            img1.source = "../Pictogram/m0_lok.png"; err.vz1 = 1;
-            img2.source = "../Pictogram/m0_lok.png"; err.vz2 = 1;
+            img1.source = "../Pictogram/m0_lok.png"; // err.vz1 = 1;
+            img2.source = "../Pictogram/m0_lok.png"; //err.vz2 = main_window.is_slave;
             img0.opacity = 0;
             img8.opacity = 0; err.vz8 = 0;
             img9.opacity = 0; err.vz9 = 0;
+            txt_1.color = txt_2.color = cltxt;
             switchFoot_Exit();
             break;
         }
         case Qt.Key_1:
         {
-            img1.source = "../Pictogram/m1_lok.png"; err.vz1 = 1;
-            img2.source = "../Pictogram/m0_lok.png"; err.vz2 = 1;
-            img0.opacity = 1;
-            img8.opacity = 1; err.vz8 = 1;
-            img9.opacity = 1; err.vz9 = 1;
-            txt_1.color =cltxtSelect;
-            txt_2.color = cltxt;
-
-            //idDisp = 1;  // ?? надо подать сигнал о смене секций, а может и не надо?
-            switchSection(1);
+            if (setSection(1)) {
+                img1.source = "../Pictogram/m1_lok.png"; // err.vz1 = 1;
+                img2.source = "../Pictogram/m0_lok.png"; //err.vz2 = main_window.is_slave;
+                img0.opacity = 1;
+                img8.opacity = 1; err.vz8 = 1;
+                img9.opacity = 1; err.vz9 = 1;
+                txt_1.color =cltxtSelect;
+                txt_2.color = cltxt;
+            }
             break;
         }
         case Qt.Key_2:
         {
-            img1.source = "../Pictogram/m0_lok.png"; err.vz1 = 1;
-            img2.source = "../Pictogram/m1_lok.png"; err.vz2 = 1;
-            img0.opacity = 1;
-            img8.opacity = 1; err.vz8 = 1;
-            img9.opacity = 1; err.vz9 = 1;
-            txt_2.color = cltxtSelect;
-            txt_1.color = cltxt;
-
-            //idDisp = 2;  // ?? надо подать сигнал о смене секций, а может и не надо?
-            switchSection(2);
+            if (setSection(2)) {
+                img1.source = "../Pictogram/m0_lok.png"; //err.vz1 = 1;
+                img2.source = "../Pictogram/m1_lok.png"; //err.vz2 = main_window.is_slave;
+                img0.opacity = 1;
+                img8.opacity = 1; err.vz8 = 1;
+                img9.opacity = 1; err.vz9 = 1;
+                txt_2.color = cltxtSelect;
+                txt_1.color = cltxt;
+            }
             break;
         }
         case Qt.Key_3:
@@ -93,6 +89,7 @@ Rectangle {
             if (img8.opacity == 1)  // будем переключаться на меню ДИЗЕЛЬ
             {
                 switchFootDizel();
+                main_window.current_system = 1;
             }
             break;
         }
@@ -101,6 +98,7 @@ Rectangle {
             if (img9.opacity == 1) // будем переключаться на меню ЭЛЕКТРООБОРУДОВАНИЕ
             {
                 switchFootElektr();
+                main_window.current_system = 2;
             }
             break;
         }
@@ -109,24 +107,28 @@ Rectangle {
         {
             console.log("даем сигнал о нажатии В");
             knopaS(); // сигнал о нажатии клавиши ДМ "S"
+            main_window.current_system = 4;
             break;
         }
         case Qt.Key_C:  //67 :
         {
             console.log("даем сигнал о нажатии C");
             knopai(); // сигнал о нажатии клавиши ДМ "i"
+            main_window.current_system = 5;
             break;
         }
         case Qt.Key_D:  //68 :
         {
             console.log("даем сигнал о нажатии D");
             knopaSt(); // сигнал о нажатии клавиши ДМ "St"
+            main_window.current_system = 6;
             break;
         }
         case Qt.Key_I:  //73 :
         {
             console.log("даем сигнал о нажатии I");
             knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
+            main_window.current_system = 3;
             break;
         }
         // ***
@@ -138,7 +140,23 @@ Rectangle {
         // kireev add for windows
         case Qt.Key_S: {
                 console.log("даем сигнал о нажатии S");
+            main_window.current_system = 7;
             saveToUSB();
+            break;
+        }
+
+        case Qt.Key_Down:
+        {
+            if (kdr_TrLs.opacity) {
+                if (kdr_TrLs.first < kdr_TrLs.count - 12)
+                    kdr_TrLs.first++;
+            }
+            break;
+        }
+        case Qt.Key_Up:
+        {
+            if (kdr_TrLs.first > 0)
+                kdr_TrLs.first--;
             break;
         }
 
@@ -160,6 +178,7 @@ Rectangle {
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
         font.pixelSize: 30
+        visible: main_window.is_links
     }
 
     Text {
@@ -178,6 +197,7 @@ Rectangle {
         font.bold: true
         horizontalAlignment: Text.AlignHCenter
         font.family: "Times New Roman"
+        visible: main_window.is_slave
     }
 
 
@@ -200,6 +220,7 @@ Rectangle {
         height: 64
         z: 2
         source: "../Pictogram/m0_lok.png"
+        visible: main_window.is_links
     }
 
     Image {
@@ -210,6 +231,7 @@ Rectangle {
         height: 64
         z: 4
         source: "../Pictogram/m0_lok.png"
+        visible: main_window.is_slave
     }
 
     Image {
@@ -259,9 +281,35 @@ Rectangle {
             err.tr2 = trs[1]; // 1
             err.tr8 = trs[2]; // 7
             err.tr9 = trs[3]; // 8
+            if (main_window.current_section == 2 && !main_window.is_slave) {
+                setSection(1);
+                switchFoot_Exit();
+            }
+            if (main_window.current_section == 1 && !main_window.is_links) {
+                setSection(2);
+                switchFoot_Exit();
+            }
         }
 
     }
 
+    function setSection(section) {
+        if (ioBf.changeKdr(section)) {
+            main_window.current_section = section;
+            return true;
+        } else
+        return false;
+    }
+
+    function doExit() {
+        setSection(1);
+        main_window.current_system = 0;
+        img1.source = "../Pictogram/m0_lok.png";
+//        err.vz1 = 1;
+        img2.source = "../Pictogram/m0_lok.png";
+        img0.opacity = img8.opacity = img9.opacity = 0;
+        err.vz8 = err.vz9 = 0;
+        txt_1.color = txt_2.color = cltxt;
+    }
 
 }

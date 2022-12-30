@@ -18,8 +18,8 @@ using namespace std;
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 12, 0)
 #include <QDebug>
-#include <QTime>
-#include <QDate>
+//#include <QTime>
+//#include <QDate>
 #endif
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
@@ -27,6 +27,7 @@ Processor::Processor(QObject *parent) : QObject(parent)
 {
      _pt_max = 0.5;
     _section = 0;
+    _virtual_section = 0;
     _reg_timer = new QTimer();
     _reg_thread = new QThread();
     _registrator = new Registrator();
@@ -103,8 +104,8 @@ void Processor::Run()
     // start serial ports
     for (QMap<QString, ThreadSerialPort*>::iterator i = _serial_ports.begin(); i != _serial_ports.end(); i++) {
         connect(i.value(), SIGNAL(DecodeSignal(QString)), this, SLOT(Unpack(QString)));
-        connect(i.value(), SIGNAL(LostExchangeSignal(QString)), this, SLOT(LostConnection(QString)));
-        connect(i.value(), SIGNAL(RestoreExchangeSignal(QString)), this, SLOT(RestoreConnection(QString)));
+//        connect(i.value(), SIGNAL(LostExchangeSignal(QString)), this, SLOT(LostConnection(QString)));
+//        connect(i.value(), SIGNAL(RestoreExchangeSignal(QString)), this, SLOT(RestoreConnection(QString)));
         i.value()->Start();
     }
     // start registration
@@ -182,6 +183,7 @@ void Processor::Stop() {
 }
 //--------------------------------------------------------------------------------
 void Processor::RegTimerStep() {
+    int i;
     // for main circle
     if (_serial_ports.contains("BEL"))
         _mainstore.SetByte("DIAG_CQ_BEL", _serial_ports["BEL"]->Quality());
@@ -193,8 +195,6 @@ void Processor::RegTimerStep() {
         _mainstore.SetByte("DIAG_CQ_MSS", _serial_ports["MSS"]->Quality());
     //
     QDateTime dt = QDateTime::currentDateTime();
-    QDate date = dt.date();
-    QTime time = dt.time();
     // word diagnostic
     _registrator->SetByteRecord(176, _mainstore.Byte("DIAG_CQ_BEL"));
     _registrator->SetByteRecord(178, _mainstore.Byte("DIAG_CQ_USTA"));
@@ -210,22 +210,28 @@ void Processor::RegTimerStep() {
     _registrator->SetDoubleWordRecord(210, _mainstore.UInt32("DIAG_Apol"));
     _registrator->SetDoubleWordRecord(214, _mainstore.UInt32("DIAG_Tt"));
     // message params
-    _registrator->SetByteRecord(318, 0); // hour
-    _registrator->SetByteRecord(319, 0); // minute
-    _registrator->SetByteRecord(320, 0); // second
-    _registrator->SetByteRecord(322, 0); // index
+    if (_tr_reg_queue.empty()) { // not tr soob
+        for (i = 0; i < 4; i++)
+            _registrator->SetByteRecord(318 + i, 0);
+    } else {
+        _registrator->SetByteRecord(318, _tr_reg_queue[0].hour); // hour
+        _registrator->SetByteRecord(319, _tr_reg_queue[0].minute); // minute
+        _registrator->SetByteRecord(320, _tr_reg_queue[0].second); // second
+        _registrator->SetByteRecord(322, _tr_reg_queue[0].index); // index
+        _tr_reg_queue.removeFirst();
+    }
     // date and time
-    _registrator->SetByteRecord(326, date.day());
-    _registrator->SetByteRecord(327, date.month());
-    _registrator->SetByteRecord(328, date.year() % 100);
-    _registrator->SetByteRecord(329, time.hour());
-    _registrator->SetByteRecord(330, time.minute());
-    _registrator->SetByteRecord(331, time.second());
+    _registrator->SetByteRecord(326, dt.date().day());
+    _registrator->SetByteRecord(327, dt.date().month());
+    _registrator->SetByteRecord(328, dt.date().year() % 100);
+    _registrator->SetByteRecord(329, dt.time().hour());
+    _registrator->SetByteRecord(330, dt.time().minute());
+    _registrator->SetByteRecord(331, dt.time().second());
     // discret diagnostic
     _registrator->SetByteRecord(346, _mainstore.Byte("DIAG_Connections"));
     quint8 byte;
     QBitArray* ba = _mainstore.Bits("PROG_TrSoob");
-    for (int i = 0; i < 5; i++) {
+    for (i = 0; i < 5; i++) {
         byte = 0;
         for (int j = 0; j < 8; j++ )
             byte +=  ba->testBit(i * 8 + j) ? (1 << i) : 0;
@@ -239,47 +245,149 @@ void Processor::RegTimerStep() {
 }
 //--------------------------------------------------------------------------------
 void Processor::DiagTimerStep() {
-    int pku = _mainstore.Int16("USTA_PKM") + 1;
-    int pkb = _mainstore.Byte("BEL_PKM") + 1;
+    int i;
+    int banner_key = 0;
+    int pku = _mainstore.Int16("USTA_PKM") + (( _mainstore.Bit("DIAG_Connections", CONN_USTA)) ? 1 : 0);
+    int pkb = _mainstore.Byte("BEL_PKM") + (( _mainstore.Bit("DIAG_Connections", CONN_BEL)) ? 1 : 0);
     if (pkb > 9)
         pkb = 9;
     if (pku > 9)
         pku = 9;
-    _mainstore.SetInt16("PROG_PKM", (pkb < pku) ? pku : pkb);
-    _mainstore.SetInt16("PROG_Regime", (_mainstore.Int16("PROG_Reversor") < 2 || pkb < 2) ? 3 : (_mainstore.Byte("BEL_Diagn") & 1) + 1); // 3 - XX
+    _mainstore.SetByte("PROG_PKM", (pkb < pku) ? pku : pkb);
+    _mainstore.SetByte("PROG_Regime", _mainstore.Bit("DIAG_Connections", CONN_BEL) ? ((_mainstore.Byte("PROG_Reversor") < 2 || pkb < 2) ? 3
+                                                                                   : (_mainstore.Byte("BEL_Diagn") & 1) + 1) : 0); // 3 - XX
+    _virtual_section = (_virtual_section == 1) ? 0 : 1;
     _diagnostics->Motoresurs();
-    _diagnostics->Connections(_serial_ports);
-    _diagnostics->RizCU(_mainstore.Int16("PROG_PKM"));
-    _diagnostics->APSignalization(_mainstore.Int16("PROG_PKM"));
-    SetAddSectionData();
-    for (QMap<QString, ThreadSerialPort*>::iterator i = _serial_ports.begin(); i != _serial_ports.end(); i++) {
-        if (i.key() == "BEL")
-            i.value()->OutData.SetByteParameter("BEL_SIGNALIZATION",
-                 ((_mainstore.Float("IT_TSM4") >= 40) ? 1 : 0) + (_mainstore.Bit("USTA_Inputs", USTA_INPUTS_PKM18) ? 2 : 0));
-        else if (i.key() == "USTA")
-            i.value()->OutData.SetByteParameter("USTA_SIGNALIZATION", (_mainstore.Bit("PROG_TrSoob", 17) ? 1 : 0) + (_mainstore.Bit("PROG_TrSoob", 16) ? 2 : 0));
-        else if  (i.key() == "MSS") {
-            _serial_ports["MSS"]->OutData.SetData(0, 580, _slave.Outdata());
+    _diagnostics->Connections(_serial_ports, _registrator, &_slave);
+    _diagnostics->RizCU(_mainstore.Byte("PROG_PKM"));
+    _diagnostics->APSignalization(_mainstore.Byte("PROG_PKM"));
+    SetSlaveData();
+    // tr soob
+    for ( QMap<int, TrMess*>::iterator it = _tr_messages.begin(); it != _tr_messages.end(); it++) {
+        if (it.key() != 90) {
+            if (_storage[_virtual_section]->Bit("PROG_TrSoob", it.key())) { // is trevoga
+                // registration queue
+                if (!_virtual_section) {
+                    if (!_tr_states[0][it.key()]->status.testBit(0)) {
+                        _tr_states[0][it.key()]->status.setBit(0);
+                        _tr_reg_queue.append(TrRec(_diagnostics->Time.hour(), _diagnostics->Time.minute(),
+                                                   _diagnostics->Time.second(), i));
+                    }
+                }
+                // string list queue
+                if (!_tr_states[_virtual_section][it.key()]->status.testBit(1)) {
+                    _tr_states[_virtual_section][it.key()]->status.setBit(1);
+                    if (_tr_strings.count() >= 300)
+                        _tr_strings.removeFirst();
+                    _tr_strings.append(_diagnostics->Date.toString("yy/MM/dd") + " " + _diagnostics->Time.toString("hh:mm:ss") + " " +
+                                       FormMessage(_virtual_section, it.key(), it.value()->system) + " " + it.value()->text);
+                }
+                // banner output
+                if (!_tr_states[_virtual_section][it.key()]->status.testBit(2)) { // init
+                    _tr_states[_virtual_section][it.key()]->status.setBit(2);
+                    _tr_states[_virtual_section][it.key()]->delay = it.value()->delay * 1000;
+                    _tr_states[_virtual_section][it.key()]->kvit = false;
+                } else { // coorect delay
+                    if (_tr_states[_virtual_section][it.key()]->delay > 0) {
+                        _tr_states[_virtual_section][it.key()]->delay -= _diag_interval;
+                        if (_tr_states[_virtual_section][it.key()]->delay < 0 )
+                            _tr_states[_virtual_section][it.key()]->delay = 0;
+                    }
+                }
+                if (!_tr_states[_virtual_section][it.key()]->kvit) {  // add to queue
+                    if (!_tr_states[_virtual_section][it.key()]->delay) {
+                        banner_key = it.key() * 10 + _virtual_section;
+                        if (!_tr_banner_queue.contains(banner_key)) {
+                            _tr_banner_queue[banner_key] = TrBanner { FormMessage(_virtual_section, it.key(), it.value()->system), it.value()->text, _virtual_section, it.key() };
+                        }
+                    }
+                }
+            } else { // not trevoga
+                if (!_virtual_section) {
+                    // registration queue
+                    if (_tr_states[0][it.key()]->status.testBit(0)) {
+                        // ищем, есть ли в очереди такая тревога
+                        for (i = 0; i < _tr_reg_queue.count(); i++)
+                            if (_tr_reg_queue[i].index == it.key())
+                                break;
+                        // есть
+                        if (i < _tr_reg_queue.count())
+                            _tr_states[0][it.key()]->status.clearBit(0);
+                    }
+                }
+                // string list queue
+                if (_tr_states[_virtual_section][it.key()]->status.testBit(1)) {
+                    _tr_states[_virtual_section][it.key()]->status.clearBit(1);
+                }
+                // banner output
+                if (_tr_states[_virtual_section][it.key()]->status.testBit(2)) {
+                    _tr_states[_virtual_section][it.key()]->status.clearBit(2);
+                    banner_key = it.key() * 10 + _virtual_section;
+                    if (_tr_banner_queue.contains(banner_key))
+                        _tr_banner_queue.remove(banner_key);
+                }
+            }
         }
     }
 }
 //--------------------------------------------------------------------------------
-void Processor::SetAddSectionData()
+QString Processor::FormMessage(int sec, int index, int system) {
+    QString out;
+    if (sec) //section
+        out = "секц 2.";
+    else
+        out = "секц 1.";
+    int high = system / 10;
+    int low = system % 10;
+    switch (high) {// устройство
+    case 2: out += "БЭЛ: "; break;
+    case 3: out += "УСТА: "; break;
+    case 4: out += "СУД: авария "; break;
+    case 5: out += "СУД: сокр. нагрузки "; break;
+    case 6: out += "СУД: остановка ";  break;
+    default:
+        out += "Внимание: ";
+        switch (low) {
+        case 1: out += ("борт. сеть"); break;
+        case 3: out += ("тэд"); break;
+        case 2: out += ("возбуждение"); break;
+        case 4: out += ("моторесурс"); break;
+        case 5: out += ("топливо"); break;
+        case 6: out += ("масло"); break;
+        case 7: out += ("охлаждение"); break;
+        case 8: out += ("газы"); break;
+        }
+    }
+    if (high == 4 || high == 5 || high == 6) {
+        switch (low) {
+        case 1: out += ("топливо"); break;
+        case 4: out += ("охлаждение"); break;
+        case 7: out += ("картер"); break;
+        case 2: out += ("масло"); break;
+        case 5: out += ("газы"); break;
+        case 8: out += ("отключатели"); break;
+        case 3: out += ("воздух"); break;
+        case 6: out += ("наддув"); break;
+        case 9: out += ("автоматика"); break;
+        }
+    }
+    return out;
+}
+//--------------------------------------------------------------------------------
+void Processor::SetSlaveData()
 {
-    QTime tm = QTime::currentTime();
-    QDate dt = QDate::currentDate();
     QByteArray date;
     QBitArray* ba = _mainstore.Bits("PROG_TrSoob");
     QByteArray ts;
     qint8 byte;
 
     date.resize(6);
-    date[0] = dt.day();
-    date[1] = dt.month();
-    date[2] = dt.year() - 2000;
-    date[3] = tm.hour();
-    date[4] = tm.minute();
-    date[5] = tm.second();
+    date[0] = _diagnostics->Date.day();
+    date[1] = _diagnostics->Date.month();
+    date[2] = _diagnostics->Date.year() - 2000;
+    date[3] = _diagnostics->Time.hour();
+    date[4] = _diagnostics->Time.minute();
+    date[5] = _diagnostics->Time.second();
 
     for (int i = 1; i < 8; i++) {
         byte = 0;
@@ -306,50 +414,51 @@ void Processor::SetAddSectionData()
     _slave.SetBytePacket(290, _mainstore.Byte("PROG_Regime"));
 }
 //--------------------------------------------------------------------------------
-void Processor::changeKdr(int kdr) {
-    _control->KdrNum = kdr;
-    _section = kdr / 100 - 1;  // in qml: 1 - own section, 2 - additional section
+bool Processor::changeKdr(int kdr) {
+    int section = kdr - 1;
+//    _control->KdrNum = kdr;
+//    section = kdr / 100 - 1;  // in qml: 1 - own section, 2 - additional section
+    if ((section == 0) || (section == 1 && _mainstore.Bit("DIAG_Connections", CONN_MSS))) {
+        _section = section;
+        return true;
+    } else
+        return false;
 }
 //--------------------------------------------------------------------------------
-void Processor::LostConnection(QString alias) {
-    QByteArray arr(128, 0);
-    _mainstore.LoadSpData(_serial_ports[alias]); // reset parameters to 0
-    if (alias == "BEL") {
-        _mainstore.SetBit("DIAG_Connections", CONN_BEL, 0);
-        // в 0
-        _registrator->UpdateRecord(338, 8, arr.mid(0, 8)); // дискретные (+ ПКМ)
-        _slave.UpdatePacket(0, 8, arr.mid(0, 8)); // дискретные (+ ПКМ)
+void Processor:: kvitTrBanner() {
+    int first;
+    if (!_tr_banner_queue.isEmpty()) {
+        first = _tr_banner_queue.firstKey();
+        _tr_states[_tr_banner_queue[first].section][_tr_banner_queue[first].index]->kvit = true;
+        _tr_banner_queue.remove(first);
     }
-    else if (alias == "USTA") {
-        _mainstore.SetBit("DIAG_Connections", CONN_USTA, 0);
-        // в 0
-        _registrator->UpdateRecord(0, 80, arr.mid(0, 80));  // аналоговые
-        _registrator->UpdateRecord(332, 6, arr.mid(0, 6)); // дискретные
-        _slave.UpdatePacket(8, 80, arr.mid(0, 80));  // аналоговые
-        _slave.UpdatePacket(88, 6, arr.mid(0, 6));
-    }
-    if (alias == "IT") {
-        _mainstore.SetBit("DIAG_Connections", CONN_IT, 0);
-        // в 0
-        _registrator->UpdateRecord(80, 96, arr.mid(0, 96));
-        _slave.UpdatePacket(96, 96, arr.mid(0, 96));
-    }
-    else if (alias == "MSS")
-        _mainstore.SetBit("DIAG_Connections", CONN_MSS, 0);
-     qDebug() << "Lost " + alias;
 }
-//--------------------------------------------------------------------------------
-void Processor::RestoreConnection(QString alias) {
-    if (alias == "BEL")
-        _mainstore.SetBit("DIAG_Connections", CONN_BEL, 1);
-    else if (alias == "USTA")
-        _mainstore.SetBit("DIAG_Connections", CONN_USTA, 1);
-    if (alias == "IT")
-        _mainstore.SetBit("DIAG_Connections", CONN_IT, 1);
-    else if (alias == "MSS")
-        _mainstore.SetBit("DIAG_Connections", CONN_MSS, 1);
-     qDebug() << "Restore " + alias;
-}
+////--------------------------------------------------------------------------------
+//void Processor::LostConnection(QString alias) {
+
+//    _mainstore.LoadSpData(_serial_ports[alias]); // reset parameters to 0
+//    if (alias == "BEL")
+//        OnLostBel(_serial_ports[alias]);
+//    else if (alias == "USTA")
+//        OnLostUsta(_serial_ports[alias]);
+//    if (alias == "IT")
+//        OnLostIt(_serial_ports[alias]);
+//    else if (alias == "MSS")
+//        _mainstore.SetBit("DIAG_Connections", CONN_MSS, 0);
+//     qDebug() << "Lost " + alias;
+//}
+////--------------------------------------------------------------------------------
+//void Processor::RestoreConnection(QString alias) {
+//    if (alias == "BEL")
+//        _mainstore.SetBit("DIAG_Connections", CONN_BEL, 1);
+//    else if (alias == "USTA")
+//        _mainstore.SetBit("DIAG_Connections", CONN_USTA, 1);
+//    if (alias == "IT")
+//        _mainstore.SetBit("DIAG_Connections", CONN_IT, 1);
+//    else if (alias == "MSS")
+//        _mainstore.SetBit("DIAG_Connections", CONN_MSS, 1);
+//     qDebug() << "Restore " + alias;
+//}
 //--------------------------------------------------------------------------------
 void Processor::Unpack(QString alias) {
     QByteArray data = _serial_ports[alias]->InData.Data();
@@ -381,7 +490,7 @@ void Processor::Unpack(QString alias) {
         if (data.size() >= 10) {
             //Storage.SetByteRecord(186, Storage.Byte("BEL_PKM")); // ???????????????????????????????????????????????
             _registrator->UpdateRecord(338, 8, data.mid(1, 8)); // дискретные (+ ПКМ)
-            _mainstore.SetInt16("PROG_Reversor", (_mainstore.Byte("BEL_Diagn") & 3) + 1);
+            _mainstore.SetByte("PROG_Reversor", (_mainstore.Byte("BEL_Diagn") & 3) + 1);
             _slave.UpdatePacket(0, 8, data.mid(1, 8)); // дискретные (+ ПКМ)
         }
     } else if (alias == "MSS") {
@@ -440,6 +549,8 @@ void Processor::ParseTrMess(NodeXML *node)
         while (node != nullptr) {
             if (node->Name == "message") {
                 TrMess *newMess = new TrMess;
+                TrState *newState = new TrState;
+                TrState *newStateSlave = new TrState;
                 newMess->text = node->Text;
                 for (int i = 0; i < node->Attributes.count(); i++) {
                     AttributeXML *attr = node->Attributes[i];
@@ -455,6 +566,8 @@ void Processor::ParseTrMess(NodeXML *node)
                         index = attr->Value.toInt();
                 }
                 _tr_messages[index] = newMess;
+                _tr_states[0][index] = newState;
+                _tr_states[1][index] = newStateSlave;
                 //Storage.Add(newMess->Variable, newPar->Type);
             }
             node = node->Next;
@@ -749,8 +862,10 @@ QJsonArray Processor::getParamKdrSmlMain()
                 ogrIgMax, ogrUgMax, _control->KdrSmlMain(_section) };
 }
 //------------------------------------------------------------------------------
-QJsonArray Processor::getParamFrameTop()
-{
+QJsonArray Processor::getParamMainWindow() {
+    bool iKVmain_own = _storage[0]->Bit("USTA_Inputs", USTA_INPUTS_KV);
+    bool iKVmain_add = _storage[1]->Bit("USTA_Inputs", USTA_INPUTS_KV);
+    //bool iKVadd = _storage[1]->Bit("USTA_Inputs", USTA_INPUTS_KV);
     int min[10] = { 240, 240, 240, 240, 307, 377, 457, 547, 627, 738};
     int max[10] = { 315, 315, 315, 315, 352, 422, 502, 592, 672, 757};
     int bt = _storage[_section]->Byte("BEL_PKM") & 0x30; //= dab[0,7];
@@ -758,7 +873,7 @@ QJsonArray Processor::getParamFrameTop()
     int dsk_iSA1 = 1;   // dsk_iSA1  = dsk[0,iSA1 ];
     int dsk_iKMv0 = 1;  // dsk_iKMv0 = dsk[0,iKMv0];
     int dsk_iDizZ = 0;  // dsk_iDizZ = dsk[0,iDizZ];
-    int pkm = _mainstore.Int16("PROG_PKM");
+    int pkm = _mainstore.Byte("PROG_PKM");
 
     int n_diz = _storage[_section]->Int16("USTA_N");
     float pt_min = 0, pt_max = 0, pm_min = 0, pm_max = 0, nd_min = 0, nd_max = 0;
@@ -775,25 +890,19 @@ QJsonArray Processor::getParamFrameTop()
         nd_min = min[pkm];
         nd_max = max[pkm];
     }
+    QStringList tr_banner;
+    if (_tr_banner_queue.empty()) {
+        tr_banner.append("");
+        tr_banner.append("");
+    }
+    else {
+        tr_banner.append(_tr_banner_queue.first().str1);
+        tr_banner.append(_tr_banner_queue.first().str2);
+    }
     return {
-         _storage[_section]->Bit("DIAG_Connections", CONN_USTA),
-        QJsonArray { pkm,  _mainstore.Int16("PROG_Reversor"), _mainstore.Int16("PROG_Regime") },
-        QJsonArray { QTime::currentTime().toString("HH:mm:ss"), QDate::currentDate().toString("dd/MM/yy") },
-        QJsonArray { "", // RejPrT
-            (bt == 0x00) ? "" : ((bt == 0x10) ? "Прожиг коллектора": "Завершение прожига"), // RejPro
-            (dsk_iAPvkl1 == 00) ? "" : ((dsk_iSA1 == 01) ? "Режим АвтоПрогрева" : ((dsk_iKMv0 == 00) ? "АП: Установи ПКМ в 0" : ((dsk_iDizZ == 00) ? "АП: Запусти дизель" : ""))), },
-        RejPrT(), // getRejPrT// RejAP
-        rand() % 100, // load usb indicator
-        QJsonArray { _storage[_section]->Float("USTA_Pf_tnvd") * 0.1, pt_min * 0.01, pt_max * 0.01,
-                    _storage[_section]->Float("USTA_Po_diz") * 0.1, pm_min * 0.01, pm_max * 0.01,  n_diz, nd_min, nd_max } }; // !!! исправить нормирование!!!
-}
-//------------------------------------------------------------------------------
-QJsonArray Processor::getParamFrameLeft() {
-    bool iKVmain_own = _storage[0]->Bit("USTA_Inputs", USTA_INPUTS_KV);
-    bool iKVmain_add = _storage[1]->Bit("USTA_Inputs", USTA_INPUTS_KV);
-    //bool iKVadd = _storage[1]->Bit("USTA_Inputs", USTA_INPUTS_KV);
-    return {
-        QJsonArray { _storage[0]->Bit("DIAG_Connections", CONN_USTA), _storage[1]->Bit("DIAG_Connections", CONN_USTA) },
+        // frame left
+        QJsonArray { _storage[0]->Bit("DIAG_Connections", CONN_BEL), _storage[0]->Bit("DIAG_Connections", CONN_USTA), _storage[0]->Bit("DIAG_Connections", CONN_IT),
+                    _storage[0]->Bit("DIAG_Connections", CONN_MSS), _storage[1]->Bit("DIAG_Connections", CONN_USTA)},
         _storage[0]->Float("USTA_Ug_filtr") * _storage[0]->Float("USTA_Ig_filtr") * 0.001,
         _storage[1]->Float("USTA_Ug_filtr") * _storage[1]->Float("USTA_Ig_filtr") * 0.001,
         _storage[0]->Float("USTA_Ubs_filtr"), _storage[1]->Float("USTA_Ubs_filtr"),
@@ -802,6 +911,18 @@ QJsonArray Processor::getParamFrameLeft() {
                 _storage[0]->Bit("USTA_Inputs", USTA_INPUTS_URV), _storage[0]->Bit("USTA_Inputs", USTA_INPUTS_RZ), _storage[0]->Bit("USTA_Inputs", USTA_INPUTS_OBTM) } , // ур. воды, реле земли,обрыв ТМ
         QJsonArray { iKVmain_add && _storage[1]->Bit("USTA_Inputs", USTA_INPUTS_OM2), iKVmain_add && _storage[1]->Bit("USTA_Inputs", USTA_INPUTS_OM1), _storage[1]->Bit("USTA_Outputs", USTA_OUTPUTS_BOKS), // OM1, OM2, боксование
                 _storage[1]->Bit("USTA_Inputs", USTA_INPUTS_URV), _storage[1]->Bit("USTA_Inputs", USTA_INPUTS_RZ), _storage[1]->Bit("USTA_Inputs", USTA_INPUTS_OBTM) } , // ур. воды, реле земли,обрыв ТМ
+        // frame top
+        _storage[_section]->Bit("DIAG_Connections", CONN_USTA),
+        QJsonArray { pkm,  _mainstore.Byte("PROG_Reversor"), _mainstore.Byte("PROG_Regime") },
+        QJsonArray { _diagnostics->Time.toString("HH:mm:ss"), _diagnostics->Date.toString("dd/MM/yy") },
+        QJsonArray { "", // RejPrT
+            (bt == 0x00) ? "" : ((bt == 0x10) ? "Прожиг коллектора": "Завершение прожига"), // RejPro
+            (dsk_iAPvkl1 == 00) ? "" : ((dsk_iSA1 == 01) ? "Режим АвтоПрогрева" : ((dsk_iKMv0 == 00) ? "АП: Установи ПКМ в 0" : ((dsk_iDizZ == 00) ? "АП: Запусти дизель" : ""))), },
+        RejPrT(), // getRejPrT// RejAP
+        rand() % 100, // load usb indicator
+        QJsonArray { _storage[_section]->Float("USTA_Pf_tnvd") * 0.1, pt_min * 0.01, pt_max * 0.01,
+                    _storage[_section]->Float("USTA_Po_diz") * 0.1, pm_min * 0.01, pm_max * 0.01,  n_diz, nd_min, nd_max },
+        QJsonArray { tr_banner[0], tr_banner[1], /*_tr_banner_queue.first().section, _tr_banner_queue.first().index*/ }
     };
 }
 //------------------------------------------------------------------------------
@@ -970,6 +1091,14 @@ QJsonArray Processor::getAnalogArray(int offset) {
         break;
     }
     return result;
+}
+//------------------------------------------------------------------------------
+// Tr soob string list
+QStringList Processor::getKdrTrL() {
+    QStringList list;
+    for (int i = 0; i < 100; i++)
+        list.append("Строка № " + QString::number(i));
+    return list;
 }
 //------------------------------------------------------------------------------
 // Old realisation

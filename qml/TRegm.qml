@@ -16,7 +16,7 @@ Rectangle {
 //        3:begin Caption:='х.ход' ;Font.Color:=clGray   ;end; end;//
 //                                     Visible:=true     ;end; End;//
 
-        if  ((value==0) || (value>3))
+        if  ((value == 0) || (value > 3))
         { txt.opacity = 0 }
         else {
             if (value == 1) { txt.color = "yellow"; txt.text = "тормоз";}

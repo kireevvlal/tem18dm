@@ -4,7 +4,6 @@
 #include <QMap>
 #include <QBitArray>
 
-
 // номера индексов в словарях битовых массивов
 #define CONN_BEL  0 // Наличие связи с БЭЛ
 #define CONN_USTA 1 // Наличие связи с УСТА

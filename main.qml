@@ -3,6 +3,7 @@ import QtQuick.Window 2.2
 import "qml"
 
 Window {
+    id: main_window
     width: 640
     height: 480
     visible: true
@@ -17,41 +18,740 @@ Window {
 //    focus: true
     property int cnt: 0;
     property int current_section: 1; // 1 - own, 2 - extra
+    property bool is_slave: false; // true - is exchange with slave locomotive
+    property bool is_links: false; // true - is exchange with BEL or USTA or TI
     property int current_system: 0; // 0 - not 1 - diesel, 2 - electro, 3 - links
-    property int current_subsystem: 0; // 0 - not
+//    property int current_subsystem: 0; // 0 - not
 
 //    signal setKdr(kdr: int);
 
     Timer {
         triggeredOnStart: true
 
-        interval: 1000
+        interval: 500
         repeat: true
         running:  true
         Component.onCompleted: {
-            go_Exit(); // KVA Fix screen blink
+            // KVA Fix screen blink
+            opastyNul(); // все экраны в невидимое состояние
+            // все менюшки в начальное невидимое состояние
+            kdr_FootDizel.opacity=0;
+            kdr_FootElektrooborud.opacity=0;
+            kdr_FootUso.opacity = 0;
+            kdr_Foot_Usta.opacity=0;
+            kdr_FootBEL.opacity=0;
+            kdr_Foot_TI.opacity=0;
+
+            kdr_Foot.opacity = 1;
+            kdr_Foot.focus = true;
+
+            kdr_Main_small.opacity = 1; // главный маленький
         }
         onTriggered: {
+            var par = ioBf.getParamMainWindow();
+            // frame_Left
+            is_slave = par[0][3]; // связь по МСС
+            is_links = par[0][0] || par[0][1] || par[0][2]; // Связь БЭЛ, УСТА, ТИ
 
+            var is_slave_usta = par[0][3] && par[0][4]; // есть связь МСС и на slave есть связь с УСТА
+
+            pr_Mtg1.value = par[1].toFixed(0); //ioBf.getParamDiap(1500);// заглушка
+            pr_Mtg2.value = par[2].toFixed(0);// ioBf.getParamDiap(1500); // заглушка
+
+            indUb0.text = par[3].toFixed(0); //ioBf.getParamDiap(100);// заглушка
+            indUb1.text = par[4].toFixed(0); //ioBf.getParamDiap(100);// заглушка
+
+            indIz0.text = par[5].toFixed(0); //ioBf.getParamDiap(60);// заглушка
+            indIz1.text = par[6].toFixed(0); //ioBf.getParamDiap(60);// заглушка
+
+            in1OM1.visible = par[7][0] && par[0][1];
+            in1OM2.visible = par[7][1] && par[0][1];
+            in1BX.visible = par[7][2] && par[0][1];
+            in1DR.visible = par[7][3] && par[0][1];
+            in1RZ.visible = par[7][4] && par[0][1];
+            in1OT.visible = par[7][5] && par[0][1];
+
+            in2OM1.visible = par[8][0] && is_slave_usta;
+            in2OM2.visible = par[8][1] && is_slave_usta;
+            in2BX.visible = par[8][2] && is_slave_usta;
+            in2DR.visible = par[8][3] && is_slave_usta;
+            in2RZ.visible = par[8][4] && is_slave_usta;
+            in2OT.visible = par[8][5] && is_slave_usta;
+
+            indUb0.visible = indIz0.visible = pr_Mtg1.visible = par[0][1];
+            indUb1.visible = indIz1.visible = pr_Mtg2.visible = is_slave_usta;
+            txtUb.visible = txtV.visible = txtIz.visible = txtA.visible = par[0][1] || is_slave_usta;
+
+            // frame_Top
+            pkm.pkms = par[10][0];
+            revers.value = par[10][1];
+            regim.value = par[10][2]; // режим работы тепловоза
+
+            txt_time.text = par[11][0];
+            txt_data.text = par[11][1];
+            txt_RejPrT.text = par[12][0];
+            txt_RejPro.text = par[12][1]; // прожиг
+            txt_RejAP.text = par[12][2]; // автопрогрев
+            txt_RejPrTime.text = par[13][0]; //ioBf.getRejPrT("value");// --- косяк с разными значениями --че делать то?
+            txt_RejPrTime.color = (par[13][1] == "2") ?  "yellow" : "gray";
+            txt_RejPrT.opacity = (par[13][2] == "1") ? 1 : 0;
+
+            prBar1.value = par[14]; //ioBf.getParamDiap(100);// заглушка
+
+            indPt.value = par[15][0];
+            var start = par[15][1];
+            var finish = par[15][2];
+            if (indPt.start != start) {
+                indPt.start = start;
+                indPt.repaint = true;
+            }
+            if (indPt.finish != finish) {
+                indPt.finish = finish;
+                indPt.repaint = true;
+            }
+            indPm.value = par[15][3];
+            start = par[15][4];
+            finish = par[15][5];
+            if (indPm.start != start) {
+                indPm.start = start;
+                indPm.repaint = true;
+            }
+            if (indPm.finish != finish) {
+                indPm.finish = finish;
+                indPm.repaint = true;
+            }
+            indFd.value = par[15][6];
+            start = par[15][7];
+            finish = par[15][8];
+            if (indFd.start != start) {
+                indFd.start = start;
+                indFd.repaint = true;
+            }
+            if (indFd.finish != finish) {
+                indFd.finish = finish;
+                indFd.repaint = true;
+            }
+
+            indPt.visible = indPm.visible = indFd.visible = par[9];
+            // Trevoga messages
+            if (par[16][0] != "") {
+                kdr_Tre.opacity = 1;
+                kdr_Tre.focus = true;
+                kdr_Tre.str1 = par[16][0];
+                kdr_Tre.str2 = par[16][1];
+            } else
+            if (kdr_Tre.opacity) {
+                kdr_Tre.opacity = 0;
+                //kdr_Tre.focus = false;
+                switch (current_system) {
+                case 0:
+                    kdr_Foot.opacity = 1;
+                    kdr_Foot.focus = true;
+                    break;
+                case 1:
+                    kdr_FootDizel.opacity = 1;
+                    kdr_FootDizel.focus = true;
+                    break;
+                case 2:
+                    kdr_FootElektrooborud.opacity = 1;
+                    kdr_FootElektrooborud.focus = true;
+                    break;
+                case 3:
+                    kdr_FootUso.opacity = 1;
+                    kdr_FootUso.focus = true;
+                    break;
+                }
+            }
        }
 }
 
 // расставляем компоненты
 
-    Frame_Top {
+    Item {
         id: frame_Top
         x: 0
         y: 0
 
+        TRevers {
+            id: revers
+            x: 10
+            y: 46
+        }
+
+        TPKM {
+            id: pkm
+            x: 10
+            y: 15
+            width: 64
+            color: "#000000"
+            pkms: 5
+        }
+
+        TRegm {
+            id: regim
+            x: 4
+            y: 88
+            height: 25
+            value: 1
+        }
+
+        Text {
+            id: txt_RejPrTime
+            x: 4
+            y: 118
+            width: 80
+            color: "#6e6e63"
+            text: qsTr("00:00:00")
+            font.family: "Segoe UI Emoji"
+            clip: true
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+            font.bold: true
+            font.pointSize: 12
+            visible: false // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        }
+
+        Image {
+            id: img_ind_f
+            x: 4
+            y: 138
+            width: 22
+            height: 40
+            clip: false
+            source: "../Pictogram/flesh1.png"
+            visible: true
+        }
+
+        Image {
+            id: img_z0
+            x: 26
+            y: 147
+            width: 35
+            height: 19
+            clip: true
+            source: "../Pictogram/flesh zapis1.png"
+            visible: true
+
+        }
+
+        PrBar {
+            id: prBar1
+            x: 61
+            y: 148
+            width: 61
+            height: 14
+            clip: true
+            kind: 1
+            val_max: 100
+            value: 0
+            visible: true
+        }
+
+        Rectangle {
+            id: header
+            x: 129
+            y: 1
+            height: 24
+            width: 320
+            color: (main_window.current_section == 1 ?"black" : "gray")
+            Text {
+                id: header_text
+                width: parent.width
+    //            x: 129
+    //            y: 2
+                color: (main_window.current_section == 1 ?"#d2e8fb" : "black")
+                text: (main_window.current_section == 1 ? qsTr("ТЭМ18ДМ  №___") : qsTr("выбрана вторая секция"))
+                font.bold: true
+                font.pointSize: 13
+                horizontalAlignment: Text.AlignHCenter
+            }
+        }
+
+        Text {
+            id: txt_RejPrT
+            x: 128
+            y: 27
+            color: "#f0f026"
+            text: qsTr("Длительный х.ход! Установи 8 ПКМ на 10 минут")
+            font.pointSize: 10
+            font.bold: true
+        }
+
+        Text {
+            id: txt_RejPro
+            x: 128
+            y: 43
+            color: "#f0f026"
+            text: qsTr("Прожиг коллектора")
+            font.pointSize: 10
+            font.bold: true
+            style: Text.Outline
+        }
+
+        Text {
+            id: txt_RejAP
+            x: 128
+            y: 59
+            color: "#f0f026"
+            text: qsTr("Режим автопрогрева")
+            font.family: "Segoe UI Historic"
+            font.pointSize: 10
+            font.bold: true
+        }
+
+        Text {
+            id: txt_time
+            x: 528
+            y: 8
+            color: "#d2e8fb"
+            text: qsTr("время")
+            horizontalAlignment: Text.AlignRight
+            font.pointSize: 13
+            font.bold: true
+        }
+
+        Text {
+            id: txt_data
+            x:  528
+            y: 25
+            color: "#d2e8fb"
+            text: qsTr("дата")
+            font.family: "Segoe UI Emoji"
+            font.pointSize: 13
+            font.bold: true
+        }
+
+        ExtCircularGauge {
+            id: indPt
+            x: 128
+            y: 74
+            width: 150
+            height: 150
+            maximumValue: 1.2
+            minimumValue: 0
+            parameter: "Рт МПа"
+            start: 0.9
+            finish: 1.2
+            valuePrecision: 2
+            labelPrecision: 1
+        }
+
+        ExtCircularGauge {
+            id: indPm
+            x: 292
+            y: 74
+            width: 150
+            height: 150
+            maximumValue: 1.2
+            minimumValue: 0
+            parameter: "Рм МПа"
+            start: 0.9
+            finish: 1.2
+            valuePrecision: 2
+            labelPrecision: 1
+        }
+        ExtCircularGauge {
+            id: indFd
+            x: 458
+            y: 54
+            width: 170
+            height: 170
+            maximumValue: 900
+            minimumValue: 0
+            parameter: "F об/мин"
+            start: 600
+            finish: 750
+        }
     }
 
-    Frame_Left {
+    Item {
         id: frame_Left
         x: 0
-        y: 182
+        y: 0
+        Text {
+            id: txtUb
+            x: 8
+            y: 182
+            width: 23
+            height: 17
+            color: "#acb3b3"
+            text: qsTr("Uб:")
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: 14
+            font.bold: true
+        }
 
+        Text {
+            id: indUb0
+            x: 40
+            y: 182
+            width: 23
+            height: 17
+            color: "#d2e8fb"
+            text: qsTr("0")
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: 14
+            font.bold: true
+        }
+
+        Text {
+            id: txtV
+            x: 78
+            y: 182
+            width: 23
+            height: 17
+            color: "#acb3b3"
+            text: qsTr("В")
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: 14
+            font.bold: true
+        }
+
+        Text {
+            id: indUb1
+            x: 104
+            y: 182
+            width: 23
+            height: 17
+            color: "#d2e8fb"
+            text: qsTr("0")
+            font.family: "Segoe UI Black"
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: 14
+            font.bold: true
+        }
+
+
+
+        Text {
+            id: txtIz
+            x: 8
+            y: 198
+            width: 23
+            height: 18
+            color: "#acb3b3"
+            text: qsTr("Iз:")
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: 14
+            font.bold: true
+        }
+
+        Text {
+            id: indIz0
+            x: 40
+            y: 198
+            width: 23
+            height: 17
+            color: "#d2e8fb"
+            text: qsTr("0")
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: 14
+            font.bold: true
+        }
+
+        Text {
+            id: txtA
+            x: 78
+            y: 198
+            width: 23
+            height: 18
+            color: "#acb3b3"
+            text: qsTr("А")
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: 14
+            font.bold: true
+        }
+
+        Text {
+            id: indIz1
+            x: 104
+            y: 198
+            width: 23
+            height: 17
+            color: "#d2e8fb"
+            text: qsTr("0")
+            font.family: "Segoe UI Emoji"
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: 14
+            font.bold: true
+        }
+
+
+        ExtBeads {
+            id: pr_Mtg1
+            x: 38
+            y: 217
+            height: 195
+            width: 28
+            cntitems: 15
+            colors: ["#f01f00", "#f02f00", "#f03f00", "#f04f00", "#f05f00", "#f06f00", "#f07f00", "#f08f00", "#f09f99", "#f0afaa", "#f0bfbb", "#f0cfcc", "#f0dfdd", "#f0efee", "#f0ffff"]
+            value: 0
+            maxvalue: 1500
+        }
+
+        ExtBeads {
+            id: pr_Mtg2
+            x: 102
+            y: 217
+            height: 195
+            width: 28
+            cntitems: 15
+            colors: ["#f01f00", "#f02f00", "#f03f00", "#f04f00", "#f05f00", "#f06f00", "#f07f00", "#f08f00", "#f09f99", "#f0afaa", "#f0bfbb", "#f0cfcc", "#f0dfdd", "#f0efee", "#f0ffff"]
+            value: 1500
+            maxvalue: 1500
+        }
+
+        TInd {
+            id: in1OM1
+            x: 5
+            y: 217
+            width: 30
+            height: 30
+            radius: 2
+            gradient: Gradient {
+                GradientStop {position: 0;color: "#aca6a6"}
+                GradientStop {position: 0.5; color: "#e4d6d6"}
+                GradientStop {position: 1;color: "#aca6a6"}
+            }
+            txtSize: 16
+            txtColor: "#000000"
+            value: "ОМ"
+            border.width: 0
+            border.color: "#e4d6d6"
+        }
+
+        TInd {
+            id: in1OM2
+            x: 5
+            y: 250
+            width: 30
+            height: 30
+            radius: 2
+            gradient: Gradient {
+                GradientStop {position: 0;color: "#aca6a6"}
+                GradientStop {position: 0.5; color: "#e4d6d6"}
+                GradientStop {position: 1;color: "#aca6a6"}
+            }
+            txtSize: 16
+            txtColor: "#000000"
+            value: "ОМ"
+            border.width: 0
+            border.color: "#e4d6d6"
+        }
+
+        Image {
+            id: in1BX
+            x: 5
+            y: 283
+            width: 30
+            height: 30
+            source: "../Pictogram/ind_box.png"
+        }
+
+        TInd {
+            id: in1DR
+            x: 5
+            y: 316
+            width: 30
+            height: 30
+            color: "#160000"
+            radius: 2
+            txtSize: 15
+            txtColor: "red"
+            border.width: 2
+            border.color: "red"
+            value: "ДРУ"
+            gradient: Gradient{
+                GradientStop {position:0.0; color: "silver"}
+                GradientStop {position:0.3; color: "black"}
+                GradientStop {position:0.7; color: "black"}
+                GradientStop {position:1; color: "silver"}
+            }
+        }
+
+
+        TInd {
+            id: in1RZ
+            x: 5
+            y: 349
+            width: 30
+            height: 30
+            radius: 2
+            txtSize: 18
+            txtColor: "yellow"
+            value: "РЗ"
+            border.width: 2
+            border.color: "yellow"
+            gradient: Gradient{
+                GradientStop {position:0.0; color: "silver"}
+                GradientStop {position:0.3; color: "black"}
+                GradientStop {position:0.7; color: "black"}
+                GradientStop {position:1; color: "silver"}
+            }
+
+        }
+
+        TInd {
+            id: in1OT
+            x: 5
+            y: 382
+            width: 30
+            height: 30
+            radius: 2
+            gradient: Gradient {
+                GradientStop { position: 0; color: "#ffff00"}
+                GradientStop {position: 0.5;color: "#ffffff"}
+                GradientStop {position: 1;color: "#ffff00"}
+            }
+            txtSize: 15
+            txtColor: "#000000"
+            value: "ОТМ"
+            border.width: 0
+            border.color: "#ffff00"
+        }
+
+
+
+        TInd {
+            id: in2OM1
+            x: 69
+            y: 217
+            width: 30
+            height: 30
+            radius: 2
+            txtSize: 16
+            gradient: Gradient {
+                GradientStop {
+                    position: 0
+                    color: "#aca6a6"
+                }
+
+                GradientStop {
+                    position: 0.531
+                    color: "#e4d6d6"
+                }
+
+                GradientStop {
+                    position: 1 //1.033
+                    color: "#aca6a6"
+                }
+            }
+            txtColor: "#000000"
+            value: "ОМ"
+            border.width: 0
+            border.color: "#e4d6d6"
+        }
+
+        TInd {
+            id: in2OM2
+            x: 69
+            y: 250
+            width: 30
+            height: 30
+            radius: 2
+            txtSize: 16
+            gradient: Gradient {
+                GradientStop {
+                    position: 0
+                    color: "#aca6a6"
+                }
+
+                GradientStop {
+                    position: 0.531
+                    color: "#e4d6d6"
+                }
+
+                GradientStop {
+                    position: 1 //1.033
+                    color: "#aca6a6"
+                }
+            }
+            txtColor: "#000000"
+            value: "ОМ"
+            border.width: 0
+            border.color: "#e4d6d6"
+        }
+
+        Image {
+            id: in2BX
+            x: 69
+            y: 283
+            width: 30
+            height: 30
+            source: "../Pictogram/ind_box.png"
+        }
+
+        TInd {
+            id: in2DR
+            x: 69
+            y: 316
+            width: 30
+            height: 30
+            radius: 2
+            txtSize: 15
+            txtColor: "red"
+            value: "ДРУ"
+            border.width: 2
+            border.color: "red"
+            gradient: Gradient{
+                GradientStop {position:0.0; color: "silver"}
+                GradientStop {position:0.3; color: "black"}
+                GradientStop {position:0.7; color: "black"}
+                GradientStop {position:1; color: "silver"}
+            }
+        }
+
+        TInd {
+            id: in2RZ
+            x: 69
+            y: 349
+            width: 30
+            height: 30
+            radius: 2
+            txtSize: 18
+            txtColor: "#ffff00"
+            value: "РЗ"
+            border.width: 2
+            border.color: "#ffff00"
+            gradient: Gradient{
+                GradientStop {position:0.0; color: "silver"}
+                GradientStop {position:0.3; color: "black"}
+                GradientStop {position:0.7; color: "black"}
+                GradientStop {position:1; color: "silver"}
+            }
+
+        }
+
+        TInd {
+            id: in2OT
+            x: 69
+            y: 382
+            width: 30
+            height: 30
+            radius: 2
+            txtSize: 15
+            gradient: Gradient {
+                GradientStop {
+                    position: 0
+                    color: "#ffff00"
+                }
+
+                GradientStop {
+                    position: 0.498
+                    color: "#ffffff"
+                }
+
+                GradientStop {
+                    position: 1
+                    color: "#ffff00"
+                }
+            }
+            txtColor: "#000000"
+            value: "ОТМ"
+            border.width: 0
+            border.color: "#ffff00"
+        }
     }
-
     Kdr_smlMain {
         id: kdr_Main_small
         x: 128
@@ -72,7 +772,7 @@ Window {
         y: 416
         width: 640
         height: 64
-        z: -1
+        z: 99
     }
 
     Kdr_Privet {
@@ -150,6 +850,7 @@ Window {
         width: 512
         height: 197
         z: 12
+        first: 0
     }
 
     Kdr_Reo {
@@ -307,7 +1008,7 @@ Window {
             width: 640
             height: 64
             z: 0
-            cltxtSelect: "blue"
+            cltxtSelect: "#1bb7e4"
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 0
             focus: true
@@ -315,17 +1016,14 @@ Window {
             onSwitchFootDizel:  { // переход на дизельное меню
                 kdr_FootDizel.opacity = 1;
                 kdr_FootDizel.focus = true;
-                setSystem(1);
+//                setSystem(1);
             }
 
             onSwitchFootElektr:  { // переход на электрическое меню
                        kdr_FootElektrooborud.opacity = 1;
                        kdr_FootElektrooborud.focus = true;
-                setSystem(2);
+//                setSystem(2);
                       }
-            onSwitchSection: function(section) {
-                setSection(section);
-            }
 
             onKnopaS: { showKdr_Nastroiki();
                      //   if (kdr_Main.color == "steelblue" ) { kdr_Main.color = "red";} // условие не читается
@@ -335,13 +1033,13 @@ Window {
             onKnopaSt:{ showKdr_Reostat();     } // сигнал о нажатии клавиши ДМ "St" /alt+d
             onKnopaUD: { // сигнал о нажатии клавиши ДМ "UD" /alt+i
                 showKdr_Svazi();
-                setSystem(3);
+//                setSystem(3);
             }
             onSaveToUSB: { ioBf.querySaveToUSB("G:/"); }  // сигнал о необходимости записи на USB (для отработки под Windows)
 
             onSwitchFoot_Exit: {  // в начальное состояние
                 go_Exit();
-                setSystem(0);
+//                setSystem(0);
             }
         }
 
@@ -359,26 +1057,26 @@ Window {
             onSwitchDzl_Cilindr: {
                 opastyNul();
                 kdr_Dizl.opacity = 1;
-                setSubsystem(6);
+//                setSubsystem(6);
             } // цилиндры
             onSwitchDzl_Maslo:   {
                 opastyNul();
                 kdr_Masl.opacity = 1;
-                setSubsystem(7);
+//                setSubsystem(7);
             }
             onSwitchDzl_Toplivo: {
                 opastyNul();
                 kdr_Toplivo.opacity = 1;
-                setSubsystem(8);
+//                setSubsystem(8);
             }
             onSwitchDzl_Holod:   {
                 opastyNul();
                 kdr_Ohl.opacity = 1;
-                setSubsystem(9);
+//                setSubsystem(9);
             }
             onSwitchDzl_Exit:    {
                 go_Exit();
-                setSubsystem(0);
+//                setSubsystem(0);
             }// возврат на главный экран
             onKnopaS: { showKdr_Nastroiki();   } // сигнал о нажатии клавиши ДМ "S"  /alt+b
             onKnopai: { showKdr_ArhivMessage();} // сигнал о нажатии клавиши ДМ "i"  /alt+c
@@ -399,26 +1097,26 @@ Window {
             onSwitchEl_Bortovay:    {
                 opastyNul();
                 kdr_Bos.opacity = 1;
-                setSubsystem(6);
+//                setSubsystem(6);
             }    // бортовая сеть
             onSwitchEl_Vozbugdenie: {
                 opastyNul();
                 kdr_Vzb.opacity = 1;
-                setSubsystem(7);
+//                setSubsystem(7);
             }    // система возбуждения
             onSwitchEl_Tagovie:     {
                 opastyNul();
                 kdr_TED.opacity = 1;
-                setSubsystem(8);
+//                setSubsystem(8);
             }    // тяговые двигатели
             onSwitchEl_Motores:     {
                 opastyNul();
                 kdr_Mot.opacity = 1;
-                setSubsystem(9);
+//                setSubsystem(9);
             }    // моторесурс
             onSwitchEl_Exit: {
                 go_Exit();
-                setSubsystem(0);
+//                setSubsystem(0);
             }
             onKnopaS: { showKdr_Nastroiki();   } // сигнал о нажатии клавиши ДМ "S"  /alt+b
             onKnopai: { showKdr_ArhivMessage();} // сигнал о нажатии клавиши ДМ "i"  /alt+c
@@ -594,6 +1292,7 @@ Window {
 
     function  go_Exit()    // выход из меню
     {
+        kdr_TrLs.first = -1; // ????????????????????????????????????????
         opastyNul(); // все экраны в невидимое состояние
         // все менюшки в начальное невидимое состояние
         kdr_FootDizel.opacity=0;
@@ -602,8 +1301,10 @@ Window {
         kdr_Foot_Usta.opacity=0;
         kdr_FootBEL.opacity=0;
         kdr_Foot_TI.opacity=0;
-        // главный экран показываем
 
+        // главный экран показываем
+        //kdr_Foot.is_exit = true;
+        kdr_Foot.doExit();
         kdr_Foot.opacity = 1;
         kdr_Foot.focus = true;
 
@@ -673,18 +1374,19 @@ Window {
             kdr_Main.focus = true;
 
     }
-        function setSection(section) {
-            current_section = section;
-            ioBf.changeKdr(current_section * 100 + current_system * 10 + current_subsystem)
-        }
+//        function setSection(section) {
+//            //current_section = section;
+//            if (ioBf.changeKdr(section * 100 + current_system * 10 + current_subsystem))
+//                current_section = section;
+//        }
 
-        function setSystem(system) {
-            current_system = system;
-            ioBf.changeKdr(current_section * 100 + current_system * 10 + current_subsystem)
-        }
+//        function setSystem(system) {
+//            current_system = system;
+//            ioBf.changeKdr(current_section * 100 + current_system * 10 + current_subsystem)
+//        }
 
-        function setSubsystem(subsystem) {
-            current_subsystem = subsystem;
-            ioBf.changeKdr(current_section * 100 + current_system * 10 + current_subsystem)
-        }
+//        function setSubsystem(subsystem) {
+//            current_subsystem = subsystem;
+//            ioBf.changeKdr(current_section * 100 + current_system * 10 + current_subsystem)
+//        }
 }

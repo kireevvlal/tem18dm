@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QJsonArray>
 #include <QFileSystemWatcher>
+#include <QQueue>
 #include "zapuso.h"
 #include "threadserialport.h"
 #include "treexml.h"
@@ -21,15 +22,45 @@ struct TrMess {
     int system; // i
     int repair; // v
     QString text; // s
+
     TrMess() { delay = output = system = repair = 0; text = ""; }
+};
+// структура для регистрации тр. сооб.
+struct TrRec {
+    quint8 hour;
+    quint8 minute;
+    quint8 second;
+    quint8 index;
+    TrRec(quint8 h, quint8 m, quint8 s, quint8 i) { hour = h; minute = m; second = s; index = i;}
+};
+// структура отслеживания состояния обработки тревожного сообщения
+struct TrState {
+    QBitArray status; // state bits: 0 - wait registration, 1 - wait addition to list, 2 - ready for banner out
+    int delay; //
+    bool kvit;
+    TrState() { status.fill(false, 3); delay = 0; kvit = false; }
+};
+//
+struct TrBanner {
+    QString str1; // система
+    QString str2; // тревожное сообщение
+    int section; // номер секции
+    int index;   // индекс тревожного сообщения
+    TrBanner() { str1 = str2 = ""; section = index = 0; }
+    TrBanner(QString s1, QString s2, int s, int i) { str1 = s1; str2 = s2; section = s; index = i; };
 };
 
 class Processor : public QObject
 {
     Q_OBJECT
 private:
+    int _virtual_section; // переключение номера секции (0, 1) в циклах диагностики
+    QMap<int, TrBanner> _tr_banner_queue; // очередь на вывод в баннер
+    QMap<int, TrState*> _tr_states[2]; // состояния обработки тревог (для мастрера и слейва (0 - своя секция, 1 - ведомая)
+    QList<TrRec> _tr_reg_queue; // очередь на запись в файл регистрации
     int _section; // 0 - тепловоз, 1 - дополнительная секеция
     QMap<int, TrMess*> _tr_messages;
+    QStringList _tr_strings;
     float _pt_max; // макимальное значение давления топлива
     DataStore* _storage[2];
     QMap<QString, ThreadSerialPort*> _serial_ports;
@@ -59,7 +90,8 @@ private:
     void ParseDiagnostic(NodeXML*);
     void ParseRegistration(NodeXML*);
     void ParseTrMess(NodeXML*);
-    void SetAddSectionData();
+    void SetSlaveData();
+    QString FormMessage(int, int, int);
 #ifdef Q_OS_UNIX
     void GPIO();
 #endif
@@ -77,10 +109,11 @@ private slots:
     void DiagTimerStep();
 public slots:
     void Unpack(QString);
-    void LostConnection(QString);
-    void RestoreConnection(QString);
+//    void LostConnection(QString);
+//    void RestoreConnection(QString);
     void querySaveToUSB(QString);
-    void changeKdr(int);
+    bool changeKdr(int);
+    void kvitTrBanner();
     // New:
     QJsonArray getParamKdrFoot();
     QJsonArray getParamKdrFtDzl();
@@ -97,12 +130,12 @@ public slots:
     QJsonArray getParamKdrDizl();
     QJsonArray getParamKdrAvProgrev();
     QJsonArray getParamKdrSmlMain();
-    QJsonArray getParamFrameTop();
-    QJsonArray getParamFrameLeft();
+    QJsonArray getParamMainWindow();
     QStringList getStructAnlg(int);
     QStringList getStructDiskr(int);
     QJsonArray getDiskretArray(int);
     QJsonArray getAnalogArray(int);
+    QStringList getKdrTrL();
 
     // Old:
 //    int getReversor();     // реверс

@@ -36,8 +36,6 @@ DISTFILES += \
     qml/ExtBeads.qml \
     qml/ExtCircularGauge.qml \
     qml/ExtGauge.qml \
-    qml/Frame_Left.qml \
-    qml/Frame_Top.qml \
     qml/Gauge/edit.png \
     qml/Kdr_Analog.qml \
     qml/Kdr_AvProgrev.qml \

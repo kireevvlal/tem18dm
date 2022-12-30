@@ -73,7 +73,7 @@ qint8 Control::KdrTed(int section) //
 qint8 Control::KdrSmlMain(int section) //
 {
     qint8 kdr_smlmain_flags = 0;
-    QBitArray* bits = _storage[section]->Bits("USTA_Inputs");
+    QBitArray* bits = _storage[section]->Bits("USTA_Outputs");
     kdr_smlmain_flags = (bits->at(USTA_OUTPUTS_OP1) ? 1 : 0) + (bits->at(USTA_OUTPUTS_OP2) ? 2 : 0);
     return kdr_smlmain_flags;
 }

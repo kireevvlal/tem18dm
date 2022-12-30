@@ -9,14 +9,14 @@ Rectangle {
     border.width: 0
     onPkmsChanged: { // событие на изменение значения
 
-        if  ((pkms==0) || ( pkms>9))
+        if  ((pkms == 0) || ( pkms > 9))
         { txt.opacity = 0 }    // Visible:=false
         else {
              if (pkms == 1)
              { txt.color = "gray"}
              else txt.color = "white";
 
-             txt.text = pkms-1;
+             txt.text = pkms - 1;
              txt.opacity = 1;
 
             }

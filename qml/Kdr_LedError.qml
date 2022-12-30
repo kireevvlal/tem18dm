@@ -47,7 +47,7 @@ Rectangle {
         width: 17
         height: 17
         z: 1
-        opacity: vz1
+        opacity: main_window.is_links
         val : tr1
     }
     }
@@ -69,7 +69,7 @@ Rectangle {
             width: 17
             height: 17
             z: 2
-            opacity: vz2
+            opacity: main_window.is_slave
             val : tr2
         }
     }

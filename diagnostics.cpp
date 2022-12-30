@@ -1,7 +1,9 @@
 #include <QDateTime>
 #include <QtMath>
+#include <QDebug>
 #include "diagnostics.h"
 #include "tem18dm.h"
+
 
 Diagnostics::Diagnostics(DataStore* storage, float ptmax)
 {
@@ -168,8 +170,9 @@ void Diagnostics::Motoresurs() {
     }
 }
 //--------------------------------------------------------------------------------
-void Diagnostics::Connections(QMap<QString, ThreadSerialPort*> serialPorts) {
-    for (QMap<QString, ThreadSerialPort*>::iterator i = serialPorts.begin(); i != serialPorts.end(); i++)
+void Diagnostics::Connections(QMap<QString, ThreadSerialPort*> serialPorts, Registrator* reg, SlaveLcm* slave) {
+    for (QMap<QString, ThreadSerialPort*>::iterator i = serialPorts.begin(); i != serialPorts.end(); i++) {
+        // ports state
         if (i.key() == "BEL") {
             if (i.value()->isOpen())
                 _ports_state |= 1;
@@ -190,4 +193,91 @@ void Diagnostics::Connections(QMap<QString, ThreadSerialPort*> serialPorts) {
                             _ports_state |= 8;
                         else _ports_state &= nobit3;
                     }
+        // connections state
+        if (i.key() == "BEL") {
+            i.value()->OutData.SetByteParameter("BEL_SIGNALIZATION",
+                 ((_storage->Float("IT_TSM4") >= 40) ? 1 : 0) + (_storage->Bit("USTA_Inputs", USTA_INPUTS_PKM18) ? 2 : 0));
+            if (_storage->Bit("DIAG_Connections", CONN_BEL)) {
+                if (!i.value()->IsExchange())
+                    OnLostBel(i.value(), reg, slave);
+            } else {
+                if (i.value()->IsExchange()) {
+                    _storage->SetBit("DIAG_Connections", CONN_BEL, 1);
+                    qDebug() << "Restore BEL";
+                }
+            }
+        }
+        else if (i.key() == "USTA") {
+            i.value()->OutData.SetByteParameter("USTA_SIGNALIZATION", (_storage->Bit("PROG_TrSoob", 17) ? 1 : 0) + (_storage->Bit("PROG_TrSoob", 16) ? 2 : 0));
+            if (_storage->Bit("DIAG_Connections", CONN_USTA)) {
+                if (!i.value()->IsExchange())
+                    OnLostUsta(i.value(), reg, slave);
+            } else {
+                if (i.value()->IsExchange()) {
+                    _storage->SetBit("DIAG_Connections", CONN_USTA, 1);
+                    qDebug() << "Restore USTA";
+                }
+            }
+        }
+        else if (i.key() == "IT") {
+            if (_storage->Bit("DIAG_Connections", CONN_IT)) {
+                if (!i.value()->IsExchange())
+                    OnLostIt(i.value(), reg, slave);
+            } else {
+                if (i.value()->IsExchange()) {
+                    _storage->SetBit("DIAG_Connections", CONN_IT, 1);
+                    qDebug() << "Restore IT";
+                }
+            }
+        }
+        else if  (i.key() == "MSS") {
+            i.value()->OutData.SetData(0, 580, slave->Outdata());
+            if (_storage->Bit("DIAG_Connections", CONN_MSS)) {
+                if (!i.value()->IsExchange()) {
+                    _storage->ClearSpData(i.value());
+                    _storage->SetBit("DIAG_Connections", CONN_MSS, 0);
+                    qDebug() << "Lost MSS";
+                }
+            } else {
+                if (i.value()->IsExchange()) {
+                    _storage->SetBit("DIAG_Connections", CONN_MSS, 1);
+                    qDebug() << "Restore MSS";
+                }
+            }
+        }
+    }
 }
+//--------------------------------------------------------------------------------
+void Diagnostics::OnLostBel(ThreadSerialPort* port, Registrator* reg, SlaveLcm* slave) {
+    QByteArray arr(8, 0);
+    _storage->ClearSpData(port);
+    _storage->SetBit("DIAG_Connections", CONN_BEL, 0);
+    // в 0
+    reg->UpdateRecord(338, 8, arr.mid(0, 8)); // дискретные (+ ПКМ)
+    slave->UpdatePacket(0, 8, arr.mid(0, 8)); // дискретные (+ ПКМ)
+    _storage->SetByte("PROG_Reversor", 0);
+    qDebug() << "Lost BEL";
+}
+//--------------------------------------------------------------------------------
+void Diagnostics::OnLostUsta(ThreadSerialPort* port, Registrator* reg, SlaveLcm* slave) {
+    QByteArray arr(80, 0);
+    _storage->ClearSpData(port);
+    _storage->SetBit("DIAG_Connections", CONN_USTA, 0);
+    // в 0
+    reg->UpdateRecord(0, 80, arr.mid(0, 80));  // аналоговые
+    reg->UpdateRecord(332, 6, arr.mid(0, 6)); // дискретные
+    slave->UpdatePacket(8, 80, arr.mid(0, 80));  // аналоговые
+    slave->UpdatePacket(88, 6, arr.mid(0, 6));
+    qDebug() << "Lost USTA";
+}
+//--------------------------------------------------------------------------------
+void Diagnostics::OnLostIt(ThreadSerialPort* port, Registrator* reg, SlaveLcm* slave) {
+    QByteArray arr(96, 0);
+    _storage->ClearSpData(port);
+    _storage->SetBit("DIAG_Connections", CONN_IT, 0);
+    // в 0
+    reg->UpdateRecord(80, 96, arr.mid(0, 96));
+    slave->UpdatePacket(96, 96, arr.mid(0, 96));
+    qDebug() << "Lost IT";
+}
+//--------------------------------------------------------------------------------

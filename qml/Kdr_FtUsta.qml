@@ -43,22 +43,25 @@ Rectangle {
             break;
         }
         case Qt.Key_1:        {
-            img1.source = "../Pictogram/m1_lok.png";
-            img2.source = "../Pictogram/m0_lok.png";
+            if (kdr_Foot.setSection(1)) {
+                img1.source = "../Pictogram/m1_lok.png";
+                img2.source = "../Pictogram/m0_lok.png";
 
-            idDisp = 1; // ?? надо подать сигнал о смене секций
-            txt_1.color = cltxtSelect;
-            txt_2.color = cltxt;
-
+                idDisp = 1; // ?? надо подать сигнал о смене секций
+                txt_1.color = cltxtSelect;
+                txt_2.color = cltxt;
+            }
             break;
         }
         case Qt.Key_2:        {
-            img1.source = "../Pictogram/m0_lok.png";
-            img2.source = "../Pictogram/m1_lok.png";
+            if (kdr_Foot.setSection(1)) {
+                img1.source = "../Pictogram/m0_lok.png";
+                img2.source = "../Pictogram/m1_lok.png";
 
-            idDisp = 2; // ?? надо подать сигнал о смене секций
-            txt_2.color = cltxtSelect;
-            txt_1.color = cltxt;
+                idDisp = 2; // ?? надо подать сигнал о смене секций
+                txt_2.color = cltxtSelect;
+                txt_1.color = cltxt;
+            }
             break;
         }
         case Qt.Key_7:        {
@@ -85,7 +88,6 @@ Rectangle {
                 img7.source = "../Pictogram/uso/0_dot.png"
                 img8.source = "../Pictogram/uso/0_din.png"
                 img9.source = "../Pictogram/uso/1_aud.png"
-                switchUso_USTA_Analogi(0);
             }
             break;
         }
@@ -115,7 +117,7 @@ Rectangle {
         y: 27
         width: 64
         height: 37
-        color: "#ffffff"
+        color: (main_window.current_section == 1) ? cltxtSelect : cltxt
         text: qsTr("1")
         z: 3
         font.italic: false
@@ -132,7 +134,7 @@ Rectangle {
         y: 27
         width: 64
         height: 37
-        color: "#ffffff"
+        color: (main_window.current_section == 2) ? cltxtSelect : cltxt
         text: qsTr("2")
         z: 8
         wrapMode: Text.NoWrap
@@ -162,7 +164,7 @@ Rectangle {
         width: 64
         height: 64
         z: 2
-        source: "../Pictogram/m0_lok.png"
+        source: (main_window.current_section == 1) ? "../Pictogram/m1_lok.png" : "../Pictogram/m0_lok.png"
     }
 
     Image {
@@ -172,7 +174,7 @@ Rectangle {
         width: 64
         height: 64
         z: 4
-        source: "../Pictogram/m0_lok.png"
+        source: (main_window.current_section == 2) ? "../Pictogram/m1_lok.png" : "../Pictogram/m0_lok.png"
     }
 
     Image {

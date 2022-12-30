@@ -33,8 +33,8 @@ Rectangle {
             stb_Tms.value = par[4];
             stb_Tms.barColor = (par[4] < 20) ? "red" : (par[4] < 45) ? "yellow" : (par[4] < 70) ? "#00d7d7" : "red";
 
-            vh1.visible = (par[7] & 1) && par[0][1]; // ??? добавил наличие связи в условии
-            vh2.visible = (par[7] & 2) && par[0][1]; // ??? добавил наличие связи в условии
+            vh1.visible = (par[7] & 1) && par[0][0]; // ??? добавил наличие связи в условии
+            vh2.visible = (par[7] & 2) && par[0][0]; // ??? добавил наличие связи в условии
 
             indIg.visible =  indUg.visible = par[0][0]; // usta connection
             stb_Tvd.visible = stb_Tms.visible = par[0][1]; // ti connection
