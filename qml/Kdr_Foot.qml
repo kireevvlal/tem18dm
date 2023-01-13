@@ -24,7 +24,8 @@ Rectangle {
 
     //** переключение
     Keys.onPressed: {
-        // console.log("код нажатой клавиши ===>" + event.key);
+        console.log("код нажатой клавиши ===>" + event.key);
+
         switch(event.key){
 
         case Qt.Key_0:

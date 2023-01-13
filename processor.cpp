@@ -36,12 +36,6 @@ Processor::Processor(QObject *parent) : QObject(parent)
     _diagnostics = new Diagnostics(&_mainstore, _pt_max);
     _is_active = false;
     _fswatcher = new QFileSystemWatcher;
-#ifdef Q_OS_WIN
-    _fswatcher->addPath("D:/000");
-#endif
-#ifdef  Q_OS_UNIX
-    _fswatcher->addPath("/dev");
-#endif
     _saver =  new Saver();
     _saver_thread = new QThread();
     _control = new Control(&_mainstore, _slave.Storage());
@@ -93,7 +87,25 @@ bool Processor:: Load(QString startPath, QString cfgfile)
         _mainstore.SetUInt32("DIAG_Tt", par.Value);
         _mtr_file.close();
     }
+#ifdef Q_OS_WIN
+    _fswatcher->addPath("D:/_USB");
+#endif
+#ifdef  Q_OS_UNIX
+    _fswatcher->addPath("_saver->MediaPath("/dev");
+#endif
     return true;
+}
+//--------------------------------------------------------------------------------
+void Processor::SaveMessagesList() {
+    // save tr messages list to file
+    if (_trmess_file.open(QIODevice::WriteOnly)) {
+        QTextStream stream(&_trmess_file);
+        stream.setCodec("UTF-8");
+        foreach (QString s, _tr_strings) {
+            stream << s << endl;
+        }
+        _trmess_file.close();
+    }
 }
 //--------------------------------------------------------------------------------
 void Processor::Run()
@@ -117,12 +129,28 @@ void Processor::Run()
     connect(_diag_timer, SIGNAL(timeout()), this, SLOT(DiagTimerStep()));
     _diag_timer->start(_diag_interval);
 
-    connect(_fswatcher, SIGNAL(directoryChanged(QString)), this, SLOT(querySaveToUSB(QString)));
+    connect(_fswatcher, SIGNAL(directoryChanged(QString)), this, SLOT(ChangeMediaDir(QString)));
 
     _saver->moveToThread(_saver_thread);
     connect(this, SIGNAL(SaveFilesSignal()), _saver, SLOT(Save()));
+    connect(this, SIGNAL(ChangeMediaDirSignal()), _saver, SLOT(MediaChange()));
     _saver_thread->start();
     _saver->Run();
+
+    // read tr meaasges
+    if (_trmess_file.open(QIODevice::ReadOnly)) {
+        while (!_trmess_file.atEnd()) {
+            QString str = _trmess_file.readLine();
+            str.truncate(str.lastIndexOf("\n"));
+            _tr_strings.append(str);
+        }
+        _trmess_file.close();
+    }
+    if (_tr_strings.count() >= 300)
+        _tr_strings.removeFirst();
+    _tr_strings.append(_diagnostics->Date().toString("yy/MM/dd") + " " + _diagnostics->Time().toString("hh:mm:ss") + " Начало работы");
+    SaveMessagesList();
+
     _is_active = true;
 }
 //--------------------------------------------------------------------------------
@@ -152,13 +180,17 @@ void Processor::GPIO() {
 }
 #endif
 //--------------------------------------------------------------------------------
-void Processor::querySaveToUSB(QString dir) {
-#ifdef Q_OS_WIN
+void Processor::ChangeMediaDir(QString dir) {
+    ChangeMediaDirSignal();
+}
+//--------------------------------------------------------------------------------
+void Processor::querySaveToUSB() {
+//#ifdef Q_OS_WIN
     SaveFilesSignal(); // (dir)
-#endif
-#ifdef Q_OS_UNIX
-    // find flash usb
-#endif
+//#endif
+//#ifdef Q_OS_UNIX
+//    // find flash usb
+//#endif
 }
 //--------------------------------------------------------------------------------
 void Processor::Stop() {
@@ -257,6 +289,7 @@ void Processor::DiagTimerStep() {
     _mainstore.SetByte("PROG_Regime", _mainstore.Bit("DIAG_Connections", CONN_BEL) ? ((_mainstore.Byte("PROG_Reversor") < 2 || pkb < 2) ? 3
                                                                                    : (_mainstore.Byte("BEL_Diagn") & 1) + 1) : 0); // 3 - XX
     _virtual_section = (_virtual_section == 1) ? 0 : 1;
+    _diagnostics->RefreshDT();
     _diagnostics->Motoresurs();
     _diagnostics->Connections(_serial_ports, _registrator, &_slave);
     _diagnostics->RizCU(_mainstore.Byte("PROG_PKM"));
@@ -270,8 +303,8 @@ void Processor::DiagTimerStep() {
                 if (!_virtual_section) {
                     if (!_tr_states[0][it.key()]->status.testBit(0)) {
                         _tr_states[0][it.key()]->status.setBit(0);
-                        _tr_reg_queue.append(TrRec(_diagnostics->Time.hour(), _diagnostics->Time.minute(),
-                                                   _diagnostics->Time.second(), i));
+                        _tr_reg_queue.append(TrRec(_diagnostics->Time().hour(), _diagnostics->Time().minute(),
+                                                   _diagnostics->Time().second(), i));
                     }
                 }
                 // string list queue
@@ -279,8 +312,10 @@ void Processor::DiagTimerStep() {
                     _tr_states[_virtual_section][it.key()]->status.setBit(1);
                     if (_tr_strings.count() >= 300)
                         _tr_strings.removeFirst();
-                    _tr_strings.append(_diagnostics->Date.toString("yy/MM/dd") + " " + _diagnostics->Time.toString("hh:mm:ss") + " " +
+                    _tr_strings.append(_diagnostics->Date().toString("yy/MM/dd") + " " + _diagnostics->Time().toString("hh:mm:ss") + " " +
                                        FormMessage(_virtual_section, it.key(), it.value()->system) + " " + it.value()->text);
+                    // save tr messages list to file
+                    SaveMessagesList();
                 }
                 // banner output
                 if (!_tr_states[_virtual_section][it.key()]->status.testBit(2)) { // init
@@ -380,14 +415,16 @@ void Processor::SetSlaveData()
     QBitArray* ba = _mainstore.Bits("PROG_TrSoob");
     QByteArray ts;
     qint8 byte;
+    QDate dt = _diagnostics->Date();
+    QTime tm = _diagnostics->Time();
 
     date.resize(6);
-    date[0] = _diagnostics->Date.day();
-    date[1] = _diagnostics->Date.month();
-    date[2] = _diagnostics->Date.year() - 2000;
-    date[3] = _diagnostics->Time.hour();
-    date[4] = _diagnostics->Time.minute();
-    date[5] = _diagnostics->Time.second();
+    date[0] = dt.day();
+    date[1] = dt.month();
+    date[2] = dt.year() - 2000;
+    date[3] = tm.hour();
+    date[4] = tm.minute();
+    date[5] = tm.second();
 
     for (int i = 1; i < 8; i++) {
         byte = 0;
@@ -589,8 +626,10 @@ void Processor::ParseDiagnostic(NodeXML *node)
                 Parameter *newPar = new Parameter;
                 newPar->Parse(node);
                 _mainstore.Add(newPar->Variable, newPar);
-            } else if (node->Name == "path") {
+            } else if (node->Name == "mrfile") {
                 _mtr_file.setFileName(node->Text);
+            } else if (node->Name == "trmessfile") {
+                _trmess_file.setFileName(node->Text);
             }
             node = node->Next;
         }
@@ -914,12 +953,12 @@ QJsonArray Processor::getParamMainWindow() {
         // frame top
         _storage[_section]->Bit("DIAG_Connections", CONN_USTA),
         QJsonArray { pkm,  _mainstore.Byte("PROG_Reversor"), _mainstore.Byte("PROG_Regime") },
-        QJsonArray { _diagnostics->Time.toString("HH:mm:ss"), _diagnostics->Date.toString("dd/MM/yy") },
+        QJsonArray { _diagnostics->Time().toString("HH:mm:ss"), _diagnostics->Date().toString("dd/MM/yy") },
         QJsonArray { "", // RejPrT
             (bt == 0x00) ? "" : ((bt == 0x10) ? "Прожиг коллектора": "Завершение прожига"), // RejPro
             (dsk_iAPvkl1 == 00) ? "" : ((dsk_iSA1 == 01) ? "Режим АвтоПрогрева" : ((dsk_iKMv0 == 00) ? "АП: Установи ПКМ в 0" : ((dsk_iDizZ == 00) ? "АП: Запусти дизель" : ""))), },
         RejPrT(), // getRejPrT// RejAP
-        rand() % 100, // load usb indicator
+        QJsonArray { _saver->MediaInserted(), _saver->Recording(),  _saver->PercentRecorded() }, // load usb indicator
         QJsonArray { _storage[_section]->Float("USTA_Pf_tnvd") * 0.1, pt_min * 0.01, pt_max * 0.01,
                     _storage[_section]->Float("USTA_Po_diz") * 0.1, pm_min * 0.01, pm_max * 0.01,  n_diz, nd_min, nd_max },
         QJsonArray { tr_banner[0], tr_banner[1], /*_tr_banner_queue.first().section, _tr_banner_queue.first().index*/ }
@@ -1095,10 +1134,11 @@ QJsonArray Processor::getAnalogArray(int offset) {
 //------------------------------------------------------------------------------
 // Tr soob string list
 QStringList Processor::getKdrTrL() {
-    QStringList list;
-    for (int i = 0; i < 100; i++)
-        list.append("Строка № " + QString::number(i));
-    return list;
+
+//    for (int i = 0; i < 100; i++)
+//        list.append("Строка № " + QString::number(i));
+
+    return _tr_strings; //list;
 }
 //------------------------------------------------------------------------------
 // Old realisation

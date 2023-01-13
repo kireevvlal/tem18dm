@@ -12,7 +12,7 @@ Rectangle {
 
     signal switchUso_USTA_DisVih();    // переход на меню
     signal switchUso_USTA_DisVhod();  //
-    signal switchUso_USTA_Analogi(int offset);   //
+    signal switchUso_USTA_Analogi(/*int offset*/);   //
     signal switchUso_Exit();    // переход на уровень ввех
 
     signal knopaS();  // сигнал о нажатии клавиши ДМ "S"
@@ -38,6 +38,7 @@ Rectangle {
             img7.source =  "../Pictogram/uso/0_dot.png"
             img8.source =  "../Pictogram/uso/0_din.png"
             img9.source =  "../Pictogram/uso/0_a.png"
+
 
             switchUso_Exit();
             break;
@@ -81,14 +82,14 @@ Rectangle {
             break;
         }
         case Qt.Key_9:        {
-            if (kdr_USTA_Analog.opacity == 1) {
-                switchUso_USTA_Analogi(1);
-            }
-            else {
+//            if (kdr_USTA_Analog.opacity == 1) {
+                switchUso_USTA_Analogi(/*1*/);
+//            }
+//            else {
                 img7.source = "../Pictogram/uso/0_dot.png"
                 img8.source = "../Pictogram/uso/0_din.png"
                 img9.source = "../Pictogram/uso/1_aud.png"
-            }
+//            }
             break;
         }
         // *** ! кодировка на ТПК может отличаться

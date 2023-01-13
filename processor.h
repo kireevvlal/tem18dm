@@ -40,7 +40,7 @@ struct TrState {
     bool kvit;
     TrState() { status.fill(false, 3); delay = 0; kvit = false; }
 };
-//
+// структура для вывода и квитирования тревожных сообщений на баннере
 struct TrBanner {
     QString str1; // система
     QString str2; // тревожное сообщение
@@ -68,6 +68,7 @@ private:
     SlaveLcm _slave; // additional section
     bool _is_active;
     QFile _mtr_file; // имя и путь файла моторесурса
+    QFile _trmess_file; // имя и путь файла тревожных сообщений
     QThread *_reg_thread;
     QTimer *_reg_timer;
     //QThread *_diag_thread;
@@ -92,6 +93,7 @@ private:
     void ParseTrMess(NodeXML*);
     void SetSlaveData();
     QString FormMessage(int, int, int);
+    void SaveMessagesList();
 #ifdef Q_OS_UNIX
     void GPIO();
 #endif
@@ -104,6 +106,7 @@ public:
 signals:
     void AddRecordSignal();
     void SaveFilesSignal();
+    void ChangeMediaDirSignal();
 private slots:
     void RegTimerStep();
     void DiagTimerStep();
@@ -111,7 +114,8 @@ public slots:
     void Unpack(QString);
 //    void LostConnection(QString);
 //    void RestoreConnection(QString);
-    void querySaveToUSB(QString);
+    void ChangeMediaDir(QString);
+    void querySaveToUSB();
     bool changeKdr(int);
     void kvitTrBanner();
     // New:

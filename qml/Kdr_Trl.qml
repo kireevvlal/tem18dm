@@ -33,7 +33,7 @@ Rectangle {
 
     ListView {
         y: 20
-        x: 10
+        x: 2
         width: parent.width - 10
         height: parent.height - 20
         model: tr_mess_list_model
@@ -60,7 +60,7 @@ Rectangle {
                     first = 0;
             }
             for (var i = first; i < first + 12 && i < count; i++) {
-                tr_mess_list_model.append({ message: par[i] });
+                tr_mess_list_model.append({ message: qsTr(par[i]) });
             }
 //            ind_i.value = par.length
         }

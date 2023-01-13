@@ -9,6 +9,8 @@ class Saver : public QObject
 {
     Q_OBJECT
 private:
+    QStringList _devices;
+    bool _media_inserted;
     QTimer *_task_timer;
     int _task_interval;
     QString _media_path; // путь к каталогу (диску) для записи
@@ -19,13 +21,20 @@ private:
     QFileInfoList _files;
     QStorageInfo _storage_info;
     int _index; // индекс копируемого файла
+    int _quantity; // колоичество файлов для записи
+    void FindUSBDevices(); // проверка на подключение USB flash
+    QStringList ScanDev();
 public:
     Saver(QObject *parent = nullptr);
     void Run();
     void SetParameters(QString, QString, int);
+    bool MediaInserted() { return _media_inserted; }
+    bool Recording() { return _state; }
+    int PercentRecorded();
+//    QString MediaPath() { return _media_path; }
 public slots:
     void Save();
-    //void MediaDisconnected();
+    void MediaChange();
     void TaskTimerStep();
 };
 

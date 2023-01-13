@@ -10,7 +10,12 @@ Diagnostics::Diagnostics(DataStore* storage, float ptmax)
     _storage = storage;
     _pt_max = ptmax;
     _ports_state = 0;
-    _msec = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    _date_time = QDateTime::currentDateTime();
+    _msec = _date_time.toMSecsSinceEpoch();
+}
+//--------------------------------------------------------------------------------
+void Diagnostics::RefreshDT() {
+    _date_time = QDateTime::currentDateTime();
 }
 //--------------------------------------------------------------------------------
 void Diagnostics::APSignalization(int pkm) {

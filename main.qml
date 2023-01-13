@@ -96,7 +96,10 @@ Window {
             txt_RejPrTime.color = (par[13][1] == "2") ?  "yellow" : "gray";
             txt_RejPrT.opacity = (par[13][2] == "1") ? 1 : 0;
 
-            prBar1.value = par[14]; //ioBf.getParamDiap(100);// заглушка
+            // save to USB
+            insertedUSB.visible = par[14][0];
+            recordUSB.visible = recUSBprBar.visible = par[14][1];
+            recUSBprBar.value = par[14][2];
 
             indPt.value = par[15][0];
             var start = par[15][1];
@@ -160,6 +163,22 @@ Window {
                     kdr_FootUso.opacity = 1;
                     kdr_FootUso.focus = true;
                     break;
+                case 4:
+                    kdr_Foot.opacity = 1;
+                    kdr_Foot.focus = true;
+                    break;
+                case 5:
+                    kdr_Foot.opacity = 1;
+                    kdr_Foot.focus = true;
+                    break;
+                case 6:
+                    kdr_Foot.opacity = 1;
+                    kdr_Foot.focus = true;
+                    break;
+                case 7:
+                    kdr_Foot.opacity = 1;
+                    kdr_Foot.focus = true;
+                    break;
                 }
             }
        }
@@ -212,39 +231,39 @@ Window {
         }
 
         Image {
-            id: img_ind_f
+            id: insertedUSB
             x: 4
-            y: 138
+            y: 128
             width: 22
             height: 40
             clip: false
             source: "../Pictogram/flesh1.png"
-            visible: true
+            visible: false
         }
 
         Image {
-            id: img_z0
+            id: recordUSB
             x: 26
-            y: 147
+            y: 137
             width: 35
             height: 19
             clip: true
             source: "../Pictogram/flesh zapis1.png"
-            visible: true
+            visible: false
 
         }
 
         PrBar {
-            id: prBar1
+            id: recUSBprBar
             x: 61
-            y: 148
+            y: 138
             width: 61
             height: 14
             clip: true
             kind: 1
             val_max: 100
             value: 0
-            visible: true
+            visible: false
         }
 
         Rectangle {
@@ -260,7 +279,7 @@ Window {
     //            x: 129
     //            y: 2
                 color: (main_window.current_section == 1 ?"#d2e8fb" : "black")
-                text: (main_window.current_section == 1 ? qsTr("ТЭМ18ДМ  №___") : qsTr("выбрана вторая секция"))
+                text: (main_window.current_section == 1 ? qsTr("ТЭМ18ДМ  №101") : qsTr("выбрана вторая секция"))
                 font.bold: true
                 font.pointSize: 13
                 horizontalAlignment: Text.AlignHCenter
@@ -879,7 +898,7 @@ Window {
     Kdr_Nstr {
         id: kdr_Nastroika
         x: 128
-        y: 23
+        y: 219
         opacity: 1
         z: -3
 
@@ -1035,7 +1054,7 @@ Window {
                 showKdr_Svazi();
 //                setSystem(3);
             }
-            onSaveToUSB: { ioBf.querySaveToUSB("G:/"); }  // сигнал о необходимости записи на USB (для отработки под Windows)
+            onSaveToUSB: { ioBf.querySaveToUSB(); }  // сигнал о необходимости записи на USB (для отработки под Windows)
 
             onSwitchFoot_Exit: {  // в начальное состояние
                 go_Exit();
@@ -1211,8 +1230,8 @@ Window {
 
             onSwitchUso_USTA_DisVih:  { opastyNul(); kdr_USTA_DskrVihodi.opacity = 1; }
             onSwitchUso_USTA_DisVhod: { opastyNul(); kdr_USTA_DskrVh.opacity = 1;     }
-            onSwitchUso_USTA_Analogi: function(offset) {
-                if (offset) {
+            onSwitchUso_USTA_Analogi: function(/*offset*/) {
+                if (kdr_USTA_Analog.opacity) {
                     if (kdr_USTA_Analog.offset == 30) {
                         kdr_USTA_Analog.offset = 0;
                         kdr_USTA_Analog.numPage = 1;
@@ -1221,7 +1240,8 @@ Window {
                         kdr_USTA_Analog.offset += 10;
                         kdr_USTA_Analog.numPage++;
                     }
-                }
+                } else
+                    kdr_USTA_Analog.offset = 0;
                 opastyNul();
                 kdr_USTA_Analog.opacity = 1;
             }

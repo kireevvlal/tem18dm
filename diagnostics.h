@@ -18,6 +18,7 @@ struct StructRizCU {
 class Diagnostics
 {
 private:
+    QDateTime _date_time;
     float _pt_max; // макимальное значение давления топлива
     StructRizCU _riz_cu;
 //    Processor* _processor;
@@ -30,8 +31,9 @@ private:
     void OnLostIt(ThreadSerialPort*, Registrator* reg, SlaveLcm* slave);
 //    void OnLostMss(ThreadSerialPort*);
 public:
-    QTime Time;
-    QDate Date;
+    void RefreshDT();
+    QTime Time() { return _date_time.time(); }
+    QDate Date() { return _date_time.date(); }
     qint8 PortsState() { return _ports_state; }
     float Adiz() { return _a_diz; }
     void Adiz(float value) { _a_diz = value; }
