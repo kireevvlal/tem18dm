@@ -78,21 +78,21 @@ Rectangle {
 
         TInd {
             id: ind_Fd
-            x: 187
-            y: 137
-            width: 54
+            x: 188
+            y: 132
+            width: 40
             height: 26
             color: "gray"
             txtColor: "white"
-            txtSize: 24
+            txtSize: 20
             border.color: "#00000000"
         }
 
         Text {
             id: text2
             x: 234
-            y: 141
-            color: "#f9f8f8"
+            y: 140
+            color: "silver"
             text: qsTr("об/мин")
             font.pixelSize: 12
         }

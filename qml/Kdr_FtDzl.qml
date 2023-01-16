@@ -44,6 +44,8 @@ Rectangle {
             if (kdr_Foot.setSection(1)) {
                 img1.source = "../Pictogram/m1_lok.png";
                 img2.source = "../Pictogram/m0_lok.png";
+                img8.source = "../Pictogram/disel/0_tpl.png"
+                img9.source = "../Pictogram/disel/0_oxl.png"
 
                 txt_1.color = cltxtSelect;
                 txt_2.color = cltxt;
@@ -56,6 +58,9 @@ Rectangle {
             if (kdr_Foot.setSection(2)) {
                 img1.source = "../Pictogram/m0_lok.png";
                 img2.source = "../Pictogram/m1_lok.png";
+                img8.source = "../Pictogram/disel/0_tpl.png"
+                img9.source = "../Pictogram/disel/0_oxl.png"
+
                 txt_2.color = cltxtSelect;
                 txt_1.color = cltxt;
             }
@@ -108,6 +113,7 @@ Rectangle {
         }
         case Qt.Key_C:  //67 :
         {
+            kdr_Foot.doTrMessList();
             knopai(); // сигнал о нажатии клавиши ДМ "i"
             break;
         }

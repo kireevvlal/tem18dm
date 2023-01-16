@@ -21,6 +21,7 @@ using namespace std;
 //#include <QTime>
 //#include <QDate>
 #endif
+#include <QSound>
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 Processor::Processor(QObject *parent) : QObject(parent)
@@ -93,6 +94,7 @@ bool Processor:: Load(QString startPath, QString cfgfile)
 #ifdef  Q_OS_UNIX
     _fswatcher->addPath("_saver->MediaPath("/dev");
 #endif
+
     return true;
 }
 //--------------------------------------------------------------------------------
@@ -152,6 +154,8 @@ void Processor::Run()
     SaveMessagesList();
 
     _is_active = true;
+
+    QSound::play("D:/CF/tada.wav");
 }
 //--------------------------------------------------------------------------------
 #ifdef Q_OS_UNIX
@@ -462,13 +466,17 @@ bool Processor::changeKdr(int kdr) {
         return false;
 }
 //--------------------------------------------------------------------------------
-void Processor:: kvitTrBanner() {
+void Processor::kvitTrBanner() {
     int first;
     if (!_tr_banner_queue.isEmpty()) {
         first = _tr_banner_queue.firstKey();
         _tr_states[_tr_banner_queue[first].section][_tr_banner_queue[first].index]->kvit = true;
         _tr_banner_queue.remove(first);
     }
+}
+//--------------------------------------------------------------------------------
+void Processor::playSoundOnShowBanner() {
+    QSound::play("D:/CF/tada.wav");
 }
 ////--------------------------------------------------------------------------------
 //void Processor::LostConnection(QString alias) {
@@ -700,21 +708,25 @@ QJsonArray Processor::getParamKdrFoot()
     for ( QMap<int, TrMess*>::iterator i = _tr_messages.begin(); i != _tr_messages.end(); i++) {
         if (i.key() != 90) {
             if (_mainstore.Bit("PROG_TrSoob", i.key())) { // main section
-                par1 = 1;
+                //par1 = 1;
                 if (_section == 0) {
-                    if ((i.key() >= 1 && i.key() <= 4) || (i.key() >= 21 && i.key() <= 24) || (i.key() >= 31 && i.key() <= 34)) // electric
-                        par8 = 1;
-                    if (i.key() == 5 || i.key() == 6 || i.key() == 7 || i.key() == 45 || i.key() == 46 ) // diesel
-                        par9 = 1;
+                    if ((i.value()->system >= 1 && i.value()->system <= 4) || (i.value()->system >= 21 && i.value()->system <= 24)
+                            || (i.value()->system >= 31 && i.value()->system <= 34))  // electric
+                        par1 = par9 = 1;
+                    if (i.value()->system == 5 || i.value()->system == 6 || i.value()->system == 7 || i.value()->system == 45
+                            || i.value()->system == 46 ) // diesel
+                        par1 = par8 = 1;
                 }
             }
             if (_slave.Storage()->Bit("PROG_TrSoob", i.key())) { // additional section
-                par2 = 1;
+//                par2 = 1;
                 if (_section == 1) {
-                    if ((i.key() >= 1 && i.key() <= 4) || (i.key() >= 21 && i.key() <= 24) || (i.key() >= 31 && i.key() <= 34)) // electric
-                        par8 = 1;
-                    if (i.key() == 5 || i.key() == 6 || i.key() == 7 || i.key() == 45 || i.key() == 46 ) // diesel
-                        par9 = 1;
+                    if ((i.value()->system >= 1 && i.value()->system <= 4) || (i.value()->system >= 21 && i.value()->system <= 24) ||
+                            (i.value()->system >= 31 && i.value()->system <= 34)) // electric
+                        par2 = par9 = 1;
+                    if (i.value()->system == 5 || i.value()->system == 6 || i.value()->system == 7 || i.value()->system == 45
+                            || i.value()->system == 46 ) // diesel
+                        par2 = par8 = 1;
                 }
             }
         }
@@ -728,29 +740,29 @@ QJsonArray Processor::getParamKdrFtDzl()
     for ( QMap<int, TrMess*>::iterator i = _tr_messages.begin(); i != _tr_messages.end(); i++) {
         if (i.key() != 90) {
             if (_mainstore.Bit("PROG_TrSoob", i.key())) {
-                par1 = 1;
+//                par1 = 1;
                 if (_section == 0) {
-                    if (i.key() == 5)
-                        par6 = 1;
-                    if (i.key() == 6)
-                        par7 = 1;
-                    if (i.key() == 7)
-                        par8 = 1;
-                    if (i.key() == 45 || i.key() == 46)
-                        par9 = 1;
+                    if (i.value()->system == 5)
+                        par1 = par6 = 1;
+                    if (i.value()->system == 6)
+                        par1 = par7 = 1;
+                    if (i.value()->system == 7)
+                        par1 = par8 = 1;
+                    if (i.value()->system == 45 || i.value()->system == 46)
+                        par1 = par9 = 1;
                 }
             }
             if (_slave.Storage()->Bit("PROG_TrSoob", i.key())) {
-                par2 = 1;
+//                par2 = 1;
                 if (_section == 1) {
-                    if (i.key() == 5)
-                        par6 = 1;
-                    if (i.key() == 6)
-                        par7 = 1;
-                    if (i.key() == 7)
-                        par8 = 1;
-                    if (i.key() == 45 || i.key() == 46)
-                        par9 = 1;
+                    if (i.value()->system == 5)
+                        par2 = par6 = 1;
+                    if (i.value()->system == 6)
+                        par2 = par7 = 1;
+                    if (i.value()->system == 7)
+                        par2 = par8 = 1;
+                    if (i.value()->system == 45 || i.value()->system == 46)
+                        par2 = par9 = 1;
                 }
             }
         }
@@ -764,29 +776,29 @@ QJsonArray Processor::getParamKdrFtElektr()
     for ( QMap<int, TrMess*>::iterator i = _tr_messages.begin(); i != _tr_messages.end(); i++) {
         if (i.key() != 90) {
             if (_mainstore.Bit("PROG_TrSoob", i.key())) {
-                par1 = 1;
+//                par1 = 1;
                 if (_section == 0) {
-                    if (i.key() == 1 || i.key() == 21 || i.key() == 31)
-                        par6 = 1;
-                    if (i.key() == 2 || i.key() == 22 || i.key() == 32)
-                        par7 = 1;
-                    if (i.key() == 3 || i.key() == 23 || i.key() == 33)
-                        par8 = 1;
-                    if (i.key() == 4 || i.key() == 24 || i.key() == 34)
-                        par9 = 1;
+                    if (i.value()->system == 1 || i.value()->system == 21 || i.value()->system == 31)
+                        par1 = par6 = 1;
+                    if (i.value()->system == 2 || i.value()->system == 22 || i.value()->system == 32)
+                        par1 = par7 = 1;
+                    if (i.value()->system == 3 || i.value()->system == 23 || i.value()->system == 33)
+                        par1 = par8 = 1;
+                    if (i.value()->system == 4 || i.value()->system == 24 || i.value()->system == 34)
+                        par1 = par9 = 1;
                 }
             }
             if (_slave.Storage()->Bit("PROG_TrSoob", i.key())) {
-                par1 = 2;
+//                par1 = 2;
                 if (_section == 1) {
-                    if (i.key() == 1 || i.key() == 21 || i.key() == 31)
-                        par6 = 1;
-                    if (i.key() == 2 || i.key() == 22 || i.key() == 32)
-                        par7 = 1;
-                    if (i.key() == 3 || i.key() == 23 || i.key() == 33)
-                        par8 = 1;
-                    if (i.key() == 4 || i.key() == 24 || i.key() == 34)
-                        par9 = 1;
+                    if (i.value()->system == 1 || i.value()->system == 21 || i.value()->system == 31)
+                        par2 = par6 = 1;
+                    if (i.value()->system == 2 || i.value()->system == 22 || i.value()->system == 32)
+                        par2 = par7 = 1;
+                    if (i.value()->system == 3 || i.value()->system == 23 || i.value()->system == 33)
+                        par2 = par8 = 1;
+                    if (i.value()->system == 4 || i.value()->system == 24 || i.value()->system == 34)
+                        par2 = par9 = 1;
                 }
             }
         }
@@ -1134,257 +1146,5 @@ QJsonArray Processor::getAnalogArray(int offset) {
 //------------------------------------------------------------------------------
 // Tr soob string list
 QStringList Processor::getKdrTrL() {
-
-//    for (int i = 0; i < 100; i++)
-//        list.append("Строка № " + QString::number(i));
-
     return _tr_strings; //list;
 }
-//------------------------------------------------------------------------------
-// Old realisation
-
-//int Processor::getReversor()
-//{
-//   // if(revs=dab[0,bReV])then exit;revs:=dab[0,bReV];
-
-//    int revs = rand() % 4;// // заглушка пока возвращем число в диапазоне от 0 до 3
-//    return revs;
-//}
-
-//int Processor::getPKM()
-//{
-//   //  int pkms:=dab[0,bPKV];
-//    int pkm = rand() % 10; // заглушка
-//    return pkm;
-//}
-
-//int Processor::getRegim()
-//{
-//    int rg = rand() % 4; // заглушка
-//    // if not(dab[0,bRjV]in[1..3])then Visible:=false
-//    // rg = dab[0,bRjV];
-
-//     if ( (rg != 1) & (rg !=2 ) & (rg !=3 ) ) { rg = 0; }  // нет режима - не отрисовывать
-
-//    return rg;
-//}
-
-////*****************************************
-//QString Processor::getRejPrT(QString param)
-
-//{
-
-//   int t;
-//   QString  vzbl_msg, vzbl_tm ;
-//   int d = rand() % 4000;// dal[0,lTxox];
-
-//   QString TxS= "00";
-//   QString TxM= "00";
-//   QString TxC= "00";
-//   QString capt= "00:00:00";
-
-//   if (d==0) {
-//        // TxC.Visible:=false; TxM.Visible:=false; TxS.Visible:=false; TxT.Visible:=false;
-//        // RejPrT.Visible:=false;
-//        capt= "00:00:00";
-//        vzbl_msg = "0"; // сообщение убрали
-//        vzbl_tm = "0";  // время убрали
-//    }
-//    else
-//    {
-//              t = (d%60); // inttostr( d mod 60);  //секунды    х.х.
-//              TxS.setNum(t);
-
-//              t = (d%3600)/60; // inttostr((d mod 3600)div 60);  //минуты
-//              TxM.setNum(t);
-
-//              t = d/3600; // inttostr( d div 3600 );  //часы
-//              TxC.setNum(t);
-
-//                //  if(dal[0,lTxox]<2400)then begin //40мин
-//                if (d<2400) { //40мин
-//                            // TxC.Font.Color:=clGray;TxM.Font.Color:=clGray; TxS.Font.Color:=clGray; TxT.Font.Color:=clGray;
-//                            // RejPrT.Visible:=false;
-//                            vzbl_msg = "0"; // сообщение убираем
-//                            vzbl_tm = "1";  // время серое
-
-//                            }
-//                            else
-//                            {
-//                            // TxC.Font.Color:=clYellow;TxM.Font.Color:=clYellow; TxS.Font.Color:=clYellow; TxT.Font.Color:=clYellow;
-//                            // RejPrT.Visible:=true;
-//                            vzbl_msg = "1"; // сообщение показываем
-//                            vzbl_tm = "2";  // время желтое
-//                            }
-
-//     // TxC.Visible:=true; TxM.Visible:=true;
-//     // TxS.Visible:=true; TxT.Visible:=true;
-//     // capt = TxC +" : "+ TxM+" : " + TxS;
-//     }
-//if (param == "value") { capt = TxC +" : "+ TxM+" : " + TxS;;}
-
-//if (param == "ms") {capt = vzbl_msg;}
-
-//if (param == "tm") {capt = vzbl_tm;}
-
-//{return capt;}
-//}
-////*****************************************
-//QString Processor::getRejPro()
-//{
-////исходник    with RejPro do
-////    if((dab[0,7]and $30)=$00)
-////    then Visible:=false
-////    else
-////      begin          //прожиг коллектора
-////           if ((dab[0,7]and $30)=$10)
-////           then Caption:='Прожиг коллектора'
-////           else Caption:='Завершение прожига';
-////           Visible:=true;
-////      end;
-
-// QString capt;
-// int bt = rand() % 48 ; //= dab[0,7];
-
-//      if ( (bt & 0x30) == 0x00) {
-//       capt = ""; }
-//      else
-//        {    //прожиг коллектора
-//             if ((bt & 0x30) == 0x10)
-//             { capt = "Прожиг коллектора"; }
-//             else capt = "Завершение прожига";
-
-//        };
-
-//    return capt;
-//}
-////********************************************
-//QString Processor::getRejAP()
-//{
-////{$IFDEF ES_OBO}  исходник  with RejAP do
-////    if(dsk[0,iAPvkl1]=00)
-////    then Visible:=false //режим автопрогрева
-////    else
-////       begin
-////        if(dsk[0,iSA1 ]=01)then Caption:='Режим АвтоПрогрева'  else
-////         if(dsk[0,iKMv0]=00)then Caption:='АП: Установи ПКМ в 0'else
-////            if(dsk[0,iDizZ]=00)then Caption:='АП: Запусти дизель'  else
-////                                Caption:='';
-////        Visible:=true;
-////       end;{$ENDIF}
-
-// QString capt;
-// int dsk_iAPvkl1 = rand() % 3 ; // dsk_iAPvkl1= dsk[0,iAPvkl1];
-// int dsk_iSA1=1 ;  // dsk_iSA1  = dsk[0,iSA1 ];
-// int dsk_iKMv0=1;  // dsk_iKMv0 = dsk[0,iKMv0];
-// int dsk_iDizZ= 0; // dsk_iDizZ = dsk[0,iDizZ];
-
-//     if(dsk_iAPvkl1 == 00){
-//        capt = ""; } //режим автопрогрева
-//     else
-//        {
-//         if(dsk_iSA1 == 01) { capt="Режим АвтоПрогрева"; }  else
-//          if(dsk_iKMv0 == 00) { capt="АП: Установи ПКМ в 0"; } else
-//             if( dsk_iDizZ == 00) { capt="АП: Запусти дизель" ;} else
-//                                  capt="";
-//         };
-
-//    return capt;
-//}
-////***********************************************
-//QString Processor::getParam()
-//{
-//    int d = rand() % 1000 ;
-//    QString v = QString::number(d);
-//    return v;
-//}
-
-//QString Processor::getParamExt(int ext)
-//{
-//   float d = rand() % 1000 ;
-//   QString v = QString::number(d, 'f', ext);
-//   return v;
-//}
-
-//QString Processor::getParamDiap(int diapazon)
-//{
-//    float d = rand() % diapazon ;
-//    QString v = QString::number(d);
-//    return v;
-//}
-
-//QString Processor::tm()
-//{// текущее время
-//    QString v = QTime::currentTime().toString("HH:mm:ss");
-//    return v;
-//}
-
-//QString Processor::dt()
-//{// текущая дата
-//    QString v = QDate::currentDate().toString("dd/MM/yy");
-//    return v;
-//}
-
-//int Processor::mysz()
-//{// проверка размерности разных структур
-//    // QString v = QDate::currentDate().toString("dd/MM/yy");
-//    QString v = "ффффффф"; // указатель на строку/  размер указателя 4 байта
-//    int r=v.count();// количество символов
-
-//    // QByteArray vv[] = "я";
-//    //char vv[] = "я";
-//    //int r = sizeof(vv); // размер в байтах
-
-//    return r;
-//}
-
-////QString Connector::getStructAnlg_r(int indx, QString &s1, QString &s2, QString &s3, QString &s4, QString &s5)
-////{
-
-////    s1 = zapAnalog[indx].r;
-////    s2 = zapAnalog[indx].n;
-////    s3 = zapAnalog[indx].o;
-////    s4 = zapAnalog[indx].i;
-////    s5 = zapAnalog[indx].a;
-
-////    return s1;
-////}
-
-//QString Processor::getStructAnlg_r(int indx){return zapAnalog[indx].r;}
-//QString Processor::getStructAnlg_n(int indx){return zapAnalog[indx].n;}
-//QString Processor::getStructAnlg_o(int indx){return zapAnalog[indx].o;}
-//QString Processor::getStructAnlg_i(int indx){return zapAnalog[indx].i;}
-//QString Processor::getStructAnlg_a(int indx){return zapAnalog[indx].a;}
-
-//QString Processor::getStructDiskr_r(int indx){return zapDiskr[indx].r;}
-//QString Processor::getStructDiskr_n(int indx){return zapDiskr[indx].n;}
-//QString Processor::getStructDiskr_o(int indx){return zapDiskr[indx].o;}
-//QString Processor::getStructDiskr_i(int indx){return zapDiskr[indx].i;}
-
-//***********************************************
-//int  Processor::getTrevogaTotal(int indx)//возвращает состояние лампочки-ошибки для главного(верхнего меню)
-//{
-//    // indx - номер лампочки, потом по нему к массиву будем обращаться
-//    // массив TrTotal создадим в другой подпрограмме
-
-//    int d = rand() % 2 ;// ! отладка
-//    return d;
-//}
-
-//int  Processor::getTrevogaDizel(int indx)//возвращает состояние лампочки-ошибки для Дизельного меню
-//{
-//    // indx - номер лампочки, потом по нему к массиву будем обращаться
-//    // массив TrDizel создадим в другой подпрограмме - согласoвывается с массивом TrTotal
-
-//    int d = rand() % 2 ;// ! отладка
-//    return d;
-//}
-
-//int  Processor::getTrevogaElektr(int indx)//возвращает состояние лампочки-ошибки для Дизельного меню
-//{
-//    // indx - номер лампочки, потом по нему к массиву будем обращаться
-//    // массив TrDizel создадим в другой подпрограмме - согласoвывается с массивом TrTotal
-
-//    int d = rand() % 2 ; // ! отладка
-//    return d;
-//}

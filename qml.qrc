@@ -98,5 +98,7 @@
         <file>qml/ExtBeadItem.qml</file>
         <file>qml/ExtBeads.qml</file>
         <file>Locomotive.ico</file>
+        <file>Pictogram/0_dn.png</file>
+        <file>Pictogram/0_up.png</file>
     </qresource>
 </RCC>

@@ -64,14 +64,23 @@ Rectangle {
 
         TInd {
             id: ind_Fd
-            x: 326
+            x: 332
             y: 132
-            width: 45
+            width: 40
             height: 26
             color: "gray"
             txtColor: "white"
-            txtSize: 24
+            txtSize: 20
             border.color: "#00000000"
+        }
+
+        Text {
+            id: text2
+            x: 376
+            y: 140
+            color: "silver"
+            text: qsTr("об/мин")
+            font.pixelSize: 12
         }
 
         Text {
@@ -82,15 +91,6 @@ Rectangle {
             text: qsTr("ОХЛАЖДЕНИЕ")
             font.bold: true
             font.pixelSize: 14
-        }
-
-        Text {
-            id: text2
-            x: 372
-            y: 137
-            color: "#f9f8f8"
-            text: qsTr("об/мин")
-            font.pixelSize: 12
         }
 
         Text {

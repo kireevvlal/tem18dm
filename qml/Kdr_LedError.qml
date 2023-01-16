@@ -9,15 +9,15 @@ Rectangle {
     opacity: 1
     border.width: 0
 
-    property int vz1: 1,00 ; // тревога 1 0-невидимый/1-видимый
-    property int vz2: 1,00; // тревога 2
-    property int vz3: 0,00; // тревога 3
-    property int vz4: 0,00; // тревога 4
-    property int vz5: 0,00; // тревога 5
-    property int vz6: 0,00; // тревога 6
-    property int vz7: 0,00; // тревога 7
-    property int vz8: 0,00; // тревога 8
-    property int vz9: 0,00; // тревога 9
+    property int vz1: 1 ; // тревога 1 0-невидимый/1-видимый
+    property int vz2: 1; // тревога 2
+    property int vz3: 0; // тревога 3
+    property int vz4: 0; // тревога 4
+    property int vz5: 0; // тревога 5
+    property int vz6: 0; // тревога 6
+    property int vz7: 0; // тревога 7
+    property int vz8: 0; // тревога 8
+    property int vz9: 0; // тревога 9
 
     property int tr1: 0; // тревога 1 / 0 - зеленый / 1-красный
     property int tr2: 0; // тревога 2

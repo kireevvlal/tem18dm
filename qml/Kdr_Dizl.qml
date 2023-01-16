@@ -85,7 +85,7 @@ Rectangle {
 
         TInd {
             id: t_hsp
-            x: 34
+            x: 32
             y: 32
             width: 31
             height: 16
@@ -525,32 +525,33 @@ Rectangle {
             // N (F)
             Text {
                 id: text1
-                x: 337
-                y: 83
-                color: "lightGray"
+                x: 346
+                y: 108
+                color: "silver"
                 text: qsTr("F")
+                styleColor: "#0f0c0c"
                 font.bold: true
-                font.pixelSize: 38
+                font.pixelSize: 20
             }
 
             TInd {
                 id: f_d
-                x: 357
-                y: 102
-                width: 56
-                height: 26
-                color: "#808080"
+                x: 360
+                y: 108
+                width: 60
+                height: 24
+                color: "gray"
                 z: 20
                 txtSize: 24
-                txtColor: "#ffffff"
+                txtColor: "white"
                 border.color: "#00000000"
             }
 
             Text {
                 id: text11
-                x: 419
-                y: 103
-                color: "#d3d3d3"
+                x: 420
+                y: 112
+                color: "silver"
                 text: qsTr("об/мин")
                 font.bold: true
                 font.pixelSize: 16

@@ -62,7 +62,7 @@ Rectangle {
         id: ind_MotC
         x: 59
         y: 55
-        value: "000000000"
+        value: "000000"
 
     }
 
@@ -80,7 +80,7 @@ Rectangle {
     TInd {
         id: ind_MotM
         value: "00"
-        x: 156
+        x: 160
         y: 55
         width: 40
         height: 22
@@ -88,7 +88,7 @@ Rectangle {
 
     Text {
         id: text_MotM
-        x: 200
+        x: 208
         y: 55
         color: "#8f8282"
         text: qsTr("м")
@@ -100,7 +100,7 @@ Rectangle {
     TInd {
         id: ind_MotS
         value: "00"
-        x: 216
+        x: 228
         y: 55
         width: 40
         height: 22
@@ -108,7 +108,7 @@ Rectangle {
 
     Text {
         id: text_MotS
-        x: 260
+        x: 276
         y: 55
         color: "#8f8282"
         text: qsTr("с")
@@ -133,7 +133,7 @@ Rectangle {
         id: ind_TagC
         x: 59
         y: 89
-        value: "000000000"
+        value: "000000"
 
     }
     Text {
@@ -150,7 +150,7 @@ Rectangle {
     TInd {
         id: ind_TagM
         value: "00"
-        x: 156
+        x: 160
         y: 89
         width: 40
         height: 22
@@ -158,19 +158,19 @@ Rectangle {
 
     Text {
         id: text_TagM
-        x: 200
+        x: 208
         y: 89
         color: "#8f8282"
         text: qsTr("м")
         font.bold: true
         verticalAlignment: Text.AlignVCenter
-        font.pixelSize: 16
+        font.pixelSize: 15
     }
 
     TInd {
         id: ind_TagS
         value: "00"
-        x: 216
+        x: 228
         y: 89
         width: 40
         height: 22
@@ -178,7 +178,7 @@ Rectangle {
 
     Text {
         id: text_TagS
-        x: 260
+        x: 276
         y: 89
         color: "#8f8282"
         text: qsTr("с")
@@ -201,7 +201,7 @@ Rectangle {
 
     TInd {
         id: ind_Rab
-        value: "000000000"
+        value: "000000"
         x: 65
         y: 124
         width: 130
@@ -223,20 +223,21 @@ Rectangle {
     // Fd
     Text {
         id: text_Fd
-        x: 360
+        x: 346
         y: 108
-        color: "#080000"
+        color: "silver"
         text: qsTr("F")
         styleColor: "#0f0c0c"
-        font.pixelSize: 16
+        font.pixelSize: 20
         font.bold: true
     }
 
     TInd {
         id: ind_Fd
-        x: 370
+        x: 360
         y: 108
-        height: 26
+        height: 24
+        width: 60
         color: "gray"
         txtColor: "white"
         txtSize: 24
@@ -245,10 +246,10 @@ Rectangle {
 
     Text {
         id: text_obm
-        x: 457
-        y: 108
-        color: "#080000"
-        text: qsTr("о/м")
+        x: 420
+        y: 112
+        color: "silver"
+        text: qsTr("об/мин")
         font.pixelSize: 16
         font.bold: true
         styleColor: "#0f0c0c"

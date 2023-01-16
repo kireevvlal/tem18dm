@@ -138,6 +138,8 @@ Window {
             indPt.visible = indPm.visible = indFd.visible = par[9];
             // Trevoga messages
             if (par[16][0] != "") {
+                if (!kdr_Tre.opacity)
+                    ioBf.playSoundOnShowBanner();
                 kdr_Tre.opacity = 1;
                 kdr_Tre.focus = true;
                 kdr_Tre.str1 = par[16][0];
@@ -191,25 +193,25 @@ Window {
         x: 0
         y: 0
 
-        TRevers {
-            id: revers
-            x: 10
-            y: 46
-        }
-
         TPKM {
             id: pkm
             x: 10
-            y: 15
+            y: 10
             width: 64
             color: "#000000"
             pkms: 5
         }
 
+        TRevers {
+            id: revers
+            x: 10
+            y: 41
+        }
+
         TRegm {
             id: regim
             x: 4
-            y: 88
+            y: 83
             height: 25
             value: 1
         }
@@ -281,7 +283,7 @@ Window {
                 color: (main_window.current_section == 1 ?"#d2e8fb" : "black")
                 text: (main_window.current_section == 1 ? qsTr("ТЭМ18ДМ  №101") : qsTr("выбрана вторая секция"))
                 font.bold: true
-                font.pointSize: 13
+                font.pointSize: 12
                 horizontalAlignment: Text.AlignHCenter
             }
         }
@@ -325,7 +327,8 @@ Window {
             color: "#d2e8fb"
             text: qsTr("время")
             horizontalAlignment: Text.AlignRight
-            font.pointSize: 13
+            font.family: "Segoe UI Emoji"
+            font.pointSize: 12
             font.bold: true
         }
 
@@ -336,7 +339,7 @@ Window {
             color: "#d2e8fb"
             text: qsTr("дата")
             font.family: "Segoe UI Emoji"
-            font.pointSize: 13
+            font.pointSize: 12
             font.bold: true
         }
 
@@ -1286,7 +1289,19 @@ Window {
 
     function  showKdr_ArhivMessage() // сигнал о нажатии клавиши ДМ "i"  /alt+c
     {
-    opastyNul(); kdr_TrLs.opacity = 1;
+//        opastyNul();
+        kdr_FootDizel.opacity=0;
+        kdr_FootElektrooborud.opacity=0;
+        kdr_FootUso.opacity = 0;
+        kdr_Foot_Usta.opacity=0;
+        kdr_FootBEL.opacity=0;
+        kdr_Foot_TI.opacity=0;
+
+        // главный экран показываем
+        //kdr_Foot.is_exit = true;
+
+        //            txt_1.color = txt_2.color = cltxt;
+//        kdr_TrLs.opacity = 1;
     }
 
     function showKdr_Reostat()      // сигнал о нажатии клавиши ДМ "St"/alt+d

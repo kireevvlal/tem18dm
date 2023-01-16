@@ -69,6 +69,8 @@ void Saver::MediaChange() {
     QStringList devs = ScanDev();
     if (devs.length() != _devices.length()) {
         _media_inserted = (devs.length() > _devices.length()) ? true : false;
+        if (!_media_inserted && state)
+            _state = _index = _quantity = 0;
         _devices.clear();
         foreach (QString str, devs)
             _devices.append(str);

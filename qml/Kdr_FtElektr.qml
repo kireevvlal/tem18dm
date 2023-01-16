@@ -119,25 +119,26 @@ Rectangle {
         // *** ! кодировка на ТПК может отличаться
         case Qt.Key_B:  //66 :
         {
-            console.log("даем сигнал о нажатии В");
+//            console.log("даем сигнал о нажатии В");
             knopaS(); // сигнал о нажатии клавиши ДМ "S"
             break;
         }
         case Qt.Key_C:  //67 :
         {
-            console.log("даем сигнал о нажатии C");
+//            console.log("даем сигнал о нажатии C");
+            kdr_Foot.doTrMessList();
             knopai(); // сигнал о нажатии клавиши ДМ "i"
             break;
         }
         case Qt.Key_D:  //68 :
         {
-            console.log("даем сигнал о нажатии D");
+//            console.log("даем сигнал о нажатии D");
             knopaSt(); // сигнал о нажатии клавиши ДМ "St"
             break;
         }
         case Qt.Key_I:  //73 :
         {
-            console.log("даем сигнал о нажатии I");
+//            console.log("даем сигнал о нажатии I");
             knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
             break;
         }

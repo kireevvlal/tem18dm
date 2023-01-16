@@ -98,7 +98,9 @@ Rectangle {
             break;
         }
         case Qt.Key_C:  //67 :
-        {   knopai(); // сигнал о нажатии клавиши ДМ "i"
+        {
+            kdr_Foot.doTrMessList();
+            knopai(); // сигнал о нажатии клавиши ДМ "i"
             break;
         }
         case Qt.Key_D:  //68 :

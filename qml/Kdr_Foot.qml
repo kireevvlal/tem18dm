@@ -32,6 +32,8 @@ Rectangle {
         {
             img1.source = "../Pictogram/m0_lok.png"; // err.vz1 = 1;
             img2.source = "../Pictogram/m0_lok.png"; //err.vz2 = main_window.is_slave;
+            img8.source = "../Pictogram/0_diz.png";
+            img9.source = "../Pictogram/0_ele.png";
             img0.opacity = 0;
             img8.opacity = 0; err.vz8 = 0;
             img9.opacity = 0; err.vz9 = 0;
@@ -44,6 +46,8 @@ Rectangle {
             if (setSection(1)) {
                 img1.source = "../Pictogram/m1_lok.png"; // err.vz1 = 1;
                 img2.source = "../Pictogram/m0_lok.png"; //err.vz2 = main_window.is_slave;
+                img8.source = "../Pictogram/0_diz.png";
+                img9.source = "../Pictogram/0_ele.png";
                 img0.opacity = 1;
                 img8.opacity = 1; err.vz8 = 1;
                 img9.opacity = 1; err.vz9 = 1;
@@ -57,6 +61,8 @@ Rectangle {
             if (setSection(2)) {
                 img1.source = "../Pictogram/m0_lok.png"; //err.vz1 = 1;
                 img2.source = "../Pictogram/m1_lok.png"; //err.vz2 = main_window.is_slave;
+                img8.source = "../Pictogram/0_diz.png";
+                img9.source = "../Pictogram/0_ele.png";
                 img0.opacity = 1;
                 img8.opacity = 1; err.vz8 = 1;
                 img9.opacity = 1; err.vz9 = 1;
@@ -87,47 +93,57 @@ Rectangle {
         }
         case Qt.Key_8:
         {
-            if (img8.opacity == 1)  // будем переключаться на меню ДИЗЕЛЬ
-            {
-                switchFootDizel();
-                main_window.current_system = 1;
+            if (kdr_TrLs.opacity) { // кадр тревожных сообщений
+                if (kdr_TrLs.first > 0)
+                    kdr_TrLs.first--;
+            } else {
+                if (img8.opacity == 1)  // будем переключаться на меню ДИЗЕЛЬ
+                {
+                    switchFootDizel();
+                    main_window.current_system = 1;
+                }
             }
             break;
         }
         case Qt.Key_9:
         {
-            if (img9.opacity == 1) // будем переключаться на меню ЭЛЕКТРООБОРУДОВАНИЕ
-            {
-                switchFootElektr();
-                main_window.current_system = 2;
+            if (kdr_TrLs.opacity) {  // кадр тревожных сообщений
+                if (kdr_TrLs.first < kdr_TrLs.count - 12)
+                    kdr_TrLs.first++;
+            } else {
+                if (img9.opacity == 1) // будем переключаться на меню ЭЛЕКТРООБОРУДОВАНИЕ
+                {
+                    switchFootElektr();
+                    main_window.current_system = 2;
+                }
             }
             break;
         }
         // *** ! кодировка на ТПК может отличаться
         case Qt.Key_B:  //66 :
         {
-            console.log("даем сигнал о нажатии В");
+//            console.log("даем сигнал о нажатии В");
             knopaS(); // сигнал о нажатии клавиши ДМ "S"
             main_window.current_system = 4;
             break;
         }
         case Qt.Key_C:  //67 :
         {
-            console.log("даем сигнал о нажатии C");
+//            console.log("даем сигнал о нажатии C");
+            doTrMessList();
             knopai(); // сигнал о нажатии клавиши ДМ "i"
             main_window.current_system = 5;
             break;
         }
         case Qt.Key_D:  //68 :
         {
-            console.log("даем сигнал о нажатии D");
+//            console.log("даем сигнал о нажатии D");
             knopaSt(); // сигнал о нажатии клавиши ДМ "St"
             main_window.current_system = 6;
             break;
         }
         case Qt.Key_I:  //73 :
         {
-            console.log("даем сигнал о нажатии I");
             knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
             main_window.current_system = 3;
             break;
@@ -139,8 +155,8 @@ Rectangle {
             break;
         }
         // kireev add for windows
-        case Qt.Key_S: {
-                console.log("даем сигнал о нажатии S");
+        case Qt.Key_F: { // 70 "V=0"
+//                console.log("даем сигнал о нажатии S");
             main_window.current_system = 7;
             saveToUSB();
             break;
@@ -156,8 +172,10 @@ Rectangle {
         }
         case Qt.Key_Up:
         {
-            if (kdr_TrLs.first > 0)
-                kdr_TrLs.first--;
+            if (kdr_TrLs.opacity) {
+                if (kdr_TrLs.first > 0)
+                    kdr_TrLs.first--;
+            }
             break;
         }
 
@@ -295,10 +313,12 @@ Rectangle {
     }
 
     function setSection(section) {
-        if (ioBf.changeKdr(section)) {
-            main_window.current_section = section;
-            return true;
-        } else
+        if (!kdr_TrLs.opacity) {
+            if (ioBf.changeKdr(section)) {
+                main_window.current_section = section;
+                return true;
+            }
+        }
         return false;
     }
 
@@ -306,11 +326,28 @@ Rectangle {
         setSection(1);
         main_window.current_system = 0;
         img1.source = "../Pictogram/m0_lok.png";
-//        err.vz1 = 1;
         img2.source = "../Pictogram/m0_lok.png";
         img0.opacity = img8.opacity = img9.opacity = 0;
         err.vz8 = err.vz9 = 0;
         txt_1.color = txt_2.color = cltxt;
+    }
+
+    function doTrMessList() {
+        main_window.opastyNul();
+        setSection(1);
+        main_window.current_system = 0;
+        img1.source = "../Pictogram/m0_lok.png";
+        img2.source = "../Pictogram/m0_lok.png";
+        img8.opacity = img9.opacity = 0;
+        img0.opacity = 1;
+        err.vz8 = err.vz9 = 0;
+        txt_1.color = txt_2.color = cltxt;
+        img8.source = "../Pictogram/0_up.png";
+        img9.source = "../Pictogram/0_dn.png";
+        img8.opacity = img9.opacity = 1;
+        kdr_TrLs.opacity = 1;
+        kdr_Foot.opacity = 1;
+        kdr_Foot.focus = true;
     }
 
 }

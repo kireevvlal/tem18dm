@@ -118,6 +118,7 @@ public slots:
     void querySaveToUSB();
     bool changeKdr(int);
     void kvitTrBanner();
+    void playSoundOnShowBanner();
     // New:
     QJsonArray getParamKdrFoot();
     QJsonArray getParamKdrFtDzl();
