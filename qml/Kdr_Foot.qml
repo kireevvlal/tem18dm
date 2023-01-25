@@ -11,6 +11,7 @@ Rectangle {
 
     property string cltxtSelect:"#1bb7e4"; // цвет текста нажатой кнопки
     property string cltxt:"white";         // штатный цвет текста всех кнопок
+    property int start_counter: 0;
 
     signal switchFootDizel();  // переход на меню ДИЗЕЛЬ
     signal switchFootElektr(); // переход на меню ЭЛЕКТРООБОРУДОВАНИЕ
@@ -24,12 +25,16 @@ Rectangle {
 
     //** переключение
     Keys.onPressed: {
-        console.log("код нажатой клавиши ===>" + event.key);
-
+        if (event.key == Qt.Key_Return)
+            main_window.exitPasswd("1");
+        else if (event.key == Qt.Key_A)
+            main_window.exitPasswd("0");
+        else
+            if (event.key != 16777249 && event.key != 16777251)
+                main_window.exitstr = "";
         switch(event.key){
 
         case Qt.Key_0:
-        {
             img1.source = "../Pictogram/m0_lok.png"; // err.vz1 = 1;
             img2.source = "../Pictogram/m0_lok.png"; //err.vz2 = main_window.is_slave;
             img8.source = "../Pictogram/0_diz.png";
@@ -40,9 +45,7 @@ Rectangle {
             txt_1.color = txt_2.color = cltxt;
             switchFoot_Exit();
             break;
-        }
         case Qt.Key_1:
-        {
             if (setSection(1)) {
                 img1.source = "../Pictogram/m1_lok.png"; // err.vz1 = 1;
                 img2.source = "../Pictogram/m0_lok.png"; //err.vz2 = main_window.is_slave;
@@ -55,9 +58,7 @@ Rectangle {
                 txt_2.color = cltxt;
             }
             break;
-        }
         case Qt.Key_2:
-        {
             if (setSection(2)) {
                 img1.source = "../Pictogram/m0_lok.png"; //err.vz1 = 1;
                 img2.source = "../Pictogram/m1_lok.png"; //err.vz2 = main_window.is_slave;
@@ -70,33 +71,20 @@ Rectangle {
                 txt_1.color = cltxt;
             }
             break;
-        }
         case Qt.Key_3:
-        {
             break;
-        }
         case Qt.Key_4:
-        {
             break;
-        }
         case Qt.Key_5:
-        {
             break;
-        }
         case Qt.Key_6:
-        {
             break;
-        }
         case Qt.Key_7:
-        {
             break;
-        }
         case Qt.Key_8:
-        {
-            if (kdr_TrLs.opacity) { // кадр тревожных сообщений
-                if (kdr_TrLs.first > 0)
-                    kdr_TrLs.first--;
-            } else {
+            if (kdr_TrLs.opacity)  // кадр тревожных сообщений
+                trListUp();
+            else {
                 if (img8.opacity == 1)  // будем переключаться на меню ДИЗЕЛЬ
                 {
                     switchFootDizel();
@@ -104,13 +92,10 @@ Rectangle {
                 }
             }
             break;
-        }
         case Qt.Key_9:
-        {
-            if (kdr_TrLs.opacity) {  // кадр тревожных сообщений
-                if (kdr_TrLs.first < kdr_TrLs.count - 12)
-                    kdr_TrLs.first++;
-            } else {
+            if (kdr_TrLs.opacity)   // кадр тревожных сообщений
+                trListDown();
+            else {
                 if (img9.opacity == 1) // будем переключаться на меню ЭЛЕКТРООБОРУДОВАНИЕ
                 {
                     switchFootElektr();
@@ -118,68 +103,81 @@ Rectangle {
                 }
             }
             break;
-        }
-        // *** ! кодировка на ТПК может отличаться
+            // *** ! кодировка на ТПК может отличаться
         case Qt.Key_B:  //66 :
-        {
-//            console.log("даем сигнал о нажатии В");
             knopaS(); // сигнал о нажатии клавиши ДМ "S"
             main_window.current_system = 4;
             break;
-        }
+
         case Qt.Key_C:  //67 :
-        {
-//            console.log("даем сигнал о нажатии C");
             doTrMessList();
             knopai(); // сигнал о нажатии клавиши ДМ "i"
             main_window.current_system = 5;
             break;
-        }
+
         case Qt.Key_D:  //68 :
-        {
-//            console.log("даем сигнал о нажатии D");
             knopaSt(); // сигнал о нажатии клавиши ДМ "St"
             main_window.current_system = 6;
             break;
-        }
+
         case Qt.Key_I:  //73 :
-        {
             knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
             main_window.current_system = 3;
             break;
-        }
-        // ***
-        case Qt.Key_Escape :{
+
+            // ***
+        case Qt.Key_Escape :
             // выходим из программы
             ioBf.close();
             break;
-        }
-        // kireev add for windows
-        case Qt.Key_F: { // 70 "V=0"
-//                console.log("даем сигнал о нажатии S");
+
+            // kireev add for windows
+        case Qt.Key_F:
             main_window.current_system = 7;
             saveToUSB();
             break;
-        }
 
         case Qt.Key_Down:
-        {
-            if (kdr_TrLs.opacity) {
-                if (kdr_TrLs.first < kdr_TrLs.count - 12)
-                    kdr_TrLs.first++;
-            }
+            if (kdr_TrLs.opacity)
+                trListDown();
             break;
-        }
-        case Qt.Key_Up:
-        {
-            if (kdr_TrLs.opacity) {
-                if (kdr_TrLs.first > 0)
-                    kdr_TrLs.first--;
-            }
-            break;
-        }
 
+        case Qt.Key_Up:
+            if (kdr_TrLs.opacity)
+                trListUp();
+            break;
+        case Qt.Key_Backspace:
+            kdr_Privet.opacity = 1;
+            break;
         }
+    }
+
+    function trListUp() {
+        if (kdr_TrLs.first - 15 >= 0)
+            kdr_TrLs.first -= 15;
+        else
+            kdr_TrLs.first = 0;
+    }
+
+    function trListDown() {
+        if (kdr_TrLs.first < kdr_TrLs.count - 29) {
+            kdr_TrLs.first += 15;
+        }
+        else
+            if (kdr_TrLs.count > 15)
+                kdr_TrLs.first = kdr_TrLs.count - 16;
+    }
+
+    Text {
+        id: no_connections
+        x: 20
+        y: 20
+        color: "silver"
+        text: qsTr("НЕТ СВЯЗИ")
+        font.bold: true
+        font.family: "Times New Roman"
+        font.pixelSize: 30
+        visible: !main_window.is_links && !main_window.is_slave
     }
 
     Text {
@@ -295,6 +293,8 @@ Rectangle {
         repeat: true
         running: kdr_Foot.opacity // при появлении панели - лампочки иницализируем
         onTriggered: {
+            if (start_counter < 4)
+                start_counter++;
             var trs = ioBf.getParamKdrFoot();
             err.tr1 = trs[0]; // 0
             err.tr2 = trs[1]; // 1
@@ -304,9 +304,13 @@ Rectangle {
                 setSection(1);
                 switchFoot_Exit();
             }
-            if (main_window.current_section == 1 && !main_window.is_links) {
+            if (main_window.current_section == 1 && !main_window.is_links && start_counter >= 4) {
                 setSection(2);
-                switchFoot_Exit();
+                if (kdr_TrLs.opacity) {
+                    switchFoot_Exit();
+                    kdr_TrLs.opacity = 1; // restore
+                } else
+                    switchFoot_Exit();
             }
         }
 

@@ -1,14 +1,14 @@
 #include <QDateTime>
 #include <QtMath>
-#include <QDebug>
+//#include <QDebug>
 #include "diagnostics.h"
 #include "tem18dm.h"
 
 
-Diagnostics::Diagnostics(DataStore* storage, float ptmax)
+Diagnostics::Diagnostics(DataStore* storage, LcmSettings *settings)
 {
     _storage = storage;
-    _pt_max = ptmax;
+    _settings = settings;
     _ports_state = 0;
     _date_time = QDateTime::currentDateTime();
     _msec = _date_time.toMSecsSinceEpoch();
@@ -19,6 +19,7 @@ void Diagnostics::RefreshDT() {
 }
 //--------------------------------------------------------------------------------
 void Diagnostics::APSignalization(int pkm) {
+    float pt_min = _settings->ElInjection ? 4.0 : 0.5;
     int uu[9] = { 0, 210, 335, 430, 525, 630, 755, 850, 945 };
     int ii[9] = { 0, 735, 1272, 1575, 1985, 1995, 1995, 1995, 1995 };
     _storage->SetBit("PROG_TrSoob", 16, (_storage->Float("IT_TSM3") > 68.9) ? true : false);
@@ -43,12 +44,12 @@ void Diagnostics::APSignalization(int pkm) {
     if (_ports_state & 2) {
         if (_storage->Float("USTA_Ubs_filtr") > 70  && _storage->Float("USTA_Iakb") < 1)
             _storage->SetBit("PROG_TrSoob", 12, true); // заряд АКБ
-        if (qFabs(_storage->Float("USTA_Ubs_filtr")) - 75 > 5)
+        if (qFabs(_storage->Float("USTA_Ubs_filtr") - 75) > 5)
             _storage->SetBit("PROG_TrSoob", 26, true); // неиспр. рег. U
         if (_storage->Int16("USTA_N") >= 250) {
             if (_storage->Float("USTA_Po_diz") < 1.7 ||  (_storage->Int16("USTA_N") > 800 && _storage->Float("USTA_Po_diz") < 4))
                 _storage->SetBit("PROG_TrSoob", 13, true); // Давление масла ниже нормы
-            if (_storage->Float("USTA_Pf_tnvd") < _pt_max ||  _storage->Float("USTA_Pf_ftot") < _pt_max)
+            if (_storage->Float("USTA_Pf_tnvd") < pt_min ||  _storage->Float("USTA_Pf_ftot") < pt_min)
                 _storage->SetBit("PROG_TrSoob", 40, true); // Давление масла ниже нормы
             if (_storage->Bit("USTA_Inputs", USTA_INPUTS_KV) && pkm >= 3) {
                 if (_storage->Float("USTA_Ug_filtr") > uu[pkm - 1] || _storage->Float("USTA_Ig_filtr") > ii[pkm - 1])
@@ -126,7 +127,7 @@ void Diagnostics::RizCU(int pkm) {
     if (_riz_cu.Up > u - 1) { // Зем -
         _storage->SetInt16("DIAG_Rminus", 1);
          _storage->SetBit("PROG_TrSoob", 33, 1);
-    } else ;
+    } else
          _storage->SetBit("PROG_TrSoob", 33, 0);
     if (_storage->Bit("PROG_TrSoob", 32) || _storage->Bit("PROG_TrSoob", 33))
         return;
@@ -208,7 +209,7 @@ void Diagnostics::Connections(QMap<QString, ThreadSerialPort*> serialPorts, Regi
             } else {
                 if (i.value()->IsExchange()) {
                     _storage->SetBit("DIAG_Connections", CONN_BEL, 1);
-                    qDebug() << "Restore BEL";
+//                    qDebug() << "Restore BEL";
                 }
             }
         }
@@ -220,7 +221,7 @@ void Diagnostics::Connections(QMap<QString, ThreadSerialPort*> serialPorts, Regi
             } else {
                 if (i.value()->IsExchange()) {
                     _storage->SetBit("DIAG_Connections", CONN_USTA, 1);
-                    qDebug() << "Restore USTA";
+//                    qDebug() << "Restore USTA";
                 }
             }
         }
@@ -231,7 +232,7 @@ void Diagnostics::Connections(QMap<QString, ThreadSerialPort*> serialPorts, Regi
             } else {
                 if (i.value()->IsExchange()) {
                     _storage->SetBit("DIAG_Connections", CONN_IT, 1);
-                    qDebug() << "Restore IT";
+//                    qDebug() << "Restore IT";
                 }
             }
         }
@@ -241,12 +242,12 @@ void Diagnostics::Connections(QMap<QString, ThreadSerialPort*> serialPorts, Regi
                 if (!i.value()->IsExchange()) {
                     _storage->ClearSpData(i.value());
                     _storage->SetBit("DIAG_Connections", CONN_MSS, 0);
-                    qDebug() << "Lost MSS";
+//                    qDebug() << "Lost MSS";
                 }
             } else {
                 if (i.value()->IsExchange()) {
                     _storage->SetBit("DIAG_Connections", CONN_MSS, 1);
-                    qDebug() << "Restore MSS";
+//                    qDebug() << "Restore MSS";
                 }
             }
         }
@@ -261,7 +262,7 @@ void Diagnostics::OnLostBel(ThreadSerialPort* port, Registrator* reg, SlaveLcm* 
     reg->UpdateRecord(338, 8, arr.mid(0, 8)); // дискретные (+ ПКМ)
     slave->UpdatePacket(0, 8, arr.mid(0, 8)); // дискретные (+ ПКМ)
     _storage->SetByte("PROG_Reversor", 0);
-    qDebug() << "Lost BEL";
+//    qDebug() << "Lost BEL";
 }
 //--------------------------------------------------------------------------------
 void Diagnostics::OnLostUsta(ThreadSerialPort* port, Registrator* reg, SlaveLcm* slave) {
@@ -273,7 +274,7 @@ void Diagnostics::OnLostUsta(ThreadSerialPort* port, Registrator* reg, SlaveLcm*
     reg->UpdateRecord(332, 6, arr.mid(0, 6)); // дискретные
     slave->UpdatePacket(8, 80, arr.mid(0, 80));  // аналоговые
     slave->UpdatePacket(88, 6, arr.mid(0, 6));
-    qDebug() << "Lost USTA";
+//    qDebug() << "Lost USTA";
 }
 //--------------------------------------------------------------------------------
 void Diagnostics::OnLostIt(ThreadSerialPort* port, Registrator* reg, SlaveLcm* slave) {
@@ -283,6 +284,6 @@ void Diagnostics::OnLostIt(ThreadSerialPort* port, Registrator* reg, SlaveLcm* s
     // в 0
     reg->UpdateRecord(80, 96, arr.mid(0, 96));
     slave->UpdatePacket(96, 96, arr.mid(0, 96));
-    qDebug() << "Lost IT";
+//    qDebug() << "Lost IT";
 }
 //--------------------------------------------------------------------------------

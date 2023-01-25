@@ -54,6 +54,7 @@ class Processor : public QObject
 {
     Q_OBJECT
 private:
+    LcmSettings _settings;
     int _virtual_section; // переключение номера секции (0, 1) в циклах диагностики
     QMap<int, TrBanner> _tr_banner_queue; // очередь на вывод в баннер
     QMap<int, TrState*> _tr_states[2]; // состояния обработки тревог (для мастрера и слейва (0 - своя секция, 1 - ведомая)
@@ -61,7 +62,6 @@ private:
     int _section; // 0 - тепловоз, 1 - дополнительная секеция
     QMap<int, TrMess*> _tr_messages;
     QStringList _tr_strings;
-    float _pt_max; // макимальное значение давления топлива
     DataStore* _storage[2];
     QMap<QString, ThreadSerialPort*> _serial_ports;
     DataStore _mainstore;
@@ -85,6 +85,7 @@ private:
     QFileSystemWatcher *_fswatcher;
     QJsonArray RejPrT();
     void Parse(NodeXML*);
+    void ParseCfg(NodeXML*);
     void ParseFiles(NodeXML*);
     void ParseObjects(NodeXML*);
     void ParseSerialPorts(NodeXML*);
@@ -141,6 +142,7 @@ public slots:
     QJsonArray getDiskretArray(int);
     QJsonArray getAnalogArray(int);
     QStringList getKdrTrL();
+    QStringList getKdrPrivet();
 
     // Old:
 //    int getReversor();     // реверс

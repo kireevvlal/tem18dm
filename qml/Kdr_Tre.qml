@@ -7,8 +7,6 @@ Rectangle {
     color: "red"
     property string str1: "МПСУ"
     property string str2: "сообщение"
-//    property int section: 0
-//    property int index: 0
     Text {
         id: text1
         x: 64
@@ -23,7 +21,7 @@ Rectangle {
     Text {
         id: text2
         x: 64
-        y: 44
+        y: 40
         color: "white"
         text: qsTr(str2)
         font.pixelSize: 16

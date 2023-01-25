@@ -60,7 +60,7 @@ Rectangle {
 
     TInd {
         id: ind_MotC
-        x: 59
+        x: 64
         y: 55
         value: "000000"
 
@@ -68,7 +68,7 @@ Rectangle {
 
     Text {
         id: text_MotC
-        x: 147
+        x: 152
         y: 55
         color: "#8f8282"
         text: qsTr("ч")
@@ -80,7 +80,7 @@ Rectangle {
     TInd {
         id: ind_MotM
         value: "00"
-        x: 160
+        x: 165
         y: 55
         width: 40
         height: 22
@@ -88,7 +88,7 @@ Rectangle {
 
     Text {
         id: text_MotM
-        x: 208
+        x: 213
         y: 55
         color: "#8f8282"
         text: qsTr("м")
@@ -100,7 +100,7 @@ Rectangle {
     TInd {
         id: ind_MotS
         value: "00"
-        x: 228
+        x: 233
         y: 55
         width: 40
         height: 22
@@ -108,7 +108,7 @@ Rectangle {
 
     Text {
         id: text_MotS
-        x: 276
+        x: 281
         y: 55
         color: "#8f8282"
         text: qsTr("с")
@@ -131,14 +131,14 @@ Rectangle {
 
     TInd {
         id: ind_TagC
-        x: 59
+        x: 64
         y: 89
         value: "000000"
 
     }
     Text {
         id: text_TagC
-        x: 147
+        x: 152
         y: 89
         color: "#8f8282"
         text: qsTr("ч")
@@ -150,7 +150,7 @@ Rectangle {
     TInd {
         id: ind_TagM
         value: "00"
-        x: 160
+        x: 165
         y: 89
         width: 40
         height: 22
@@ -158,7 +158,7 @@ Rectangle {
 
     Text {
         id: text_TagM
-        x: 208
+        x: 213
         y: 89
         color: "#8f8282"
         text: qsTr("м")
@@ -170,7 +170,7 @@ Rectangle {
     TInd {
         id: ind_TagS
         value: "00"
-        x: 228
+        x: 233
         y: 89
         width: 40
         height: 22
@@ -178,7 +178,7 @@ Rectangle {
 
     Text {
         id: text_TagS
-        x: 276
+        x: 281
         y: 89
         color: "#8f8282"
         text: qsTr("с")
@@ -202,7 +202,7 @@ Rectangle {
     TInd {
         id: ind_Rab
         value: "000000"
-        x: 65
+        x: 72
         y: 124
         width: 130
         height: 22
@@ -211,7 +211,7 @@ Rectangle {
 
     Text {
         id: text_Rab_kWtC
-        x: 199
+        x: 206
         y: 124
         color: "#8f8282"
         text: qsTr("кВт * ч")
@@ -223,7 +223,7 @@ Rectangle {
     // Fd
     Text {
         id: text_Fd
-        x: 346
+        x: 353
         y: 108
         color: "silver"
         text: qsTr("F")
@@ -234,7 +234,7 @@ Rectangle {
 
     TInd {
         id: ind_Fd
-        x: 360
+        x: 367
         y: 108
         height: 24
         width: 60
@@ -246,7 +246,7 @@ Rectangle {
 
     Text {
         id: text_obm
-        x: 420
+        x: 427
         y: 112
         color: "silver"
         text: qsTr("об/мин")

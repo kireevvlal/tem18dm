@@ -8,22 +8,17 @@ Window {
     height: 480
     visible: true
     color: "black"
-    property alias kdr_Masl: kdr_Masl
-//    flags: Qt.FramelessWindowHint | Qt.Window
+//    property alias kdr_Masl: kdr_Masl
+    property string lcm_number: "0001"
+    property string exitstr: ""
+    flags: Qt.FramelessWindowHint | Qt.Window
     title: qsTr("TEM18DM Bi05-04 640x480")
 
-//    rotation: 0
-//    scale: 1
-//    z: 100
-//    focus: true
     property int cnt: 0;
     property int current_section: 1; // 1 - own, 2 - extra
     property bool is_slave: false; // true - is exchange with slave locomotive
     property bool is_links: false; // true - is exchange with BEL or USTA or TI
     property int current_system: 0; // 0 - not 1 - diesel, 2 - electro, 3 - links
-//    property int current_subsystem: 0; // 0 - not
-
-//    signal setKdr(kdr: int);
 
     Timer {
         triggeredOnStart: true
@@ -64,15 +59,15 @@ Window {
             indIz0.text = par[5].toFixed(0); //ioBf.getParamDiap(60);// заглушка
             indIz1.text = par[6].toFixed(0); //ioBf.getParamDiap(60);// заглушка
 
-            in1OM1.visible = par[7][0] && par[0][1];
-            in1OM2.visible = par[7][1] && par[0][1];
+            in1OM2.visible = txt1OM2.visible = par[7][0] && par[0][1];
+            in1OM1.visible = txt1OM1.visible = par[7][1] && par[0][1];
             in1BX.visible = par[7][2] && par[0][1];
             in1DR.visible = par[7][3] && par[0][1];
             in1RZ.visible = par[7][4] && par[0][1];
             in1OT.visible = par[7][5] && par[0][1];
 
-            in2OM1.visible = par[8][0] && is_slave_usta;
-            in2OM2.visible = par[8][1] && is_slave_usta;
+            in2OM2.visible = txt2OM2.visible = par[8][0] && is_slave_usta;
+            in2OM1.visible = txt2OM1.visible = par[8][1] && is_slave_usta;
             in2BX.visible = par[8][2] && is_slave_usta;
             in2DR.visible = par[8][3] && is_slave_usta;
             in2RZ.visible = par[8][4] && is_slave_usta;
@@ -89,6 +84,8 @@ Window {
 
             txt_time.text = par[11][0];
             txt_data.text = par[11][1];
+            lcm_number = qsTr("ТЭМ18ДМ  №" + par[11][2]);
+
             txt_RejPrT.text = par[12][0];
             txt_RejPro.text = par[12][1]; // прожиг
             txt_RejAP.text = par[12][2]; // автопрогрев
@@ -281,7 +278,7 @@ Window {
     //            x: 129
     //            y: 2
                 color: (main_window.current_section == 1 ?"#d2e8fb" : "black")
-                text: (main_window.current_section == 1 ? qsTr("ТЭМ18ДМ  №101") : qsTr("выбрана вторая секция"))
+                text: (main_window.current_section == 1 ? lcm_number : qsTr("выбрана вторая секция"))
                 font.bold: true
                 font.pointSize: 12
                 horizontalAlignment: Text.AlignHCenter
@@ -523,16 +520,33 @@ Window {
             maxvalue: 1500
         }
 
-        TInd {
-            id: in1OM1
+         TInd {
+            id: txt1OM2
             x: 5
             y: 217
             width: 30
-            height: 30
+            height: 16
             radius: 2
             gradient: Gradient {
                 GradientStop {position: 0;color: "#aca6a6"}
-                GradientStop {position: 0.5; color: "#e4d6d6"}
+                GradientStop {position: 1;color: "#aca6a6"}
+            }
+            txtSize: 16
+            txtColor: "#000000"
+            value: "2"
+            border.width: 0
+            border.color: "#e4d6d6"
+        }
+
+        TInd {
+            id: in1OM2
+            x: 5
+            y: 231
+            width: 30
+            height: 16
+            radius: 2
+            gradient: Gradient {
+                GradientStop {position: 0;color: "#aca6a6"}
                 GradientStop {position: 1;color: "#aca6a6"}
             }
             txtSize: 16
@@ -543,15 +557,32 @@ Window {
         }
 
         TInd {
-            id: in1OM2
+            id: txt1OM1
             x: 5
             y: 250
             width: 30
-            height: 30
+            height: 16
             radius: 2
             gradient: Gradient {
                 GradientStop {position: 0;color: "#aca6a6"}
-                GradientStop {position: 0.5; color: "#e4d6d6"}
+                GradientStop {position: 1;color: "#aca6a6"}
+            }
+            txtSize: 16
+            txtColor: "#000000"
+            value: "1"
+            border.width: 0
+            border.color: "#e4d6d6"
+        }
+
+        TInd {
+            id: in1OM1
+            x: 5 //5
+            y: 264 //217
+            width: 30
+            height: 16
+            radius: 2
+            gradient: Gradient {
+                GradientStop {position: 0;color: "#aca6a6"}
                 GradientStop {position: 1;color: "#aca6a6"}
             }
             txtSize: 16
@@ -632,14 +663,30 @@ Window {
             border.color: "#ffff00"
         }
 
-
-
         TInd {
-            id: in2OM1
+            id: txt2OM2
             x: 69
             y: 217
             width: 30
-            height: 30
+            height: 16
+            radius: 2
+            gradient: Gradient {
+                GradientStop {position: 0;color: "#aca6a6"}
+                GradientStop {position: 1;color: "#aca6a6"}
+            }
+            txtSize: 16
+            txtColor: "#000000"
+            value: "2"
+            border.width: 0
+            border.color: "#e4d6d6"
+        }
+
+        TInd {
+            id: in2OM2
+            x: 69
+            y: 231
+            width: 30
+            height: 16
             radius: 2
             txtSize: 16
             gradient: Gradient {
@@ -647,12 +694,6 @@ Window {
                     position: 0
                     color: "#aca6a6"
                 }
-
-                GradientStop {
-                    position: 0.531
-                    color: "#e4d6d6"
-                }
-
                 GradientStop {
                     position: 1 //1.033
                     color: "#aca6a6"
@@ -665,11 +706,29 @@ Window {
         }
 
         TInd {
-            id: in2OM2
+            id: txt2OM1
             x: 69
             y: 250
             width: 30
-            height: 30
+            height: 16
+            radius: 2
+            gradient: Gradient {
+                GradientStop {position: 0;color: "#aca6a6"}
+                GradientStop {position: 1;color: "#aca6a6"}
+            }
+            txtSize: 16
+            txtColor: "#000000"
+            value: "1"
+            border.width: 0
+            border.color: "#e4d6d6"
+        }
+
+        TInd {
+            id: in2OM1
+            x: 69
+            y: 264
+            width: 30
+            height: 16
             radius: 2
             txtSize: 16
             gradient: Gradient {
@@ -677,12 +736,6 @@ Window {
                     position: 0
                     color: "#aca6a6"
                 }
-
-                GradientStop {
-                    position: 0.531
-                    color: "#e4d6d6"
-                }
-
                 GradientStop {
                     position: 1 //1.033
                     color: "#aca6a6"
@@ -799,13 +852,10 @@ Window {
 
     Kdr_Privet {
         id: kdr_Privet
-        x: 0
+        x: 418
         y: 0
-        width: 640
-        height: 480
-        anchors.verticalCenterOffset: 0
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.verticalCenter: parent.verticalCenter
+        width: 221
+        height: 150
         z: 100
         opacity: 1
     }
@@ -1296,12 +1346,6 @@ Window {
         kdr_Foot_Usta.opacity=0;
         kdr_FootBEL.opacity=0;
         kdr_Foot_TI.opacity=0;
-
-        // главный экран показываем
-        //kdr_Foot.is_exit = true;
-
-        //            txt_1.color = txt_2.color = cltxt;
-//        kdr_TrLs.opacity = 1;
     }
 
     function showKdr_Reostat()      // сигнал о нажатии клавиши ДМ "St"/alt+d
@@ -1378,50 +1422,9 @@ Window {
 
     }
 
-
-        function focusikNul()  {
-//     закомменированные пока не нужны - на них фокус не переводили
-//                kdr_Vzb.focus = false;
-//                kdr_Mot.focus = false;
-//                kdr_AvProgrev.focus = false;
-//                kdr_Bos.focus = false;
-//                kdr_TED.focus = false;
-//                kdr_Svz.focus = false;
-//                kdr_Tpl.focus = false;
-//                kdr_Masl.focus = false;
-//                kdr_Ohl.focus = false;
-//                kdr_TrLs.focus = false;
-//                kdr_Dizl.focus = false;
-//                kdr_Reostat.focus = false;
-//                kdr_Nastroika.focus = false;
-
-            kdr_TI_TXA.focus = false; //*
-            kdr_TI_TCM.focus = false; //*
-
-//                kdr_USTA_DskrVihodi.focus = false;
-//                kdr_USTA_DskrVh.focus = false;
-            kdr_USTA_Analog.focus = false; //*
-
-//                kdr_BEL_DskrVihodi.focus = false;
-//                kdr_BEL_DskrVh.focus = false;
-            kdr_BEL_Analog.focus = false; //*
-
-            kdr_Main.focus = true;
-
-    }
-//        function setSection(section) {
-//            //current_section = section;
-//            if (ioBf.changeKdr(section * 100 + current_system * 10 + current_subsystem))
-//                current_section = section;
-//        }
-
-//        function setSystem(system) {
-//            current_system = system;
-//            ioBf.changeKdr(current_section * 100 + current_system * 10 + current_subsystem)
-//        }
-
-//        function setSubsystem(subsystem) {
-//            current_subsystem = subsystem;
-//            ioBf.changeKdr(current_section * 100 + current_system * 10 + current_subsystem)
-//        }
+        function exitPasswd(str) {
+                exitstr += str;
+                if (exitstr.substring(0, 8) == "01010101")
+                    Qt.quit();
+        }
 }

@@ -6,10 +6,11 @@ CircularGauge {
     id: ecgauge
     property real start: 0
     property real finish: 0
-    property bool repaint: false
+    property bool repaint: true
     property string parameter
     property int valuePrecision: 0
     property int labelPrecision: 0
+    property int valueMultiplayer: 1
     style: CircularGaugeStyle {
         id: ecgstyle
         minimumValueAngle: -140
@@ -96,7 +97,7 @@ CircularGauge {
                 horizontalAlignment: Text.AlignHCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: parent.height - toPixels(0.3)
-                text: valuePrecision ? ecgauge.value.toFixed(valuePrecision) : Math.round(ecgauge.value)
+                text: valuePrecision ? (ecgauge.value * valueMultiplayer).toFixed(valuePrecision) : Math.round(ecgauge.value * valueMultiplayer)
             }
             // unit measure
             Text {

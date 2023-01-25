@@ -39,12 +39,6 @@ Rectangle {
             indIg.visible =  indUg.visible = par[0][0]; // usta connection
             stb_Tvd.visible = stb_Tms.visible = par[0][1]; // ti connection
 
-//            indT_vd.text =  ioBf.getParamDiap(150);
-//            stb_Tvd.value = indT_vd.text;
-
-//            indT_ms.text = ioBf.getParamDiap(50);
-//            stb_Tms.value = indT_ms.text;
-
         }
 
     }
@@ -82,7 +76,7 @@ Rectangle {
         parameter: "Iг кА"
         start: 0
         finish: 0
-        valuePrecision: 2
+        valueMultiplayer: 1000
     }
 
     ExtCircularGauge {
@@ -98,34 +92,6 @@ Rectangle {
         finish: 0
     }
 
-//     PrBar {
-//        id: stb_Tvd
-//        x: 444
-//        y: 35
-//        width: 23
-//        height: 160
-//        radius: 0
-//        color2: "#4682b4"
-//        value: 150
-//        val_max: 150
-//        z: 8
-//        kind: 0
-//    }
-
-
-//    PrBar {
-//         id: stb_Tms
-//         x: 478
-//         y: 35
-//         width: 23
-//         height: 160
-//         radius: 0
-//         color2: "#4682b4"
-//         value: 150
-//         val_max: 150
-//         z: 9
-//         kind: 0
-//     }
     ExtGauge {
         id: stb_Tvd
         x: 406
@@ -133,8 +99,6 @@ Rectangle {
         height: 200
         parameter: "В"
         name: "Т, С"
-//        warningValue: 80
-//        errorValue: 90
         barColor: "red"
         maxValue: 150
         barWidth: 30
@@ -148,113 +112,10 @@ Rectangle {
         height: 200
         visibleLabels: false
         parameter: "М"
-//        warningValue: 95
-//        errorValue: 110
         maxValue: 150
         barWidth: 30
         visibleMinorTickmarks: false
     }
-
-//    Text {
-//        id: text5
-//        x: 416
-//        y: 6
-//        width: 58
-//        height: 14
-//        color: "#d3d3d3"
-//        text: qsTr("T, C     в          м")
-//        font.pixelSize: 12
-//        font.bold: true
-//    }
-
-//    Text {
-//        id: indT_vd
-//        x: 442
-//        y: 20
-//        width: 23
-//        height: 14
-//        color: "#d2e8fb"
-//        text: qsTr("0")
-//        horizontalAlignment: Text.AlignHCenter
-//        font.pixelSize: 12
-//        font.bold: true
-//    }
-
-//    Text {
-//        id: indT_ms
-//        x: 478
-//        y: 20
-//        width: 23
-//        height: 14
-//        color: "#d2e8fb"
-//        text: qsTr("0")
-//        horizontalAlignment: Text.AlignHCenter
-//        font.pixelSize: 12
-//        font.bold: true
-//    }
-
-//    Rectangle {
-//        id: shkala
-//        x: 414
-//        y: 35
-//        width: 97
-//        height: 160
-//        color: "#000000"
-//        z: 5
-//        opacity: 1
-
-//        Text {
-//            id: text13
-//            x: 1
-//            y: 140
-//            width: 80
-//            height: 20
-//            color: "#808080"
-//            text: qsTr("0___________")
-//            verticalAlignment: Text.AlignBottom
-//            font.pixelSize: 14
-//            font.bold: false
-//        }
-
-//        Text {
-//            id: text15
-//            x: 0
-//            y: 33
-//            width: 80
-//            height: 20
-//            color: "#808080"
-//            text: qsTr("100________")
-//            verticalAlignment: Text.AlignBottom
-//            font.pixelSize: 14
-//            font.bold: false
-//            z: 3
-//        }
-
-//        Text {
-//            id: text14
-//            x: 0
-//            y: 84
-//            width: 80
-//            height: 23
-//            color: "#808080"
-//            text: qsTr("50__________")
-//            verticalAlignment: Text.AlignBottom
-//            font.pixelSize: 14
-//            font.bold: false
-//            z: 2
-//        }
-//    }
-
-//    Gauge_Big {
-//        id: indIg
-//        x: 0
-//        y: 0
-//        width: 189
-//        height: 197
-//        gaugeName: "I * 10"
-//        max: 300
-//    }
-
 
 }
 

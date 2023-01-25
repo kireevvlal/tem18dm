@@ -6,7 +6,7 @@ Rectangle {
     color: "#000000"
     border.width: 0
 
-//    property int idDisp:0; // номер нажатой клавиши - номер секции подвязать
+    //    property int idDisp:0; // номер нажатой клавиши - номер секции подвязать
     property string cltxtSelect:"#1bb7e4"; // цвет текста нажатой кнопки
     property string cltxt:"white";         // штатный цвет текста всех кнопок
 
@@ -20,20 +20,20 @@ Rectangle {
     signal knopaSt(); // сигнал о нажатии клавиши ДМ "St"
     signal knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
 
-    signal knopaDwn(); // сигнал о нажатии клавиши ДМ "стрелка вниз"
-    signal knopaUp(); // сигнал о нажатии клавиши ДМ "стрелка вверх"
-
     Keys.onPressed: {
-        switch(event.key) {
-        case Qt.Key_Down: { knopaDwn(); }
-        case Qt.Key_Up:   { knopaUp();  }
+        if (event.key == Qt.Key_Return)
+            main_window.exitPasswd("1");
+        else if (event.key == Qt.Key_A)
+            main_window.exitPasswd("0");
+        else
+            main_window.exitPasswd("2");
 
-        case Qt.Key_0:   {
+        switch(event.key) {
+
+        case Qt.Key_0:
             // ?? надо на Главное меню вернуться
             img1.source = "../Pictogram/m0_lok.png";// !! доделать
             img2.source = "../Pictogram/m0_lok.png";// !! доделать
-
-//            idDisp = 0;
 
             img7.source =  "../Pictogram/uso/0_dot.png"
             img8.source =  "../Pictogram/uso/0_din.png"
@@ -41,72 +41,64 @@ Rectangle {
 
             switchUso_Exit();
             break;
-        }
-        case Qt.Key_1:        {
+        case Qt.Key_1:
             if (kdr_Foot.setSection(1)) {
                 img1.source = "../Pictogram/m1_lok.png";
                 img2.source = "../Pictogram/m0_lok.png";
 
-//                idDisp = 1; // ?? надо подать сигнал о смене секций
+                //                idDisp = 1; // ?? надо подать сигнал о смене секций
                 txt_1.color = cltxtSelect;
                 txt_2.color = cltxt;
             }
             break;
-        }
-        case Qt.Key_2:        {
+        case Qt.Key_2:
             if (kdr_Foot.setSection(2)) {
                 img1.source = "../Pictogram/m0_lok.png";
                 img2.source = "../Pictogram/m1_lok.png";
 
-//                idDisp = 2; // ?? надо подать сигнал о смене секций
+                //                idDisp = 2; // ?? надо подать сигнал о смене секций
                 txt_2.color = cltxtSelect;
                 txt_1.color = cltxt;
             }
             break;
-        }
-        case Qt.Key_7:        {
+        case Qt.Key_7:
             img7.source =  "../Pictogram/uso/1_dot.png"
             img8.source =  "../Pictogram/uso/0_din.png"
             img9.source =  "../Pictogram/uso/0_a.png"
 
             switchUso_BEL_DisVih();
             break;
-        }
-        case Qt.Key_8:        {
+        case Qt.Key_8:
             img7.source =  "../Pictogram/uso/0_dot.png"
             img8.source =  "../Pictogram/uso/1_din.png"
             img9.source =  "../Pictogram/uso/0_a.png"
 
             switchUso_BEL_DisVhod();
             break;
-        }
-        case Qt.Key_9:        {
+        case Qt.Key_9:
             img7.source = "../Pictogram/uso/0_dot.png"
             img8.source = "../Pictogram/uso/0_din.png"
             img9.source = "../Pictogram/uso/1_a.png"
 
             switchUso_BEL_Analogi();
             break;
-        }
-        // *** ! кодировка на ТПК может отличаться
+            // *** ! кодировка на ТПК может отличаться
         case Qt.Key_B:  //66 :
-        {   knopaS(); // сигнал о нажатии клавиши ДМ "S"
+            knopaS(); // сигнал о нажатии клавиши ДМ "S"
             break;
-        }
         case Qt.Key_C:  //67 :
-        {
             kdr_Foot.doTrMessList();
             knopai(); // сигнал о нажатии клавиши ДМ "i"
             break;
-        }
         case Qt.Key_D:  //68 :
-        {   knopaSt(); // сигнал о нажатии клавиши ДМ "St"
+            knopaSt(); // сигнал о нажатии клавиши ДМ "St"
             break;
-        }
         case Qt.Key_I:  //73 :
-        {   knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
+            knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
             break;
-        }
+        case Qt.Key_Backspace:
+            kdr_Privet.opacity = 1;
+            break;
         }
     }
 
@@ -125,6 +117,7 @@ Rectangle {
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
         font.pixelSize: 30
+        visible: main_window.is_links
     }
 
     Text {
@@ -143,6 +136,7 @@ Rectangle {
         font.bold: true
         horizontalAlignment: Text.AlignHCenter
         font.family: "Times New Roman"
+        visible: main_window.is_slave
     }
 
     Image {
@@ -164,6 +158,7 @@ Rectangle {
         height: 64
         z: 2
         source: (main_window.current_section == 1) ? "../Pictogram/m1_lok.png" : "../Pictogram/m0_lok.png"
+        visible: main_window.is_links
     }
 
     Image {
@@ -174,6 +169,7 @@ Rectangle {
         height: 64
         z: 4
         source: (main_window.current_section == 2) ? "../Pictogram/m1_lok.png" : "../Pictogram/m0_lok.png"
+        visible: main_window.is_slave
     }
 
     Image {

@@ -2,13 +2,14 @@
 #include <QDateTime>
 #include "registrator.h"
 
-Registrator::Registrator(QObject *parent) : QObject(parent) {
+Registrator::Registrator(LcmSettings *settings, QObject *parent) : QObject(parent) {
 #ifdef Q_OS_WIN
     _os = 0;
 #endif
 #ifdef Q_OS_UNIX
     _os = 1;
 #endif
+    _settings = settings;
     _path = _extention = _alias = "";
     _quantity = 3600;
     _interval = 1000;
@@ -102,7 +103,7 @@ void Registrator::Prepare() {
            directory.remove(files[0]);
     }
     QDateTime dt = QDateTime::currentDateTime();
-    QString name = _path + "/" + _alias + "_" + "0018" + "_" + dt.date().toString("yyMMdd") + dt.time().toString("hhmmss") + "." + _extention;
+    QString name = _path + "/" + _alias + "_" + _settings->Number + "_" + dt.date().toString("yyMMdd") + dt.time().toString("hhmmss") + "." + _extention;
     _file.setFileName(name);
 }
 //--------------------------------------------------------------------------------

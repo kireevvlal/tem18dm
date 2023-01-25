@@ -36,4 +36,12 @@
 #define USTA_INPUTS_OBTM  14 //  обрыв ТМ (РУ15)
 #define USTA_INPUTS_OTPT  15 // пуск дизеля (КМ1)
 
+struct LcmSettings {
+    QString Number; // номер локомотива
+    int PressureSensors; // номинал двух датчиков давления
+    bool ElInjection; // электронный впрыск
+
+    LcmSettings() { Number = "0001"; PressureSensors = 16; ElInjection = false; }
+};
+
 #endif // TEM18DM_H

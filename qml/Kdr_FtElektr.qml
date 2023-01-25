@@ -23,9 +23,15 @@ Rectangle {
     signal knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
 
     Keys.onPressed: {
+        if (event.key == Qt.Key_Return)
+            main_window.exitPasswd("1");
+        else if (event.key == Qt.Key_A)
+            main_window.exitPasswd("0");
+        else
+            main_window.exitPasswd("2");
+
         switch(event.key){
         case Qt.Key_0:
-        {
             // ?? надо на Главное меню вернуться
             img1.source = "../Pictogram/m0_lok.png";// !! доделать
             img2.source = "../Pictogram/m0_lok.png";// !! доделать
@@ -39,9 +45,7 @@ Rectangle {
 
             switchEl_Exit();
             break;
-        }
         case Qt.Key_1:
-        {
             if (kdr_Foot.setSection(1)) {
                 img1.source = "../Pictogram/m1_lok.png";
                 img2.source = "../Pictogram/m0_lok.png";
@@ -51,9 +55,7 @@ Rectangle {
                 txt_2.color = cltxt;
             }
             break;
-        }
         case Qt.Key_2:
-        {
             if (kdr_Foot.setSection(2)) {
                 img1.source = "../Pictogram/m0_lok.png";
                 img2.source = "../Pictogram/m1_lok.png";
@@ -63,21 +65,13 @@ Rectangle {
                 txt_1.color = cltxt;
             }
             break;
-        }
         case Qt.Key_3:
-        {
             break;
-        }
         case Qt.Key_4:
-        {
             break;
-        }
         case Qt.Key_5:
-        {
             break;
-        }
         case Qt.Key_6:
-        {
             img6.source = "../Pictogram/elektr/1_akb.png"
             img7.source = "../Pictogram/elektr/0_vzb.png"
             img8.source = "../Pictogram/elektr/0_ted.png"
@@ -85,9 +79,7 @@ Rectangle {
 
             switchEl_Bortovay();
             break;
-        }
         case Qt.Key_7:
-        {
             img6.source = "../Pictogram/elektr/0_akb.png"
             img7.source = "../Pictogram/elektr/1_vzb.png"
             img8.source = "../Pictogram/elektr/0_ted.png"
@@ -95,9 +87,7 @@ Rectangle {
 
             switchEl_Vozbugdenie();
             break;
-        }
         case Qt.Key_8:
-        {
             img6.source = "../Pictogram/elektr/0_akb.png"
             img7.source = "../Pictogram/elektr/0_vzb.png"
             img8.source = "../Pictogram/elektr/1_ted.png"
@@ -105,9 +95,7 @@ Rectangle {
 
             switchEl_Tagovie();
             break;
-        }
         case Qt.Key_9:
-        {
             img6.source = "../Pictogram/elektr/0_akb.png"
             img7.source = "../Pictogram/elektr/0_vzb.png"
             img8.source = "../Pictogram/elektr/0_ted.png"
@@ -115,33 +103,23 @@ Rectangle {
 
             switchEl_Motores();
             break;
-        }
         // *** ! кодировка на ТПК может отличаться
         case Qt.Key_B:  //66 :
-        {
-//            console.log("даем сигнал о нажатии В");
             knopaS(); // сигнал о нажатии клавиши ДМ "S"
             break;
-        }
         case Qt.Key_C:  //67 :
-        {
-//            console.log("даем сигнал о нажатии C");
             kdr_Foot.doTrMessList();
             knopai(); // сигнал о нажатии клавиши ДМ "i"
             break;
-        }
         case Qt.Key_D:  //68 :
-        {
-//            console.log("даем сигнал о нажатии D");
             knopaSt(); // сигнал о нажатии клавиши ДМ "St"
             break;
-        }
         case Qt.Key_I:  //73 :
-        {
-//            console.log("даем сигнал о нажатии I");
             knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
             break;
-        }
+        case Qt.Key_Backspace:
+            kdr_Privet.opacity = 1;
+            break;
         // ***
         //        case Qt.Key_Escape :{ ioBf.close(); break};
 
@@ -163,6 +141,7 @@ Rectangle {
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
         font.pixelSize: 30
+        visible: main_window.is_links
     }
 
     Text {
@@ -181,6 +160,7 @@ Rectangle {
         font.bold: true
         horizontalAlignment: Text.AlignHCenter
         font.family: "Times New Roman"
+        visible: main_window.is_slave
     }
 
     Image {
@@ -202,6 +182,7 @@ Rectangle {
         height: 64
         z: 2
         source: (main_window.current_section == 1) ? "../Pictogram/m1_lok.png" : "../Pictogram/m0_lok.png"
+        visible: main_window.is_links
     }
 
     Image {
@@ -212,6 +193,7 @@ Rectangle {
         height: 64
         z: 4
         source: (main_window.current_section == 2) ? "../Pictogram/m1_lok.png" : "../Pictogram/m0_lok.png"
+        visible: main_window.is_slave
     }
 
     Image {

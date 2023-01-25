@@ -6,11 +6,13 @@
 #include <QJsonArray>
 #include "treexml.h"
 #include "vktoolstypes.h"
+#include "tem18dm.h"
 
 class Registrator : public QObject
 {
     Q_OBJECT
 private:
+    LcmSettings *_settings;
     bool _os;            // 0 - win, 1 - linux
     QString _path;      // каталог для записи файлов
     QString _extention; // расширение файла результатов
@@ -27,7 +29,7 @@ private:
     void Prepare();
 public:
     //int RecordSize() { return _record_size; }
-    explicit Registrator(QObject *parent = nullptr);
+    explicit Registrator(LcmSettings*, QObject *parent = nullptr);
     void Stop();
     int Interval() { return _interval; }
     void SetParameters( QString,  QString,  QString, RegistrationType, int, int, int);

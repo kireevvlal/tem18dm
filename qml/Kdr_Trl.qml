@@ -18,12 +18,39 @@ Rectangle {
     }
 
     TInd {
-        id: ind_i
+        id: ind_count
         x: 120
-        y: 2
+        y: 1
         txtSize: 12
-        width: 48
+        width: 40
         value: count
+    }
+
+    Text {
+        x: 164
+        y: 4
+        color: "#f3d0d0"
+        text: qsTr("(")
+        font.bold: true
+        font.pixelSize: 12
+    }
+
+    TInd {
+        id: ind_first
+        x: 168
+        y: 1
+        txtSize: 12
+        width: 40
+        value: first + 1
+    }
+
+    Text {
+        x: 208
+        y: 4
+        color: "#f3d0d0"
+        text: qsTr(")")
+        font.bold: true
+        font.pixelSize: 12
     }
 
     ListModel {
@@ -40,7 +67,7 @@ Rectangle {
         delegate:  Text {
             text: message
             color: "silver"
-            font.pixelSize: 12
+            font.pixelSize: 10
         }
     }
 
@@ -54,12 +81,12 @@ Rectangle {
             var par = ioBf.getKdrTrL();
             tr_mess_list_model.clear();
             count = par.length;
-            if (first == -1) {
-                first = count - 12;
+            if (first < 0) {
+                first = count - 16;
                 if (first < 0)
                     first = 0;
             }
-            for (var i = first; i < first + 12 && i < count; i++) {
+            for (var i = first; i < first + 16 && i < count; i++) {
                 tr_mess_list_model.append({ message: qsTr(par[i]) });
             }
 //            ind_i.value = par.length

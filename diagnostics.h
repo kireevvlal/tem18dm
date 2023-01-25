@@ -18,10 +18,9 @@ struct StructRizCU {
 class Diagnostics
 {
 private:
+    LcmSettings *_settings;
     QDateTime _date_time;
-    float _pt_max; // макимальное значение давления топлива
     StructRizCU _riz_cu;
-//    Processor* _processor;
     DataStore* _storage;
     qint8 _ports_state;  // состояние портов. побитно: 1- открыт, 0 - что-то не так
     qint64 _msec; // системное время в миллисекундах
@@ -37,7 +36,7 @@ public:
     qint8 PortsState() { return _ports_state; }
     float Adiz() { return _a_diz; }
     void Adiz(float value) { _a_diz = value; }
-    Diagnostics(DataStore*, float);
+    Diagnostics(DataStore*, LcmSettings*);
     void Motoresurs();
     void Connections(QMap<QString, ThreadSerialPort*>, Registrator* reg, SlaveLcm* slave);
     void RizCU(int);

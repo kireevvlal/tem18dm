@@ -62,7 +62,7 @@ Rectangle {
         TInd {
             id: ind_Ig
             x: 471
-            y: 77
+            y: 79
             width: 37
             height: 13
         }

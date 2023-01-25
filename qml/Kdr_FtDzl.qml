@@ -25,21 +25,22 @@ Rectangle {
     signal knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
 
     Keys.onPressed: {
+        if (event.key == Qt.Key_Return)
+            main_window.exitPasswd("1");
+        else if (event.key == Qt.Key_A)
+            main_window.exitPasswd("0");
+        else
+            main_window.exitPasswd("2");
+
         switch(event.key){
         case Qt.Key_0:
-        {
-//            img1.source = "../Pictogram/m0_lok.png";//!!! доделать
-//            img2.source = "../Pictogram/m0_lok.png";//!!!
-
             img7.source = "../Pictogram/disel/0_msl.png"
             img8.source = "../Pictogram/disel/0_tpl.png"
             img9.source = "../Pictogram/disel/0_oxl.png"
 
             switchDzl_Exit();
             break;
-        }
         case Qt.Key_1:
-        {
             // ?? надо подать сигнал о смене секций, а может и не надо?
             if (kdr_Foot.setSection(1)) {
                 img1.source = "../Pictogram/m1_lok.png";
@@ -51,9 +52,7 @@ Rectangle {
                 txt_2.color = cltxt;
             }
             break;
-        }
         case Qt.Key_2:
-        {
             // ?? надо подать сигнал о смене секций или не надо?
             if (kdr_Foot.setSection(2)) {
                 img1.source = "../Pictogram/m0_lok.png";
@@ -65,18 +64,14 @@ Rectangle {
                 txt_1.color = cltxt;
             }
             break;
-        }
         case Qt.Key_6:
-        {
             img6.source = "../Pictogram/disel/1_zil.png"
             img7.source = "../Pictogram/disel/0_msl.png"
             img8.source = "../Pictogram/disel/0_tpl.png"
             img9.source = "../Pictogram/disel/0_oxl.png"
             switchDzl_Cilindr();
             break;
-        }
         case Qt.Key_7:
-        {
             img6.source = "../Pictogram/disel/0_zil.png"
             img7.source = "../Pictogram/disel/1_msl.png"
             img8.source = "../Pictogram/disel/0_tpl.png"
@@ -84,9 +79,7 @@ Rectangle {
 
             switchDzl_Maslo();
              break;
-        }
         case Qt.Key_8:
-        {
             img6.source = "../Pictogram/disel/0_zil.png"
             img7.source = "../Pictogram/disel/0_msl.png"
             img8.source = "../Pictogram/disel/1_tpl.png"
@@ -94,9 +87,7 @@ Rectangle {
 
             switchDzl_Toplivo();
             break;
-        }
         case Qt.Key_9:
-        {
             img6.source = "../Pictogram/disel/0_zil.png"
             img7.source = "../Pictogram/disel/0_msl.png"
             img8.source = "../Pictogram/disel/0_tpl.png"
@@ -104,29 +95,23 @@ Rectangle {
 
             switchDzl_Holod();
             break;
-        }
         // *** ! кодировка на ТПК может отличаться
         case Qt.Key_B:  //66 :
-        {
             knopaS(); // сигнал о нажатии клавиши ДМ "S"
             break;
-        }
         case Qt.Key_C:  //67 :
-        {
             kdr_Foot.doTrMessList();
             knopai(); // сигнал о нажатии клавиши ДМ "i"
             break;
-        }
         case Qt.Key_D:  //68 :
-        {
              knopaSt(); // сигнал о нажатии клавиши ДМ "St"
             break;
-        }
         case Qt.Key_I:  //73 :
-        {
             knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
             break;
-        }
+        case Qt.Key_Backspace:
+            kdr_Privet.opacity = 1;
+            break;
         }
     }
 
@@ -145,6 +130,7 @@ Rectangle {
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
         font.pixelSize: 30
+        visible: main_window.is_links
     }
 
     Text {
@@ -163,6 +149,7 @@ Rectangle {
         font.bold: true
         horizontalAlignment: Text.AlignHCenter
         font.family: "Times New Roman"
+        visible: main_window.is_slave
     }
 
     Image {
@@ -184,6 +171,7 @@ Rectangle {
         height: 64
         z: 2
         source: (main_window.current_section == 1) ? "../Pictogram/m1_lok.png" : "../Pictogram/m0_lok.png"
+        visible: main_window.is_links
     }
 
     Image {
@@ -194,6 +182,7 @@ Rectangle {
         height: 64
         z: 4
         source: (main_window.current_section == 2) ? "../Pictogram/m1_lok.png" : "../Pictogram/m0_lok.png"
+        visible: main_window.is_slave
     }
 
     Image {

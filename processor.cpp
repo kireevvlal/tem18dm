@@ -17,27 +17,27 @@ using namespace std;
 
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 12, 0)
-#include <QDebug>
+//#include <QDebug>
 //#include <QTime>
 //#include <QDate>
 #endif
 #include <QSound>
+#include <QTextStream>
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 Processor::Processor(QObject *parent) : QObject(parent)
 {
-     _pt_max = 0.5;
     _section = 0;
     _virtual_section = 0;
     _reg_timer = new QTimer();
     _reg_thread = new QThread();
-    _registrator = new Registrator();
+    _registrator = new Registrator(&_settings);
     _diag_timer = new QTimer();
     _diag_interval = 200;
-    _diagnostics = new Diagnostics(&_mainstore, _pt_max);
+    _diagnostics = new Diagnostics(&_mainstore, &_settings);
     _is_active = false;
     _fswatcher = new QFileSystemWatcher;
-    _saver =  new Saver();
+    _saver =  new Saver(&_settings);
     _saver_thread = new QThread();
     _control = new Control(&_mainstore, _slave.Storage());
     _storage[0] = &_mainstore;
@@ -92,7 +92,7 @@ bool Processor:: Load(QString startPath, QString cfgfile)
     _fswatcher->addPath("D:/_USB");
 #endif
 #ifdef  Q_OS_UNIX
-    _fswatcher->addPath("_saver->MediaPath("/dev");
+    _fswatcher->addPath("/dev");
 #endif
 
     return true;
@@ -155,7 +155,7 @@ void Processor::Run()
 
     _is_active = true;
 
-    QSound::play("D:/CF/tada.wav");
+//    QSound::play("/home/user/tada.wav");
 }
 //--------------------------------------------------------------------------------
 #ifdef Q_OS_UNIX
@@ -219,7 +219,7 @@ void Processor::Stop() {
 }
 //--------------------------------------------------------------------------------
 void Processor::RegTimerStep() {
-    int i;
+    int i, j;
     // for main circle
     if (_serial_ports.contains("BEL"))
         _mainstore.SetByte("DIAG_CQ_BEL", _serial_ports["BEL"]->Quality());
@@ -237,7 +237,6 @@ void Processor::RegTimerStep() {
     _registrator->SetByteRecord(180, _mainstore.Byte("DIAG_CQ_IT"));
     _registrator->SetByteRecord(182, _mainstore.Byte("DIAG_CQ_MSS"));
     _registrator->SetWordRecord(184, _mainstore.Int16("DIAG_MESS_NUM"));
-    _registrator->SetWordRecord(186, _mainstore.Int16("DIAG_PKM_BEL"));
     _registrator->SetWordRecord(188, _mainstore.Int16("DIAG_Rplus"));
     _registrator->SetWordRecord(190, _mainstore.Int16("DIAG_Rminus"));
     _registrator->SetWordRecord(198, _mainstore.Int16("DIAG_Pg"));
@@ -264,19 +263,19 @@ void Processor::RegTimerStep() {
     _registrator->SetByteRecord(330, dt.time().minute());
     _registrator->SetByteRecord(331, dt.time().second());
     // discret diagnostic
-    _registrator->SetByteRecord(346, _mainstore.Byte("DIAG_Connections"));
     quint8 byte;
-    QBitArray* ba = _mainstore.Bits("PROG_TrSoob");
+    QBitArray* ba = _mainstore.Bits("DIAG_Connections");
+    for (j = 0; j < 8; j++ )
+        byte +=  ba->testBit(j) ? (1 << j) : 0;
+    _registrator->SetByteRecord(346, byte);
+
+    ba = _mainstore.Bits("PROG_TrSoob");
     for (i = 0; i < 5; i++) {
         byte = 0;
-        for (int j = 0; j < 8; j++ )
-            byte +=  ba->testBit(i * 8 + j) ? (1 << i) : 0;
+        for (j = 0; j < 8; j++ )
+            byte +=  ba->testBit(i * 8 + j) ? (1 << j) : 0;
         _registrator->SetByteRecord(347 + i, byte);
     }
-//    _registrator->SetByteRecord(348, _mainstore.Byte("DIAG_Discret_3"));
-//    _registrator->SetByteRecord(349, _mainstore.Byte("DIAG_Discret_4"));
-//    _registrator->SetByteRecord(350, _mainstore.Byte("DIAG_Discret_5"));
-//    _registrator->SetByteRecord(351, _mainstore.Byte("DIAG_Discret_6"));
     AddRecordSignal();
 }
 //--------------------------------------------------------------------------------
@@ -328,7 +327,7 @@ void Processor::DiagTimerStep() {
                     _tr_states[_virtual_section][it.key()]->kvit = false;
                 } else { // coorect delay
                     if (_tr_states[_virtual_section][it.key()]->delay > 0) {
-                        _tr_states[_virtual_section][it.key()]->delay -= _diag_interval;
+                        _tr_states[_virtual_section][it.key()]->delay -= (_diag_interval * 2);
                         if (_tr_states[_virtual_section][it.key()]->delay < 0 )
                             _tr_states[_virtual_section][it.key()]->delay = 0;
                     }
@@ -360,10 +359,12 @@ void Processor::DiagTimerStep() {
                 }
                 // banner output
                 if (_tr_states[_virtual_section][it.key()]->status.testBit(2)) {
-                    _tr_states[_virtual_section][it.key()]->status.clearBit(2);
-                    banner_key = it.key() * 10 + _virtual_section;
-                    if (_tr_banner_queue.contains(banner_key))
-                        _tr_banner_queue.remove(banner_key);
+                    if (_tr_states[_virtual_section][it.key()]->kvit){
+                        _tr_states[_virtual_section][it.key()]->status.clearBit(2);
+                        banner_key = it.key() * 10 + _virtual_section;
+                        if (_tr_banner_queue.contains(banner_key))
+                            _tr_banner_queue.remove(banner_key);
+                    }
                 }
             }
         }
@@ -476,34 +477,8 @@ void Processor::kvitTrBanner() {
 }
 //--------------------------------------------------------------------------------
 void Processor::playSoundOnShowBanner() {
-    QSound::play("D:/CF/tada.wav");
+    QSound::play(_start_path + "/error.wav");
 }
-////--------------------------------------------------------------------------------
-//void Processor::LostConnection(QString alias) {
-
-//    _mainstore.LoadSpData(_serial_ports[alias]); // reset parameters to 0
-//    if (alias == "BEL")
-//        OnLostBel(_serial_ports[alias]);
-//    else if (alias == "USTA")
-//        OnLostUsta(_serial_ports[alias]);
-//    if (alias == "IT")
-//        OnLostIt(_serial_ports[alias]);
-//    else if (alias == "MSS")
-//        _mainstore.SetBit("DIAG_Connections", CONN_MSS, 0);
-//     qDebug() << "Lost " + alias;
-//}
-////--------------------------------------------------------------------------------
-//void Processor::RestoreConnection(QString alias) {
-//    if (alias == "BEL")
-//        _mainstore.SetBit("DIAG_Connections", CONN_BEL, 1);
-//    else if (alias == "USTA")
-//        _mainstore.SetBit("DIAG_Connections", CONN_USTA, 1);
-//    if (alias == "IT")
-//        _mainstore.SetBit("DIAG_Connections", CONN_IT, 1);
-//    else if (alias == "MSS")
-//        _mainstore.SetBit("DIAG_Connections", CONN_MSS, 1);
-//     qDebug() << "Restore " + alias;
-//}
 //--------------------------------------------------------------------------------
 void Processor::Unpack(QString alias) {
     QByteArray data = _serial_ports[alias]->InData.Data();
@@ -512,8 +487,13 @@ void Processor::Unpack(QString alias) {
     // update record registration
     if (alias == "USTA") {
         if (data.size() >= 87) {
+            // post correction
+            if (_settings.PressureSensors == 6) {
+                _storage[_section]->SetFloat("USTA_Pf_tnvd", _storage[_section]->Float("USTA_Pf_tnvd") * 0.375);
+                _storage[_section]->SetFloat("USTA_Pf_ftot", _storage[_section]->Float("USTA_Pf_ftot") * 0.375);
+            }
             // save data
-            _registrator->UpdateRecord(0, 80, data.mid(0, 80));  // аналоговые
+            _registrator->UpdateRecord(0, 80, /*data*/_serial_ports[alias]->InData.Data().mid(0, 80));  // аналоговые
             _registrator->UpdateRecord(332, 6, data.mid(80, 6)); // дискретные
             // diagnostic
             _mainstore.SetInt16("DIAG_Pg", _mainstore.Float("USTA_Ug_filtr") * _mainstore.Float("USTA_Ig_filtr") * 0.001); // считаем мощность генератора
@@ -533,7 +513,7 @@ void Processor::Unpack(QString alias) {
     }
     else if (alias == "BEL") {
         if (data.size() >= 10) {
-            //Storage.SetByteRecord(186, Storage.Byte("BEL_PKM")); // ???????????????????????????????????????????????
+            _registrator->SetByteRecord(186, _mainstore.Byte("BEL_PKM"));
             _registrator->UpdateRecord(338, 8, data.mid(1, 8)); // дискретные (+ ПКМ)
             _mainstore.SetByte("PROG_Reversor", (_mainstore.Byte("BEL_Diagn") & 3) + 1);
             _slave.UpdatePacket(0, 8, data.mid(1, 8)); // дискретные (+ ПКМ)
@@ -542,16 +522,35 @@ void Processor::Unpack(QString alias) {
         if (data.size() >= 580)
             _slave.GetPacket(data, _serial_ports);
     }
-
-//    qDebug() << "Unpack " + alias;
 }
 //--------------------------------------------------------------------------------
 void Processor::Parse(NodeXML *node)
 {
     while (node != nullptr) {
-        if (node->Name == "files") {
-            ParseFiles(node->Child);
+        if (node->Name == "lcmconfig") {
+            ParseCfg(node->Child);
         }
+        node = node->Next;
+    }
+}
+//--------------------------------------------------------------------------------
+void Processor::ParseCfg(NodeXML *node)
+{
+    while (node != nullptr) {
+        if (node->Name == "settings") {
+            _settings.Number = node->Text.rightJustified(4, '0');
+
+            for (int i = 0; i < node->Attributes.count(); i++) {
+                AttributeXML *attr = node->Attributes[i];
+                if (attr->Name == "elinj")
+                    _settings.ElInjection = (attr->Value.toLower() == "on") ? true : false;
+                if (attr->Name == "psensor")
+                    _settings.PressureSensors = attr->Value.toInt();
+            }
+        } else
+            if (node->Name == "files") {
+                ParseFiles(node->Child);
+            }
         node = node->Next;
     }
 }
@@ -747,9 +746,9 @@ QJsonArray Processor::getParamKdrFtDzl()
                     if (i.value()->system == 6)
                         par1 = par7 = 1;
                     if (i.value()->system == 7)
-                        par1 = par8 = 1;
-                    if (i.value()->system == 45 || i.value()->system == 46)
                         par1 = par9 = 1;
+                    if (i.value()->system == 45 || i.value()->system == 46)
+                        par1 = par8 = 1;
                 }
             }
             if (_slave.Storage()->Bit("PROG_TrSoob", i.key())) {
@@ -760,9 +759,9 @@ QJsonArray Processor::getParamKdrFtDzl()
                     if (i.value()->system == 6)
                         par2 = par7 = 1;
                     if (i.value()->system == 7)
-                        par2 = par8 = 1;
-                    if (i.value()->system == 45 || i.value()->system == 46)
                         par2 = par9 = 1;
+                    if (i.value()->system == 45 || i.value()->system == 46)
+                        par2 = par8 = 1;
                 }
             }
         }
@@ -931,7 +930,7 @@ QJsonArray Processor::getParamMainWindow() {
     if (n_diz >= 100) {
         pm_min = 17;
         pm_max = 53;
-        if (_pt_max > 3) {
+        if (_settings.ElInjection) {
             pt_min = 40;
             pt_max = 65;
         } else {
@@ -965,7 +964,7 @@ QJsonArray Processor::getParamMainWindow() {
         // frame top
         _storage[_section]->Bit("DIAG_Connections", CONN_USTA),
         QJsonArray { pkm,  _mainstore.Byte("PROG_Reversor"), _mainstore.Byte("PROG_Regime") },
-        QJsonArray { _diagnostics->Time().toString("HH:mm:ss"), _diagnostics->Date().toString("dd/MM/yy") },
+        QJsonArray { _diagnostics->Time().toString("HH:mm:ss"), _diagnostics->Date().toString("dd/MM/yy"), _settings.Number },
         QJsonArray { "", // RejPrT
             (bt == 0x00) ? "" : ((bt == 0x10) ? "Прожиг коллектора": "Завершение прожига"), // RejPro
             (dsk_iAPvkl1 == 00) ? "" : ((dsk_iSA1 == 01) ? "Режим АвтоПрогрева" : ((dsk_iKMv0 == 00) ? "АП: Установи ПКМ в 0" : ((dsk_iDizZ == 00) ? "АП: Запусти дизель" : ""))), },
@@ -1147,4 +1146,12 @@ QJsonArray Processor::getAnalogArray(int offset) {
 // Tr soob string list
 QStringList Processor::getKdrTrL() {
     return _tr_strings; //list;
+}
+//------------------------------------------------------------------------------
+//
+QStringList Processor::getKdrPrivet() {
+    QStringList list;
+    list.append(QString::number(_settings.PressureSensors));
+    list.append((_settings.ElInjection) ? "El vp" : "no Elvp");
+    return list;
 }
