@@ -12,6 +12,12 @@ Diagnostics::Diagnostics(DataStore* storage, LcmSettings *settings)
     _ports_state = 0;
     _date_time = QDateTime::currentDateTime();
     _msec = _date_time.toMSecsSinceEpoch();
+    _it_packs = 0;
+}
+//--------------------------------------------------------------------------------
+void Diagnostics::IncrementITPacks() {
+    if (_it_packs < 4)
+        _it_packs++;
 }
 //--------------------------------------------------------------------------------
 void Diagnostics::RefreshDT() {
@@ -29,7 +35,7 @@ void Diagnostics::APSignalization(int pkm) {
     _storage->SetBit("PROG_TrSoob", 11, _storage->Bit("USTA_Inputs", USTA_INPUTS_URV) ? true : false);
     _storage->SetBit("PROG_TrSoob", 14, false);
     _storage->SetBit("PROG_TrSoob", 15, false);
-    if ((_ports_state & 4) && _storage->Bit("USTA_Inputs", USTA_INPUTS_KV) && (pkm > 4)) {// PKM 4-8
+    if (_storage->Bit("DIAG_Connections", CONN_IT) && _storage->Bit("USTA_Inputs", USTA_INPUTS_KV) && (pkm > 4)) {// PKM 4-8
         if ((_storage->Float("IT_TSM3") < 45) && (_storage->Float("IT_TSM3") > -50))
             _storage->SetBit("PROG_TrSoob", 14, true);
         if ((_storage->Float("IT_TSM6") < 45) && (_storage->Float("IT_TSM6") > -50))
@@ -41,10 +47,10 @@ void Diagnostics::APSignalization(int pkm) {
     _storage->SetBit("PROG_TrSoob", 40, false);
     _storage->SetBit("PROG_TrSoob", 24, false);
     _storage->SetBit("PROG_TrSoob", 25, false);
-    if (_ports_state & 2) {
+    if (_storage->Bit("DIAG_Connections", CONN_USTA)) {
         if (_storage->Float("USTA_Ubs_filtr") > 70  && _storage->Float("USTA_Iakb") < 1)
             _storage->SetBit("PROG_TrSoob", 12, true); // заряд АКБ
-        if (qFabs(_storage->Float("USTA_Ubs_filtr") - 75) > 5)
+        if (_storage->Bit("DIAG_Connections", CONN_USTA) && qFabs(_storage->Float("USTA_Ubs_filtr") - 75) > 5)
             _storage->SetBit("PROG_TrSoob", 26, true); // неиспр. рег. U
         if (_storage->Int16("USTA_N") >= 250) {
             if (_storage->Float("USTA_Po_diz") < 1.7 ||  (_storage->Int16("USTA_N") > 800 && _storage->Float("USTA_Po_diz") < 4))
@@ -71,12 +77,12 @@ void Diagnostics::APSignalization(int pkm) {
 void Diagnostics::RizCU(int pkm) {
     float r, u;
     u = _storage->Float("USTA_Ubs_filtr");
-    if (u < 40 || !(_ports_state & 2) || !((pkm == 1) || (pkm == 2))) { // add PKM not position
+    if (u < 40 || !_storage->Bit("DIAG_Connections", CONN_USTA) || !((pkm == 1) || (pkm == 2))) { // add PKM not position
         _riz_cu.tp = _riz_cu.tm = 0;
         _riz_cu.Up = _riz_cu.Um = 0;
         _riz_cu.snh = false;
         _riz_cu.rss = 2;
-        if (!(_ports_state & 2)) {
+        if (!_storage->Bit("DIAG_Connections", CONN_USTA)) {
             _storage->SetBit("PROG_TrSoob", 32, 0);
             _storage->SetBit("PROG_TrSoob", 33, 0);
             _storage->SetBit("PROG_TrSoob", 34, 0);
@@ -231,7 +237,8 @@ void Diagnostics::Connections(QMap<QString, ThreadSerialPort*> serialPorts, Regi
                     OnLostIt(i.value(), reg, slave);
             } else {
                 if (i.value()->IsExchange()) {
-                    _storage->SetBit("DIAG_Connections", CONN_IT, 1);
+                    if (_it_packs >= 4) // должно прийти 4 пакета
+                        _storage->SetBit("DIAG_Connections", CONN_IT, 1);
 //                    qDebug() << "Restore IT";
                 }
             }
@@ -279,6 +286,7 @@ void Diagnostics::OnLostUsta(ThreadSerialPort* port, Registrator* reg, SlaveLcm*
 //--------------------------------------------------------------------------------
 void Diagnostics::OnLostIt(ThreadSerialPort* port, Registrator* reg, SlaveLcm* slave) {
     QByteArray arr(96, 0);
+    _it_packs = 0;
     _storage->ClearSpData(port);
     _storage->SetBit("DIAG_Connections", CONN_IT, 0);
     // в 0

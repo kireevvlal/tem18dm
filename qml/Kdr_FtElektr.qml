@@ -7,7 +7,6 @@ Rectangle {
     color: "#000000"
     border.width: 0
 
-    property int idDisp:0; // номер нажатой клавиши - номер секции подвязать
     property string cltxtSelect:"#1bb7e4"; // цвет текста нажатой кнопки
     property string cltxt:"white";         // штатный цвет текста всех кнопок
 
@@ -36,7 +35,6 @@ Rectangle {
             img1.source = "../Pictogram/m0_lok.png";// !! доделать
             img2.source = "../Pictogram/m0_lok.png";// !! доделать
 
-            idDisp = 0;
 
             img6.source = "../Pictogram/elektr/0_akb.png"
             img7.source = "../Pictogram/elektr/0_vzb.png"
@@ -50,7 +48,6 @@ Rectangle {
                 img1.source = "../Pictogram/m1_lok.png";
                 img2.source = "../Pictogram/m0_lok.png";
 
-                idDisp = 1; // ?? надо подать сигнал о смене секций
                 txt_1.color = cltxtSelect;
                 txt_2.color = cltxt;
             }
@@ -60,7 +57,6 @@ Rectangle {
                 img1.source = "../Pictogram/m0_lok.png";
                 img2.source = "../Pictogram/m1_lok.png";
 
-                idDisp = 2; // ?? надо подать сигнал о смене секций
                 txt_2.color = cltxtSelect;
                 txt_1.color = cltxt;
             }
@@ -116,6 +112,9 @@ Rectangle {
             break;
         case Qt.Key_I:  //73 :
             knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
+            break;
+        case Qt.Key_F:
+            main_window.saveToUSB();
             break;
         case Qt.Key_Backspace:
             kdr_Privet.opacity = 1;

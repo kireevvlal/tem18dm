@@ -18,6 +18,7 @@ struct StructRizCU {
 class Diagnostics
 {
 private:
+    int _it_packs; // счетчик пакетов от ТИ (связь с ТИ считается установленной помсле прихода четырех пакетов)
     LcmSettings *_settings;
     QDateTime _date_time;
     StructRizCU _riz_cu;
@@ -30,6 +31,7 @@ private:
     void OnLostIt(ThreadSerialPort*, Registrator* reg, SlaveLcm* slave);
 //    void OnLostMss(ThreadSerialPort*);
 public:
+    void IncrementITPacks();
     void RefreshDT();
     QTime Time() { return _date_time.time(); }
     QDate Date() { return _date_time.date(); }

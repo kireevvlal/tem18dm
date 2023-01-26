@@ -10,7 +10,9 @@ CircularGauge {
     property string parameter
     property int valuePrecision: 0
     property int labelPrecision: 0
-    property int valueMultiplayer: 1
+    property color limitcolor: "gray"
+    property real oldvalue: 0;
+    property real digitalvalue: 0;
     style: CircularGaugeStyle {
         id: ecgstyle
         minimumValueAngle: -140
@@ -56,7 +58,7 @@ CircularGauge {
             if (begin !== end) {
             ctx.beginPath();
             ctx.lineWidth =  tickmarkInset - 2;
-            ctx.strokeStyle = "gray";
+            ctx.strokeStyle = ecgauge.limitcolor;
             var sAngle = valueToAngle(begin) - 90;
             var eAngle = valueToAngle(end) - 90;
             ctx.arc(outerRadius, outerRadius, outerRadius - ctx.lineWidth / 2 - 1, degreesToRadians(sAngle), degreesToRadians(eAngle));
@@ -67,23 +69,27 @@ CircularGauge {
         background: Canvas {
             id: gaugecanvas
             property real value: ecgauge.value
-//            property bool repaint: ecgauge.repaint
             anchors.fill: parent
             onValueChanged: {
+                if ((value < ecgauge.start || value > ecgauge.finish)
+                        && (ecgauge.oldvalue >= ecgauge.start && ecgauge.oldvalue <= ecgauge.finish))
+                    requestPaint();
+                if ((value >= ecgauge.start && value <= ecgauge.finish)
+                        && (oldvalue < ecgauge.start || oldvalue > ecgauge.finish))
+                    requestPaint();
+
                 if (ecgauge.repaint) {
                     requestPaint();
                     ecgauge.repaint = false;
                 }
+                ecgauge.oldvalue = value;
             }
 
-//            onRepaintChanged: {
-//                if (ecgauge.repaint) {
-//                    requestPaint();
-//                    ecgauge.repaint = repaint = false;
-//                }
-//            }
-
             onPaint: {
+                if (ecgauge.value >= ecgauge.start && ecgauge.value <= ecgauge.finish)
+                    ecgauge.limitcolor = "gray";
+                else
+                    ecgauge.limitcolor = "red";
                 var ctx = getContext("2d");
                 paintBackground(ctx, ecgauge.start, ecgauge.finish);
             }
@@ -97,7 +103,7 @@ CircularGauge {
                 horizontalAlignment: Text.AlignHCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: parent.height - toPixels(0.3)
-                text: valuePrecision ? (ecgauge.value * valueMultiplayer).toFixed(valuePrecision) : Math.round(ecgauge.value * valueMultiplayer)
+                text: valuePrecision ? ecgauge.digitalvalue.toFixed(valuePrecision) : Math.round(ecgauge.digitalvalue)
             }
             // unit measure
             Text {

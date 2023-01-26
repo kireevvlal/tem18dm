@@ -290,7 +290,7 @@ void Processor::DiagTimerStep() {
         pku = 9;
     _mainstore.SetByte("PROG_PKM", (pkb < pku) ? pku : pkb);
     _mainstore.SetByte("PROG_Regime", _mainstore.Bit("DIAG_Connections", CONN_BEL) ? ((_mainstore.Byte("PROG_Reversor") < 2 || pkb < 2) ? 3
-                                                                                   : (_mainstore.Byte("BEL_Diagn") & 1) + 1) : 0); // 3 - XX
+                                                                                   : _mainstore.Bit("BEL_Diagn", 2) + 1) : 0); // 3 - XX
     _virtual_section = (_virtual_section == 1) ? 0 : 1;
     _diagnostics->RefreshDT();
     _diagnostics->Motoresurs();
@@ -503,6 +503,7 @@ void Processor::Unpack(QString alias) {
     }
     else if (alias == "IT") {
         if (data.size() >= 38) {
+            _diagnostics->IncrementITPacks();
             int index = data[_serial_ports[alias]->InData.Index];
             if (index < 3) {// принимаются долько три пакета из четырех
                 _registrator->UpdateRecord(80 + index * 32, 32, data.mid(5, 32));
@@ -515,7 +516,7 @@ void Processor::Unpack(QString alias) {
         if (data.size() >= 10) {
             _registrator->SetByteRecord(186, _mainstore.Byte("BEL_PKM"));
             _registrator->UpdateRecord(338, 8, data.mid(1, 8)); // дискретные (+ ПКМ)
-            _mainstore.SetByte("PROG_Reversor", (_mainstore.Byte("BEL_Diagn") & 3) + 1);
+            _mainstore.SetByte("PROG_Reversor", _mainstore.Bit("BEL_Diagn", 0) + (_mainstore.Bit("BEL_Diagn", 1) * 2) + 1);
             _slave.UpdatePacket(0, 8, data.mid(1, 8)); // дискретные (+ ПКМ)
         }
     } else if (alias == "MSS") {
@@ -897,18 +898,22 @@ QJsonArray Processor::getParamKdrAvProgrev()
 //------------------------------------------------------------------------------
 QJsonArray Processor::getParamKdrSmlMain()
 {
-    int Ig, ogrUgMax = 0, ogrIgMax = 0;
-    if (_storage[_section]->Bit("USTA_Inputs", USTA_INPUTS_BELEDT) && _storage[_section]->Bit("USTA_Inputs", USTA_INPUTS_RET)) // Признак «Выход БЭЛ ЭДТ» и Признак «РЭТ по сх. КВТ 1,2»
-        Ig = _storage[_section]->Float("USTA_Itorm_zad");
-    else
-        Ig = _storage[_section]->Float("USTA_Ig_filtr");
-
+    int Ig = 0, ogrUgMax = 0, ogrIgMax = 0;
+    float Ug = 0;
+    if (_storage[_section]->Bit("USTA_Inputs", USTA_INPUTS_KV)) {
+        if (_storage[_section]->Bit("USTA_Inputs", USTA_INPUTS_BELEDT) && _storage[_section]->Bit("USTA_Inputs", USTA_INPUTS_RET)) // Признак «Выход БЭЛ ЭДТ» и Признак «РЭТ по сх. КВТ 1,2»
+            Ig = _storage[_section]->Float("USTA_Itorm_zad");
+        else
+            Ig = _storage[_section]->Float("USTA_Ig_filtr");
+    }
+    if (_storage[_section]->Bit("USTA_Inputs", USTA_INPUTS_KV))
+        Ug = _storage[_section]->Float("USTA_Ug_filtr");
     if (_storage[_section]->Bit("USTA_Inputs", USTA_INPUTS_KV)) // Признак КВ
         ogrUgMax = 800;
     if (_storage[_section]->Bit("USTA_Inputs", USTA_INPUTS_KV)) // Признак КВ
         ogrIgMax = 2000;
     return { QJsonArray  { _storage[_section]->Bit("DIAG_Connections", CONN_USTA), _storage[_section]->Bit("DIAG_Connections", CONN_IT) },
-        Ig, _storage[_section]->Float("USTA_Ug_filtr"), _storage[_section]->Float("IT_TSM6"), _storage[_section]->Float("IT_TSM3"),
+        Ig, Ug, _storage[_section]->Float("IT_TSM6"), _storage[_section]->Float("IT_TSM3"),
                 ogrIgMax, ogrUgMax, _control->KdrSmlMain(_section) };
 }
 //------------------------------------------------------------------------------
@@ -953,13 +958,13 @@ QJsonArray Processor::getParamMainWindow() {
         // frame left
         QJsonArray { _storage[0]->Bit("DIAG_Connections", CONN_BEL), _storage[0]->Bit("DIAG_Connections", CONN_USTA), _storage[0]->Bit("DIAG_Connections", CONN_IT),
                     _storage[0]->Bit("DIAG_Connections", CONN_MSS), _storage[1]->Bit("DIAG_Connections", CONN_USTA)},
-        _storage[0]->Float("USTA_Ug_filtr") * _storage[0]->Float("USTA_Ig_filtr") * 0.001,
-        _storage[1]->Float("USTA_Ug_filtr") * _storage[1]->Float("USTA_Ig_filtr") * 0.001,
+        (_storage[0]->Bit("USTA_Inputs", USTA_INPUTS_KV)) ? _storage[0]->Float("USTA_Ug_filtr") * _storage[0]->Float("USTA_Ig_filtr") * 0.001 : 0,
+        (_storage[1]->Bit("USTA_Inputs", USTA_INPUTS_KV)) ?_storage[1]->Float("USTA_Ug_filtr") * _storage[1]->Float("USTA_Ig_filtr") * 0.001 : 0,
         _storage[0]->Float("USTA_Ubs_filtr"), _storage[1]->Float("USTA_Ubs_filtr"),
         _storage[0]->Float("USTA_Iakb"), _storage[1]->Float("USTA_Iakb"),
-        QJsonArray { iKVmain_own && _storage[0]->Bit("USTA_Inputs", USTA_INPUTS_OM2), iKVmain_own && _storage[0]->Bit("USTA_Inputs", USTA_INPUTS_OM1), _storage[0]->Bit("USTA_Outputs", USTA_OUTPUTS_BOKS), // OM1, OM2, боксование
+        QJsonArray { iKVmain_own && !_storage[0]->Bit("USTA_Inputs", USTA_INPUTS_OM2), iKVmain_own && !_storage[0]->Bit("USTA_Inputs", USTA_INPUTS_OM1), _storage[0]->Bit("USTA_Outputs", USTA_OUTPUTS_BOKS), // OM1, OM2, боксование
                 _storage[0]->Bit("USTA_Inputs", USTA_INPUTS_URV), _storage[0]->Bit("USTA_Inputs", USTA_INPUTS_RZ), _storage[0]->Bit("USTA_Inputs", USTA_INPUTS_OBTM) } , // ур. воды, реле земли,обрыв ТМ
-        QJsonArray { iKVmain_add && _storage[1]->Bit("USTA_Inputs", USTA_INPUTS_OM2), iKVmain_add && _storage[1]->Bit("USTA_Inputs", USTA_INPUTS_OM1), _storage[1]->Bit("USTA_Outputs", USTA_OUTPUTS_BOKS), // OM1, OM2, боксование
+        QJsonArray { iKVmain_add && !_storage[1]->Bit("USTA_Inputs", USTA_INPUTS_OM2), iKVmain_add && !_storage[1]->Bit("USTA_Inputs", USTA_INPUTS_OM1), _storage[1]->Bit("USTA_Outputs", USTA_OUTPUTS_BOKS), // OM1, OM2, боксование
                 _storage[1]->Bit("USTA_Inputs", USTA_INPUTS_URV), _storage[1]->Bit("USTA_Inputs", USTA_INPUTS_RZ), _storage[1]->Bit("USTA_Inputs", USTA_INPUTS_OBTM) } , // ур. воды, реле земли,обрыв ТМ
         // frame top
         _storage[_section]->Bit("DIAG_Connections", CONN_USTA),

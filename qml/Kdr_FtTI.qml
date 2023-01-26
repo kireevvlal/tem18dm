@@ -45,7 +45,6 @@ Rectangle {
                 img1.source = "../Pictogram/m1_lok.png";
                 img2.source = "../Pictogram/m0_lok.png";
 
-                idDisp = 1; // ?? надо подать сигнал о смене секций
                 txt_1.color = cltxtSelect;
                 txt_2.color = cltxt;
             }
@@ -55,7 +54,6 @@ Rectangle {
                 img1.source = "../Pictogram/m0_lok.png";
                 img2.source = "../Pictogram/m1_lok.png";
 
-                idDisp = 2; // ?? надо подать сигнал о смене секций
                 txt_2.color = cltxtSelect;
                 txt_1.color = cltxt;
             }
@@ -91,6 +89,9 @@ Rectangle {
             break;
         case Qt.Key_I:  //73 :
             knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
+            break;
+        case Qt.Key_F:
+            main_window.saveToUSB();
             break;
         case Qt.Key_Backspace:
             kdr_Privet.opacity = 1;

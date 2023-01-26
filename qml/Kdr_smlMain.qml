@@ -14,23 +14,30 @@ Rectangle {
         running: kdr_Main_small.opacity
         onTriggered: {
             var par = ioBf.getParamKdrSmlMain();
-            indIg.value = Math.round(par[1]) / 1000;
+
+            indIg.digitalvalue = Math.round(par[1]);
+            indIg.value = indIg.digitalvalue / 1000;
+            if (indIg.digitalvalue < 0)
+                indIg.digitalvalue = 0;
             var finish = par[5] / 1000;
             if (indIg.finish != finish) {
                 indIg.finish = finish;
                 indIg.repaint = true;
             }
 
-            indUg.value = Math.round(par[2]);
+
+            indUg.value = indUg.digitalvalue = Math.round(par[2]);
+            if (indUg.digitalvalue < 0)
+                indUg.digitalvalue = 0;
             finish = par[6];
             if (indUg.finish != finish) {
                 indUg.finish = finish;
                 indUg.repaint = true;
             }
-            stb_Tvd.value = par[3];
+            stb_Tvd.value = stb_Tvd.digitalvalue =  par[3];
             stb_Tvd.barColor = (par[3] < 10) ? "red" : (par[3] < 45) ? "yellow" : (par[3] < 87) ? "#00d7d7" : "red";
 
-            stb_Tms.value = par[4];
+            stb_Tms.value = stb_Tms.digitalvalue = par[4];
             stb_Tms.barColor = (par[4] < 20) ? "red" : (par[4] < 45) ? "yellow" : (par[4] < 70) ? "#00d7d7" : "red";
 
             vh1.visible = (par[7] & 1) && par[0][0]; // ??? добавил наличие связи в условии
@@ -76,7 +83,6 @@ Rectangle {
         parameter: "Iг кА"
         start: 0
         finish: 0
-        valueMultiplayer: 1000
     }
 
     ExtCircularGauge {

@@ -2,7 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QObject>
-//#include <QDebug>
+#include <QDebug>
 #include <QIcon>
 #include <QFont>
 #include <signal.h>
@@ -41,11 +41,12 @@ int main(int argc, char *argv[])
     pProcessor = &ioBf;
     qmlRegisterType<Processor>("ConnectorModule", 1, 0, "Connector");
     if (ioBf.Load(/*"D:\\Development\\Qt\\tem18dm*/qApp->applicationDirPath(), "config.xml")) {
-//        qDebug() << "Config readed!";
         ioBf.Run();
     }
-//    else
-//        qDebug() << "Config read error.";
+    else {
+        qDebug() << "Config read error. Program exit.";
+        return 0;
+    }
 
 
     QQmlApplicationEngine engine;

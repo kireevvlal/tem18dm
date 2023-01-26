@@ -13,14 +13,13 @@ Rectangle {
             var params = ioBf.getParamKdrSvz();
 
             ind_Ubs.value = Math.round(params[0] * 10) / 10;
-            led_c1.visible = (params[2] & 16); // АСК
-            led_c1.visible = (params[2] & 16); // АСК
+            led_c1.visible = false; //(params[2] & 16); // АСК
             led_c2.visible = (params[2] & 1); // БЭЛ
             led_c4.visible = (params[2] & 4); // ТИ
             led_c5.visible = (params[2] & 2); // УСТА
             led_c6.visible = (params[2] & 8); // МСС
-            led_ASK.visible = true; //params[2] & 16;
-            led_BSO.visible = true; //params[2] & 32;
+            led_ASK.visible = false; //params[2] & 16;
+            led_BSO.visible = false; //params[2] & 32;
             led_Tii.visible = !params[1][2];
             led_UST.visible = !params[1][1];
             led_BEL.visible = !params[1][0];
@@ -56,8 +55,8 @@ Rectangle {
     TInd {
         id: oSKZ
         value: "00"
-        x: 304
-        y: 75
+        x: 305
+        y: 67
         width: 19
         height: 14
         txtSize: 12
@@ -71,6 +70,7 @@ Rectangle {
         height: 14
         txtSize: 12
         value: "00"
+        visible: false
     }
 
     TInd {
@@ -81,6 +81,7 @@ Rectangle {
         height: 14
         txtSize: 12
         value: "00"
+        visible: false
     }
 
     TInd {

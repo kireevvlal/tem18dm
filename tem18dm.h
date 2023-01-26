@@ -41,7 +41,7 @@ struct LcmSettings {
     int PressureSensors; // номинал двух датчиков давления
     bool ElInjection; // электронный впрыск
 
-    LcmSettings() { Number = "0001"; PressureSensors = 16; ElInjection = false; }
+    LcmSettings() { Number = "0000"; PressureSensors = 16; ElInjection = false; }
 };
 
 #endif // TEM18DM_H

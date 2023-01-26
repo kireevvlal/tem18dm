@@ -8,7 +8,6 @@ Rectangle {
     color: "#000000"
     border.width: 0
 
-    property int idDisp:0;  // номер нажатой клавиши - может привязать номер секции
     property string cltxtSelect:"#1bb7e4"; // цвет текста нажатой кнопки
     property string cltxt:"white";         // штатный цвет текста всех кнопок
 
@@ -108,6 +107,9 @@ Rectangle {
             break;
         case Qt.Key_I:  //73 :
             knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
+            break;
+        case Qt.Key_F:
+            main_window.saveToUSB();
             break;
         case Qt.Key_Backspace:
             kdr_Privet.opacity = 1;

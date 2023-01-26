@@ -104,10 +104,10 @@ Rectangle {
             }
             break;
             // *** ! кодировка на ТПК может отличаться
-        case Qt.Key_B:  //66 :
-            knopaS(); // сигнал о нажатии клавиши ДМ "S"
-            main_window.current_system = 4;
-            break;
+//        case Qt.Key_B:  //66 :
+//            knopaS(); // сигнал о нажатии клавиши ДМ "S"
+//            main_window.current_system = 4;
+//            break;
 
         case Qt.Key_C:  //67 :
             doTrMessList();
@@ -115,7 +115,8 @@ Rectangle {
             main_window.current_system = 5;
             break;
 
-        case Qt.Key_D:  //68 :
+        case Qt.Key_E: //Qt.Key_D:  //68 :
+            img0.opacity = 1;
             knopaSt(); // сигнал о нажатии клавиши ДМ "St"
             main_window.current_system = 6;
             break;
@@ -131,9 +132,8 @@ Rectangle {
             ioBf.close();
             break;
 
-            // kireev add for windows
         case Qt.Key_F:
-            main_window.current_system = 7;
+//            main_window.current_system = 7;
             saveToUSB();
             break;
 

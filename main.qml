@@ -8,7 +8,6 @@ Window {
     height: 480
     visible: true
     color: "black"
-//    property alias kdr_Masl: kdr_Masl
     property string lcm_number: "0001"
     property string exitstr: ""
     flags: Qt.FramelessWindowHint | Qt.Window
@@ -98,9 +97,13 @@ Window {
             recordUSB.visible = recUSBprBar.visible = par[14][1];
             recUSBprBar.value = par[14][2];
 
-            indPt.value = par[15][0];
+            indPt.value = indPt.digitalvalue =  par[15][0];
+            if (indPt.digitlvalue < 0)
+                indPt.digitalvalue = 0;
+
             var start = par[15][1];
             var finish = par[15][2];
+
             if (indPt.start != start) {
                 indPt.start = start;
                 indPt.repaint = true;
@@ -109,9 +112,12 @@ Window {
                 indPt.finish = finish;
                 indPt.repaint = true;
             }
-            indPm.value = par[15][3];
+            indPm.value = indPm.digitalvalue = par[15][3];
+            if (indPm.digitalvalue < 0)
+                indPm.digitalvalue = 0;
             start = par[15][4];
             finish = par[15][5];
+
             if (indPm.start != start) {
                 indPm.start = start;
                 indPm.repaint = true;
@@ -120,9 +126,12 @@ Window {
                 indPm.finish = finish;
                 indPm.repaint = true;
             }
-            indFd.value = par[15][6];
+            indFd.value = indFd.digitalvalue = par[15][6];
+            if (indFd.digitalvalue < 0)
+                indFd.digitalvalue = 0;
             start = par[15][7];
             finish = par[15][8];
+
             if (indFd.start != start) {
                 indFd.start = start;
                 indFd.repaint = true;
@@ -135,7 +144,8 @@ Window {
             indPt.visible = indPm.visible = indFd.visible = par[9];
             // Trevoga messages
             if (par[16][0] != "") {
-                if (!kdr_Tre.opacity)
+//                if (!kdr_Tre.opacity)
+                if (!kdr_Tre.opacity || kdr_Tre.str1 != par[16][0] || kdr_Tre.str2 != par[16][1])
                     ioBf.playSoundOnShowBanner();
                 kdr_Tre.opacity = 1;
                 kdr_Tre.focus = true;
@@ -174,9 +184,21 @@ Window {
                     kdr_Foot.opacity = 1;
                     kdr_Foot.focus = true;
                     break;
-                case 7:
-                    kdr_Foot.opacity = 1;
-                    kdr_Foot.focus = true;
+//                case 7:
+//                    kdr_Foot.opacity = 1;
+//                    kdr_Foot.focus = true;
+//                    break;
+                case 11:
+                    kdr_Foot_TI.opacity = 1;
+                    kdr_Foot_TI.focus = true;
+                    break;
+                case 12:
+                    kdr_Foot_Usta.opacity = 1;
+                    kdr_Foot_Usta.focus = true;
+                    break;
+                case 13:
+                    kdr_FootBEL.opacity = 1;
+                    kdr_FootBEL.focus = true;
                     break;
                 }
             }

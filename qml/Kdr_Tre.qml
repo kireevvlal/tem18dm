@@ -1,7 +1,7 @@
 import QtQuick 2.0
 
 Rectangle {
-    id: kdr_tre
+//    id: kdr_tre
     width: 800
     height: 80
     color: "red"

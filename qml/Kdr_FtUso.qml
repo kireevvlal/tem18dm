@@ -6,7 +6,6 @@ Rectangle {
     color: "#000000"
     border.width: 0
 
-    property int idDisp:0; // номер нажатой клавиши - номер секции подвязать
     property string cltxtSelect:"#1bb7e4"; // цвет текста нажатой кнопки
     property string cltxt:"white";         // штатный цвет текста всех кнопок
 
@@ -31,7 +30,6 @@ Rectangle {
         switch(event.key){
         case Qt.Key_0:
 
-            idDisp = 0;
             img7.source = "../Pictogram/uso/0_ti.png"
             img8.source = "../Pictogram/uso/0_ust.png"
             img9.source = "../Pictogram/uso/0_bel.png"
@@ -42,7 +40,6 @@ Rectangle {
                 img1.source = "../Pictogram/m1_lok.png";
                 img2.source = "../Pictogram/m0_lok.png";
 
-                idDisp = 1; // ?? надо подать сигнал о смене секций
                 txt_1.color = cltxtSelect;
                 txt_2.color = cltxt;
             }
@@ -52,18 +49,20 @@ Rectangle {
                 img1.source = "../Pictogram/m0_lok.png";
                 img2.source = "../Pictogram/m1_lok.png";
 
-                idDisp = 2; // ?? надо подать сигнал о смене секций
                 txt_2.color = cltxtSelect;
                 txt_1.color = cltxt;
             }
             break;
         case Qt.Key_7:
+            main_window.current_system = 11;
             switchUso_TI();
             break;
         case Qt.Key_8:
+            main_window.current_system = 12;
             switchUso_USTA();
             break;
         case Qt.Key_9:
+            main_window.current_system = 13;
             switchUso_BEL();
             break;
             // *** ! кодировка на ТПК может отличаться
@@ -79,6 +78,9 @@ Rectangle {
             break;
         case Qt.Key_I:  //73 :
             knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
+            break;
+        case Qt.Key_F:
+            main_window.saveToUSB();
             break;
         case Qt.Key_Backspace:
             kdr_Privet.opacity = 1;

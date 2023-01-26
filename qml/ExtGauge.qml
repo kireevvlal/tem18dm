@@ -16,6 +16,7 @@ Item {
     property int minValue: 0                // минимальное значение
     property int maxValue: 150              // максимальное значение
     property string barColor: "lightblue"
+    property real digitalvalue: 0
 //    property int warningValue: maxValue + 1               // граница, при превышении которой цвет становится warning (желтый)
 //    property int errorValue: maxValue + 1                  // граница, при превышении которой цвет становится error (красный)
     onValueChanged: {
@@ -53,7 +54,7 @@ Item {
         font.pixelSize: 14
         //font.bold: true
         color: "#00d7d7" //isHeader ? (value > errorValue ? "red" : (value > warningValue ? "yellow" : "lightblue")) : "blue"
-        text: gauge.value
+        text:  extgauge.digitalvalue //gauge.value
     }
 
     Gauge {
