@@ -219,7 +219,7 @@ void Processor::Stop() {
 }
 //--------------------------------------------------------------------------------
 void Processor::RegTimerStep() {
-    int i, j;
+    int i; //, j;
     // for main circle
     if (_serial_ports.contains("BEL"))
         _mainstore.SetByte("DIAG_CQ_BEL", _serial_ports["BEL"]->Quality());
@@ -263,19 +263,21 @@ void Processor::RegTimerStep() {
     _registrator->SetByteRecord(330, dt.time().minute());
     _registrator->SetByteRecord(331, dt.time().second());
     // discret diagnostic
-    quint8 byte;
-    QBitArray* ba = _mainstore.Bits("DIAG_Connections");
-    for (j = 0; j < 8; j++ )
-        byte +=  ba->testBit(j) ? (1 << j) : 0;
-    _registrator->SetByteRecord(346, byte);
+//    quint8 byte = 0;
+//    QBitArray* ba = _mainstore.Bits("DIAG_Connections");
+//    for (j = 0; j < 8; j++ )
+//        byte +=  ba->testBit(j) ? (1 << j) : 0;
+//    _registrator->SetByteRecord(346, byte);
+    _registrator->SetByteRecord(346, _mainstore.BitArrayToByte("DIAG_Connections"));
 
-    ba = _mainstore.Bits("PROG_TrSoob");
-    for (i = 0; i < 5; i++) {
-        byte = 0;
-        for (j = 0; j < 8; j++ )
-            byte +=  ba->testBit(i * 8 + j) ? (1 << j) : 0;
-        _registrator->SetByteRecord(347 + i, byte);
-    }
+//    ba = _mainstore.Bits("PROG_TrSoob");
+//    for (i = 0; i < 5; i++) {
+//        byte = 0;
+//        for (j = 0; j < 8; j++ )
+//            byte +=  ba->testBit(i * 8 + j) ? (1 << j) : 0;
+//        _registrator->SetByteRecord(347 + i, byte);
+//    }
+    _registrator->UpdateRecord(347, 5, _mainstore.BitArrayToByteArray("PROG_TrSoob"));
     AddRecordSignal();
 }
 //--------------------------------------------------------------------------------
@@ -316,7 +318,7 @@ void Processor::DiagTimerStep() {
                     if (_tr_strings.count() >= 300)
                         _tr_strings.removeFirst();
                     _tr_strings.append(_diagnostics->Date().toString("yy/MM/dd") + " " + _diagnostics->Time().toString("hh:mm:ss") + " " +
-                                       FormMessage(_virtual_section, it.key(), it.value()->system) + " " + it.value()->text);
+                                       FormMessage(_virtual_section, it.value()->system) + " " + it.value()->text);
                     // save tr messages list to file
                     SaveMessagesList();
                 }
@@ -336,7 +338,7 @@ void Processor::DiagTimerStep() {
                     if (!_tr_states[_virtual_section][it.key()]->delay) {
                         banner_key = it.key() * 10 + _virtual_section;
                         if (!_tr_banner_queue.contains(banner_key)) {
-                            _tr_banner_queue[banner_key] = TrBanner { FormMessage(_virtual_section, it.key(), it.value()->system), it.value()->text, _virtual_section, it.key() };
+                            _tr_banner_queue[banner_key] = TrBanner { FormMessage(_virtual_section, it.value()->system), it.value()->text, _virtual_section, it.key() };
                         }
                     }
                 }
@@ -371,7 +373,7 @@ void Processor::DiagTimerStep() {
     }
 }
 //--------------------------------------------------------------------------------
-QString Processor::FormMessage(int sec, int index, int system) {
+QString Processor::FormMessage(int sec, int system) {
     QString out;
     if (sec) //section
         out = "секц 2.";
@@ -417,9 +419,9 @@ QString Processor::FormMessage(int sec, int index, int system) {
 void Processor::SetSlaveData()
 {
     QByteArray date;
-    QBitArray* ba = _mainstore.Bits("PROG_TrSoob");
-    QByteArray ts;
-    qint8 byte;
+//    QBitArray* ba = _mainstore.Bits("PROG_TrSoob");
+//    QByteArray ts;
+//    qint8 byte;
     QDate dt = _diagnostics->Date();
     QTime tm = _diagnostics->Time();
 
@@ -431,15 +433,18 @@ void Processor::SetSlaveData()
     date[4] = tm.minute();
     date[5] = tm.second();
 
-    for (int i = 1; i < 8; i++) {
-        byte = 0;
-        for (int j = 0; j < 8; j++ )
-            byte +=  ba->testBit(i * 8 + j) ? (1 << i) : 0;
-        ts.append(byte);
-    }
-    _slave.SetBytePacket(192, (_mainstore.Bit("DIAG_Connections", CONN_BEL) ? 1 : 0) + (_mainstore.Bit("DIAG_Connections", CONN_USTA) ? 2 : 0)
-                           + (_mainstore.Bit("DIAG_Connections", CONN_IT) ? 4 : 0) + (_mainstore.Bit("DIAG_Connections", CONN_MSS) ? 8 : 0));
-    _slave.UpdatePacket(193, 7, ts); // trev. soob.
+//    for (int i = 1; i < 8; i++) {
+//        byte = 0;
+//        for (int j = 0; j < 8; j++ )
+//            byte +=  ba->testBit(i * 8 + j) ? (1 << i) : 0;
+//        ts.append(byte);
+//    }
+
+//    _slave.SetBytePacket(192, (_mainstore.Bit("DIAG_Connections", CONN_BEL) ? 1 : 0) + (_mainstore.Bit("DIAG_Connections", CONN_USTA) ? 2 : 0)
+//                           + (_mainstore.Bit("DIAG_Connections", CONN_IT) ? 4 : 0) + (_mainstore.Bit("DIAG_Connections", CONN_MSS) ? 8 : 0));
+    _slave.SetBytePacket(192, _mainstore.BitArrayToByte("DIAG_Connections"));
+//    _slave.UpdatePacket(193, 7, ts); // trev. soob.
+    _slave.UpdatePacket(193, 7, _mainstore.BitArrayToByteArray("PROG_TrSoob")); // trev. soob.
     _slave.SetBytePacket(204, _mainstore.Byte("DIAG_CQ_BEL"));
     _slave.SetBytePacket(205, _mainstore.Byte("DIAG_CQ_USTA"));
     _slave.SetBytePacket(206, _mainstore.Byte("DIAG_CQ_IT"));
@@ -458,8 +463,6 @@ void Processor::SetSlaveData()
 //--------------------------------------------------------------------------------
 bool Processor::changeKdr(int kdr) {
     int section = kdr - 1;
-//    _control->KdrNum = kdr;
-//    section = kdr / 100 - 1;  // in qml: 1 - own section, 2 - additional section
     if ((section == 0) || (section == 1 && _mainstore.Bit("DIAG_Connections", CONN_MSS))) {
         _section = section;
         return true;

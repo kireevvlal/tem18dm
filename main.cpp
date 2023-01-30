@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QIcon>
 #include <QFont>
+#include <QCursor>
 #include <signal.h>
 #include "processor.h"
 
@@ -73,6 +74,7 @@ int main(int argc, char *argv[])
     signal(SIGINT, handleSignals);
     QFont fon("Arial");
 
+    app.setOverrideCursor(QCursor(Qt::BlankCursor));
     app.setFont(fon);
     return app.exec();
 }

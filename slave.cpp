@@ -33,12 +33,14 @@ void SlaveLcm::FillStore(DataStore* mainStore)
 //--------------------------------------------------------------------------------
 void SlaveLcm::GetPacket(QByteArray packet, QMap<QString, ThreadSerialPort*> ports)
 {
-    int i;
-    for (int i = 0; i < 8; i++)
-        _storage.SetBit("DIAG_Connections", i, packet[192] & (1 << i));
-    for (int i = 0; i < 7; i++)
-        for (int j = 0; j < 8; j++)
-            _storage.SetBit("PROG_TrSoob", i * 8 + 8 + j, packet[193 + i] & (1 << j));
+//    int i;
+//    for (i = 0; i < 8; i++)
+//        _storage.SetBit("DIAG_Connections", i, packet[192] & (1 << i));
+    _storage.SetBitArray("DIAG_Connections", packet[192]);
+//    for (i = 0; i < 7; i++)
+//        for (int j = 0; j < 8; j++)
+//            _storage.SetBit("PROG_TrSoob", i * 8 + 8 + j, packet[193 + i] & (1 << j));
+    _storage.SetBitArray("PROG_TrSoob", packet.mid(193,7));
     _storage.SetByte("DIAG_CQ_BEL", packet[204]);
     _storage.SetByte("DIAG_CQ_USTA", packet[205]);
     _storage.SetByte("DIAG_CQ_IT", packet[206]);

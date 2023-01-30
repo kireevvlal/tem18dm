@@ -93,7 +93,7 @@ private:
     void ParseRegistration(NodeXML*);
     void ParseTrMess(NodeXML*);
     void SetSlaveData();
-    QString FormMessage(int, int, int);
+    QString FormMessage(int, int);
     void SaveMessagesList();
 #ifdef Q_OS_UNIX
     void GPIO();
