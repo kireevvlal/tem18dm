@@ -70,8 +70,8 @@ bool Processor:: Load(QString startPath, QString cfgfile)
     } else
         return false;
     // fill main and additional section storage maps
-    for (QMap<QString, ExtSerialPort*>::iterator i = _serial_ports.begin(); i != _serial_ports.end(); i++)
-        _mainstore.FillMaps(i.value());
+    for (QMap<QString, ThrSerialPort*>::iterator i = _serial_ports.begin(); i != _serial_ports.end(); i++)
+        _mainstore.FillMaps(&i.value()->Port);
     _slave.FillStore(&_mainstore);
     // read motoresurs
     if (_mtr_file.open(QIODevice::ReadOnly)) {
@@ -116,11 +116,17 @@ void Processor::Run()
     GPIO();
 #endif
     // start serial ports
-    for (QMap<QString, ExtSerialPort*>::iterator i = _serial_ports.begin(); i != _serial_ports.end(); i++) {
-        connect(i.value(), SIGNAL(DecodeSignal(QString)), this, SLOT(Unpack(QString)));
+    for (QMap<QString, ThrSerialPort*>::iterator i = _serial_ports.begin(); i != _serial_ports.end(); i++) {
+        ExtSerialPort *port = &i.value()->Port;
+        QThread *thread = &i.value()->Thread;
+        connect(port, SIGNAL(DecodeSignal(QString)), this, SLOT(Unpack(QString)));
 //        connect(i.value(), SIGNAL(LostExchangeSignal(QString)), this, SLOT(LostConnection(QString)));
 //        connect(i.value(), SIGNAL(RestoreExchangeSignal(QString)), this, SLOT(RestoreConnection(QString)));
-        i.value()->Start();
+         port->moveToThread(thread);
+         connect(thread, SIGNAL(started()), port, SLOT(Process()));  //Переназначения метода run
+//         connect(port, SIGNAL(FinishedSignal()), thread, SLOT(quit()));//Переназначение метода выход
+         port->Start();
+         thread->start();
     }
     // start registration
     _registrator->moveToThread(_reg_thread);
@@ -200,17 +206,23 @@ void Processor::querySaveToUSB() {
 void Processor::Stop() {
     char data[12];
     UnionUInt32 par;
-    int i;
+    int j;
+    for (QMap<QString, ThrSerialPort*>::iterator i = _serial_ports.begin(); i != _serial_ports.end(); i++) {
+        ExtSerialPort *port = &i.value()->Port;
+        QThread *thread = &i.value()->Thread;
+//        port->Disconnect();
+        thread->quit();
+    }
     if (_mtr_file.open(QIODevice::WriteOnly)) {
         par.Value = _mainstore.UInt32("DIAG_Motoresurs");
-        for (i = 0; i < 4; i++)
-            data[i] = par.Array[i];
+        for (j = 0; j < 4; j++)
+            data[j] = par.Array[j];
         par.Value = _mainstore.UInt32("DIAG_Adiz");
-        for (i = 0; i < 4; i++)
-            data[i + 4] = par.Array[i];
+        for (j = 0; j < 4; j++)
+            data[j + 4] = par.Array[j];
         par.Value = _mainstore.UInt32("DIAG_Tt");
-        for (i = 0; i < 4; i++)
-            data[i + 8] = par.Array[i];
+        for (j = 0; j < 4; j++)
+            data[j + 8] = par.Array[j];
         _mtr_file.write(data, 12);
         _mtr_file.close();
     }
@@ -223,13 +235,13 @@ void Processor::RegTimerStep() {
     int i; //, j;
     // for main circle
     if (_serial_ports.contains("BEL"))
-        _mainstore.SetByte("DIAG_CQ_BEL", _serial_ports["BEL"]->Quality());
+        _mainstore.SetByte("DIAG_CQ_BEL", _serial_ports["BEL"]->Port.Quality());
     if (_serial_ports.contains("USTA"))
-        _mainstore.SetByte("DIAG_CQ_USTA", _serial_ports["USTA"]->Quality());
+        _mainstore.SetByte("DIAG_CQ_USTA", _serial_ports["USTA"]->Port.Quality());
     if (_serial_ports.contains("IT"))
-        _mainstore.SetByte("DIAG_CQ_IT", _serial_ports["IT"]->Quality());
+        _mainstore.SetByte("DIAG_CQ_IT", _serial_ports["IT"]->Port.Quality());
     if (_serial_ports.contains("MSS"))
-        _mainstore.SetByte("DIAG_CQ_MSS", _serial_ports["MSS"]->Quality());
+        _mainstore.SetByte("DIAG_CQ_MSS", _serial_ports["MSS"]->Port.Quality());
     //
     QDateTime dt = QDateTime::currentDateTime();
     // word diagnostic
@@ -485,9 +497,9 @@ void Processor::playSoundOnShowBanner() {
 }
 //--------------------------------------------------------------------------------
 void Processor::Unpack(QString alias) {
-    QByteArray data = _serial_ports[alias]->InData.Data();
-    _serial_ports[alias]->InData.Swap();
-    _mainstore.LoadSpData(_serial_ports[alias]);
+    QByteArray data = _serial_ports[alias]->Port.InData.Data();
+    _serial_ports[alias]->Port.InData.Swap();
+    _mainstore.LoadSpData(&_serial_ports[alias]->Port);
     // update record registration
     if (alias == "USTA") {
         if (data.size() >= 87) {
@@ -497,7 +509,7 @@ void Processor::Unpack(QString alias) {
                 _storage[_section]->SetFloat("USTA_Pf_ftot", _storage[_section]->Float("USTA_Pf_ftot") * 0.375);
             }
             // save data
-            _registrator->UpdateRecord(0, 80, /*data*/_serial_ports[alias]->InData.Data().mid(0, 80));  // аналоговые
+            _registrator->UpdateRecord(0, 80, /*data*/_serial_ports[alias]->Port.InData.Data().mid(0, 80));  // аналоговые
             _registrator->UpdateRecord(332, 6, data.mid(80, 6)); // дискретные
             // diagnostic
             _mainstore.SetInt16("DIAG_Pg", _mainstore.Float("USTA_Ug_filtr") * _mainstore.Float("USTA_Ig_filtr") * 0.001); // считаем мощность генератора
@@ -508,7 +520,7 @@ void Processor::Unpack(QString alias) {
     else if (alias == "IT") {
         if (data.size() >= 38) {
             _diagnostics->IncrementITPacks();
-            int index = data[_serial_ports[alias]->InData.Index];
+            int index = data[_serial_ports[alias]->Port.InData.Index];
             if (index < 3) {// принимаются долько три пакета из четырех
                 _registrator->UpdateRecord(80 + index * 32, 32, data.mid(5, 32));
                 _control->CalculateTC();
@@ -650,13 +662,14 @@ void Processor::ParseDiagnostic(NodeXML *node)
 //--------------------------------------------------------------------------------
 void Processor::ParseSerialPorts(NodeXML *node)
 {
+    int num = 0;
     while (node != nullptr) {
         if (node->Name == "spstream") {   // serial port stream
-            ExtSerialPort *newPort = new ExtSerialPort;
-            newPort->Parse(node);
-            _serial_ports[newPort->Alias] = newPort; //SerialPorts.append(newPort);
+            _tsp_ports[num].Port.Parse(node);
+            _serial_ports[_tsp_ports[num].Port.Alias] = &_tsp_ports[num]; //SerialPorts.append(newPort);
         }
         node = node->Next;
+        num++;
     }
 }
 //--------------------------------------------------------------------------------

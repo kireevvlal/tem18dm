@@ -54,6 +54,7 @@ class Processor : public QObject
 {
     Q_OBJECT
 private:
+    ThrSerialPort _tsp_ports[4];
     LcmSettings _settings;
     int _virtual_section; // переключение номера секции (0, 1) в циклах диагностики
     QMap<int, TrBanner> _tr_banner_queue; // очередь на вывод в баннер
@@ -63,7 +64,7 @@ private:
     QMap<int, TrMess*> _tr_messages;
     QStringList _tr_strings;
     DataStore* _storage[2];
-    QMap<QString, ExtSerialPort*> _serial_ports;
+    QMap<QString, ThrSerialPort*> _serial_ports;
     DataStore _mainstore;
     SlaveLcm _slave; // additional section
     bool _is_active;

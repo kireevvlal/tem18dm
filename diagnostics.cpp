@@ -184,62 +184,63 @@ void Diagnostics::Motoresurs() {
     }
 }
 //--------------------------------------------------------------------------------
-void Diagnostics::Connections(QMap<QString, ExtSerialPort*> serialPorts, Registrator* reg, SlaveLcm* slave) {
-    for (QMap<QString, ExtSerialPort*>::iterator i = serialPorts.begin(); i != serialPorts.end(); i++) {
+void Diagnostics::Connections(QMap<QString, ThrSerialPort*> serialPorts, Registrator* reg, SlaveLcm* slave) {
+    for (QMap<QString, ThrSerialPort*>::iterator i = serialPorts.begin(); i != serialPorts.end(); i++) {
+        ExtSerialPort* port = &i.value()->Port;
         // ports state and errors counters
         if (i.key() == "BEL") {
-            if (i.value()->isOpen())
+            if (port->isOpen())
                 _storage->SetBit("DIAG_Portstates", CONN_BEL, 1);
             else _storage->SetBit("DIAG_Portstates", CONN_BEL, 0);
-            _sp_error_counters[0] = i.value()->ErrorsCount();
-            _sp_thread_running.setBit(0, i.value()->ThreadRunning());
-            _sp_is_bytes.setBit(0, i.value()->IsBytes());
+            _sp_error_counters[0] = port->ErrorsCount();
+//            _sp_thread_running.setBit(0, i.value().ThreadRunning());
+            _sp_is_bytes.setBit(0, port->IsBytes());
         } else
             if (i.key() == "USTA") {
-                if (i.value()->isOpen())
+                if (port->isOpen())
                     _storage->SetBit("DIAG_Portstates", CONN_USTA, 1);
                 else _storage->SetBit("DIAG_Portstates", CONN_USTA, 0);
-                _sp_error_counters[1] = i.value()->ErrorsCount();
-                _sp_thread_running.setBit(1, i.value()->ThreadRunning());
-                _sp_is_bytes.setBit(1, i.value()->IsBytes());
+                _sp_error_counters[1] = port->ErrorsCount();
+//                _sp_thread_running.setBit(1, i.value()->ThreadRunning());
+                _sp_is_bytes.setBit(1, port->IsBytes());
             } else
                 if (i.key() == "IT") {
-                    if (i.value()->isOpen())
+                    if (port->isOpen())
                         _storage->SetBit("DIAG_Portstates", CONN_IT, 1);
                     else _storage->SetBit("DIAG_Portstates", CONN_IT, 0);
-                    _sp_error_counters[2] = i.value()->ErrorsCount();
-                    _sp_thread_running.setBit(2, i.value()->ThreadRunning());
-                    _sp_is_bytes.setBit(2, i.value()->IsBytes());
+                    _sp_error_counters[2] = port->ErrorsCount();
+//                    _sp_thread_running.setBit(2, i.value()->ThreadRunning());
+                    _sp_is_bytes.setBit(2, port->IsBytes());
                 } else
                     if (i.key() == "MSS") {
-                        if (i.value()->isOpen())
+                        if (port->isOpen())
                             _storage->SetBit("DIAG_Portstates", CONN_MSS, 1);
                         else _storage->SetBit("DIAG_Portstates", CONN_MSS, 0);
-                        _sp_error_counters[3] = i.value()->ErrorsCount();
-                        _sp_thread_running.setBit(3, i.value()->ThreadRunning());
-                        _sp_is_bytes.setBit(3, i.value()->IsBytes());
+                        _sp_error_counters[3] = port->ErrorsCount();
+//                        _sp_thread_running.setBit(3, i.value()->ThreadRunning());
+                        _sp_is_bytes.setBit(3, port->IsBytes());
                     }
         // connections state
         if (i.key() == "BEL") {
-            i.value()->OutData.SetByteParameter("BEL_SIGNALIZATION",
+            port->OutData.SetByteParameter("BEL_SIGNALIZATION",
                  ((_storage->Float("IT_TSM4") >= 40) ? 1 : 0) + (_storage->Bit("USTA_Inputs", USTA_INPUTS_PKM18) ? 2 : 0));
             if (_storage->Bit("DIAG_Connections", CONN_BEL)) {
-                if (!i.value()->IsExchange())
-                    OnLostBel(i.value(), reg, slave);
+                if (!port->IsExchange())
+                    OnLostBel(port, reg, slave);
             } else {
-                if (i.value()->IsExchange()) {
+                if (port->IsExchange()) {
                     _storage->SetBit("DIAG_Connections", CONN_BEL, 1);
 //                    qDebug() << "Restore BEL";
                 }
             }
         }
         else if (i.key() == "USTA") {
-            i.value()->OutData.SetByteParameter("USTA_SIGNALIZATION", (_storage->Bit("PROG_TrSoob", 17) ? 1 : 0) + (_storage->Bit("PROG_TrSoob", 16) ? 2 : 0));
+            port->OutData.SetByteParameter("USTA_SIGNALIZATION", (_storage->Bit("PROG_TrSoob", 17) ? 1 : 0) + (_storage->Bit("PROG_TrSoob", 16) ? 2 : 0));
             if (_storage->Bit("DIAG_Connections", CONN_USTA)) {
-                if (!i.value()->IsExchange())
-                    OnLostUsta(i.value(), reg, slave);
+                if (!port->IsExchange())
+                    OnLostUsta(port, reg, slave);
             } else {
-                if (i.value()->IsExchange()) {
+                if (port->IsExchange()) {
                     _storage->SetBit("DIAG_Connections", CONN_USTA, 1);
 //                    qDebug() << "Restore USTA";
                 }
@@ -247,10 +248,10 @@ void Diagnostics::Connections(QMap<QString, ExtSerialPort*> serialPorts, Registr
         }
         else if (i.key() == "IT") {
             if (_storage->Bit("DIAG_Connections", CONN_IT)) {
-                if (!i.value()->IsExchange())
-                    OnLostIt(i.value(), reg, slave);
+                if (!port->IsExchange())
+                    OnLostIt(port, reg, slave);
             } else {
-                if (i.value()->IsExchange()) {
+                if (port->IsExchange()) {
                     if (_it_packs >= 4) // должно прийти 4 пакета
                         _storage->SetBit("DIAG_Connections", CONN_IT, 1);
 //                    qDebug() << "Restore IT";
@@ -258,15 +259,15 @@ void Diagnostics::Connections(QMap<QString, ExtSerialPort*> serialPorts, Registr
             }
         }
         else if  (i.key() == "MSS") {
-            i.value()->OutData.SetData(0, 580, slave->Outdata());
+            port->OutData.SetData(0, 580, slave->Outdata());
             if (_storage->Bit("DIAG_Connections", CONN_MSS)) {
-                if (!i.value()->IsExchange()) {
-                    _storage->ClearSpData(i.value());
+                if (!port->IsExchange()) {
+                    _storage->ClearSpData(port);
                     _storage->SetBit("DIAG_Connections", CONN_MSS, 0);
 //                    qDebug() << "Lost MSS";
                 }
             } else {
-                if (i.value()->IsExchange()) {
+                if (port->IsExchange()) {
                     _storage->SetBit("DIAG_Connections", CONN_MSS, 1);
 //                    qDebug() << "Restore MSS";
                 }

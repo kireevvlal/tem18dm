@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QMap>
 #include <QBitArray>
+#include "extserialport.h"
 
 // Тип дисплейногот модуля (по необходимости)
 #define BI_05_04
@@ -46,5 +47,11 @@ struct LcmSettings {
 
     LcmSettings() { Number = "0000"; PressureSensors = 16; ElInjection = false; }
 };
+
+struct ThrSerialPort {
+    ExtSerialPort Port;
+    QThread Thread;
+};
+
 
 #endif // TEM18DM_H
