@@ -13,7 +13,11 @@ public:
     QByteArray Outdata() { return _outdata; }
     DataStore* Storage() { return &_storage; }
     void FillStore(DataStore*);
+<<<<<<< HEAD
     void GetPacket(QByteArray, QMap<QString, ThrSerialPort*>);
+=======
+    void GetPacket(QByteArray, QMap<QString, ExtSerialPort*>);
+>>>>>>> bi0504ext
     void GetSpData(ExtSerialPort*, QByteArray, int);
     bool UpdatePacket(uint, uint, QByteArray);
     bool SetBytePacket(uint, quint8);

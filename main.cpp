@@ -113,8 +113,9 @@ int main(int argc, char *argv[])
 #endif
 
     QFont fon("Arial");
-
+#ifndef Q_OS_WIN
     app.setOverrideCursor(QCursor(Qt::BlankCursor));
+#endif
     app.setFont(fon);
     try {
         ret = app.exec();
