@@ -10,7 +10,7 @@ Window {
     color: "black"
     property string lcm_number: "0001"
     property string exitstr: ""
-    flags: Qt.FramelessWindowHint | Qt.Window
+//    flags: Qt.FramelessWindowHint | Qt.Window
     title: qsTr("TEM18DM Bi05-04 640x480")
 
     property int cnt: 0;
@@ -1092,6 +1092,12 @@ Window {
             z: 77 //32
     }
 
+    Kdr_Develop {
+        id: kdr_Develop
+        x: 128
+        y: 219
+        z: 255
+    }
 
       //****************************************************************************
       //***  организация меню  *****************************************************
@@ -1441,6 +1447,7 @@ Window {
             kdr_BEL_Analog.opacity = 0;
 
             kdr_Main_small.opacity = 0;
+            kdr_Develop.opacity = 0;
 
     }
 

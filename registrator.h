@@ -13,7 +13,6 @@ class Registrator : public QObject
     Q_OBJECT
 private:
     LcmSettings *_settings;
-    bool _os;            // 0 - win, 1 - linux
     QString _path;      // каталог для записи файлов
     QString _extention; // расширение файла результатов
     QString _alias;     // алиас локомотива для имени файла
@@ -23,16 +22,19 @@ private:
     QFile _file;
     RegistrationType _reg_type;
     int _counter;
-    int _record_size;
+    int _record_size;   // длина записи
+    int _position;      // позиция в буфере при записи секторами
+    int _sector_size;   // физический размер сектора
     QByteArray _banks[2];
     int _bank;
     void Prepare();
+    void CloseFile();
 public:
     //int RecordSize() { return _record_size; }
     explicit Registrator(LcmSettings*, QObject *parent = nullptr);
     void Stop();
     int Interval() { return _interval; }
-    void SetParameters( QString,  QString,  QString, RegistrationType, int, int, int);
+    void SetParameters( QString,  QString,  QString, RegistrationType, int, int, int, int);
     //void Parse(NodeXML*);           // разбор ветви дерава XML с параметрами объекта
     bool UpdateRecord(uint, uint, QByteArray);
     bool SetByteRecord(uint, quint8);

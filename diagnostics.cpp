@@ -9,10 +9,12 @@ Diagnostics::Diagnostics(DataStore* storage, LcmSettings *settings)
 {
     _storage = storage;
     _settings = settings;
-    _ports_state = 0;
+//    _ports_state = 0;
     _date_time = QDateTime::currentDateTime();
     _msec = _date_time.toMSecsSinceEpoch();
     _it_packs = 0;
+    _sp_thread_running.resize(4);
+    _sp_is_bytes.resize(4);
 }
 //--------------------------------------------------------------------------------
 void Diagnostics::IncrementITPacks() {
@@ -184,26 +186,38 @@ void Diagnostics::Motoresurs() {
 //--------------------------------------------------------------------------------
 void Diagnostics::Connections(QMap<QString, ThreadSerialPort*> serialPorts, Registrator* reg, SlaveLcm* slave) {
     for (QMap<QString, ThreadSerialPort*>::iterator i = serialPorts.begin(); i != serialPorts.end(); i++) {
-        // ports state
+        // ports state and errors counters
         if (i.key() == "BEL") {
             if (i.value()->isOpen())
-                _ports_state |= 1;
-            else _ports_state &= nobit0;
+                _storage->SetBit("DIAG_Portstates", CONN_BEL, 1);
+            else _storage->SetBit("DIAG_Portstates", CONN_BEL, 0);
+            _sp_error_counters[0] = i.value()->ErrorsCount();
+            _sp_thread_running.setBit(0, i.value()->ThreadRunning());
+            _sp_is_bytes.setBit(0, i.value()->IsBytes());
         } else
             if (i.key() == "USTA") {
                 if (i.value()->isOpen())
-                    _ports_state |= 2;
-                else _ports_state &= nobit1;
+                    _storage->SetBit("DIAG_Portstates", CONN_USTA, 1);
+                else _storage->SetBit("DIAG_Portstates", CONN_USTA, 0);
+                _sp_error_counters[1] = i.value()->ErrorsCount();
+                _sp_thread_running.setBit(1, i.value()->ThreadRunning());
+                _sp_is_bytes.setBit(1, i.value()->IsBytes());
             } else
                 if (i.key() == "IT") {
                     if (i.value()->isOpen())
-                        _ports_state |= 4;
-                    else _ports_state &= nobit2;
+                        _storage->SetBit("DIAG_Portstates", CONN_IT, 1);
+                    else _storage->SetBit("DIAG_Portstates", CONN_IT, 0);
+                    _sp_error_counters[2] = i.value()->ErrorsCount();
+                    _sp_thread_running.setBit(2, i.value()->ThreadRunning());
+                    _sp_is_bytes.setBit(2, i.value()->IsBytes());
                 } else
                     if (i.key() == "MSS") {
                         if (i.value()->isOpen())
-                            _ports_state |= 8;
-                        else _ports_state &= nobit3;
+                            _storage->SetBit("DIAG_Portstates", CONN_MSS, 1);
+                        else _storage->SetBit("DIAG_Portstates", CONN_MSS, 0);
+                        _sp_error_counters[3] = i.value()->ErrorsCount();
+                        _sp_thread_running.setBit(3, i.value()->ThreadRunning());
+                        _sp_is_bytes.setBit(3, i.value()->IsBytes());
                     }
         // connections state
         if (i.key() == "BEL") {
@@ -257,7 +271,7 @@ void Diagnostics::Connections(QMap<QString, ThreadSerialPort*> serialPorts, Regi
 //                    qDebug() << "Restore MSS";
                 }
             }
-        }
+        }       
     }
 }
 //--------------------------------------------------------------------------------

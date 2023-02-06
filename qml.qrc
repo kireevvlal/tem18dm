@@ -100,5 +100,6 @@
         <file>Locomotive.ico</file>
         <file>Pictogram/0_dn.png</file>
         <file>Pictogram/0_up.png</file>
+        <file>qml/Kdr_Develop.qml</file>
     </qresource>
 </RCC>

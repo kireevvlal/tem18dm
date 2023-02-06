@@ -126,12 +126,6 @@ Rectangle {
             main_window.current_system = 3;
             break;
 
-            // ***
-        case Qt.Key_Escape :
-            // выходим из программы
-            ioBf.close();
-            break;
-
         case Qt.Key_F:
 //            main_window.current_system = 7;
             saveToUSB();
@@ -148,6 +142,9 @@ Rectangle {
             break;
         case Qt.Key_Backspace:
             kdr_Privet.opacity = 1;
+            break;
+        case Qt.Key_G:
+            kdr_Develop.opacity = 1;
             break;
         }
     }

@@ -119,9 +119,6 @@ Rectangle {
         case Qt.Key_Backspace:
             kdr_Privet.opacity = 1;
             break;
-        // ***
-        //        case Qt.Key_Escape :{ ioBf.close(); break};
-
         }
     }
 

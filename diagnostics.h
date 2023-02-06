@@ -18,12 +18,15 @@ struct StructRizCU {
 class Diagnostics
 {
 private:
+    QBitArray _sp_thread_running;
+    QBitArray _sp_is_bytes;
+    int _sp_error_counters[4] = {0, 0, 0, 0 };
     int _it_packs; // счетчик пакетов от ТИ (связь с ТИ считается установленной помсле прихода четырех пакетов)
     LcmSettings *_settings;
     QDateTime _date_time;
     StructRizCU _riz_cu;
     DataStore* _storage;
-    qint8 _ports_state;  // состояние портов. побитно: 1- открыт, 0 - что-то не так
+//    qint8 _ports_state;  // состояние портов. побитно: 1- открыт, 0 - что-то не так
     qint64 _msec; // системное время в миллисекундах
     float _a_diz; // полезная работа дизеля
     void OnLostBel(ThreadSerialPort*, Registrator* reg, SlaveLcm* slave);
@@ -31,11 +34,14 @@ private:
     void OnLostIt(ThreadSerialPort*, Registrator* reg, SlaveLcm* slave);
 //    void OnLostMss(ThreadSerialPort*);
 public:
+    QBitArray* SpThreadRunning() { return &_sp_thread_running; }
+    QBitArray* SpIsBytes() { return &_sp_is_bytes; }
+    int SpErrorsCounter(int index) { return _sp_error_counters[index]; }
     void IncrementITPacks();
     void RefreshDT();
     QTime Time() { return _date_time.time(); }
     QDate Date() { return _date_time.date(); }
-    qint8 PortsState() { return _ports_state; }
+//    qint8 PortsState() { return _ports_state; }
     float Adiz() { return _a_diz; }
     void Adiz(float value) { _a_diz = value; }
     Diagnostics(DataStore*, LcmSettings*);

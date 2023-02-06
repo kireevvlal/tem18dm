@@ -41,6 +41,7 @@ DISTFILES += \
     qml/Kdr_Analog.qml \
     qml/Kdr_AvProgrev.qml \
     qml/Kdr_Bos.qml \
+    qml/Kdr_Develop.qml \
     qml/Kdr_Dizl.qml \
     qml/Kdr_Dskrt.qml \
     qml/Kdr_Foot.qml \

@@ -150,8 +150,8 @@ void Processor::Run()
     }
     if (_tr_strings.count() >= 300)
         _tr_strings.removeFirst();
-    _tr_strings.append(_diagnostics->Date().toString("yy/MM/dd") + " " + _diagnostics->Time().toString("hh:mm:ss") + " Начало работы");
-    SaveMessagesList();
+    _tr_strings.append(_diagnostics->Date().toString("dd/MM/yy") + " " + _diagnostics->Time().toString("hh:mm:ss") + " Начало работы");
+//    SaveMessagesList();
 
     _is_active = true;
 
@@ -214,6 +214,7 @@ void Processor::Stop() {
         _mtr_file.write(data, 12);
         _mtr_file.close();
     }
+    SaveMessagesList();
     _registrator->Stop();
     _is_active = false;
 }
@@ -242,7 +243,7 @@ void Processor::RegTimerStep() {
     _registrator->SetWordRecord(198, _mainstore.Int16("DIAG_Pg"));
     // double word diagnostic
     _registrator->SetDoubleWordRecord(206, _mainstore.UInt32("DIAG_Motoresurs"));
-    _registrator->SetDoubleWordRecord(210, _mainstore.UInt32("DIAG_Apol"));
+    _registrator->SetDoubleWordRecord(210, _mainstore.UInt32("DIAG_Adiz"));
     _registrator->SetDoubleWordRecord(214, _mainstore.UInt32("DIAG_Tt"));
     // message params
     if (_tr_reg_queue.empty()) { // not tr soob
@@ -317,10 +318,10 @@ void Processor::DiagTimerStep() {
                     _tr_states[_virtual_section][it.key()]->status.setBit(1);
                     if (_tr_strings.count() >= 300)
                         _tr_strings.removeFirst();
-                    _tr_strings.append(_diagnostics->Date().toString("yy/MM/dd") + " " + _diagnostics->Time().toString("hh:mm:ss") + " " +
+                    _tr_strings.append(_diagnostics->Date().toString("dd/MM/yy") + " " + _diagnostics->Time().toString("hh:mm:ss") + " " +
                                        FormMessage(_virtual_section, it.value()->system) + " " + it.value()->text);
                     // save tr messages list to file
-                    SaveMessagesList();
+//                    SaveMessagesList();
                 }
                 // banner output
                 if (!_tr_states[_virtual_section][it.key()]->status.testBit(2)) { // init
@@ -663,7 +664,7 @@ void Processor::ParseRegistration(NodeXML* node) {
     int i;
     QString path, alias, extention, drive;
     RegistrationType regtype = RegistrationType::Record;
-    int quantity = 0, recordsize = 0, interval = 0, save_interval = 0;;
+    int quantity = 0, recordsize = 0, interval = 0, save_interval = 0, sector_size = 0;
     if (node->Child != nullptr) {
         node = node->Child;
         while (node != nullptr) {
@@ -676,7 +677,10 @@ void Processor::ParseRegistration(NodeXML* node) {
                     if (attr->Name == "ext")
                         extention = attr->Value.toLower();
                     if (attr->Name == "type")
-                        regtype = (attr->Value.toLower() == "bulk") ? RegistrationType::Bulk : ((attr->Value.toLower() == "archive") ? RegistrationType::Archive : RegistrationType::Record);
+                        regtype = (attr->Value.toLower() == "bulk") ? RegistrationType::Bulk : ((attr->Value.toLower() == "archive") ? RegistrationType::Archive :
+                                  ((attr->Value.toLower() == "sector") ? RegistrationType::Sector : RegistrationType::Record));
+                    if (attr->Name == "sector")
+                        sector_size = attr->Value.toInt();
                 }
             }
             else if (node->Name == "records") {
@@ -700,7 +704,7 @@ void Processor::ParseRegistration(NodeXML* node) {
             node = node->Next;
         }
     }
-    _registrator->SetParameters(path, alias, extention, regtype, quantity, recordsize, interval);
+    _registrator->SetParameters(path, alias, extention, regtype, quantity, recordsize, interval, sector_size);
     _saver->SetParameters(drive, path, save_interval);
 }
 //------------------------------------------------------------------------------
@@ -836,7 +840,9 @@ QJsonArray Processor::getParamKdrSvz()
     return { _storage[_section]->Float("USTA_Ubs_filtr"),
              QJsonArray  { _storage[_section]->Bit("DIAG_Connections", CONN_BEL), _storage[_section]->Bit("DIAG_Connections", CONN_USTA),
                         _storage[_section]->Bit("DIAG_Connections", CONN_IT),_storage[_section]->Bit("DIAG_Connections", CONN_MSS), false },
-                _diagnostics->PortsState(), _storage[_section]->Byte("DIAG_CQ_MSS"),
+        QJsonArray  { _storage[_section]->Bit("DIAG_Portstates", CONN_BEL), _storage[_section]->Bit("DIAG_Portstates", CONN_USTA),
+                   _storage[_section]->Bit("DIAG_Portstates", CONN_IT),_storage[_section]->Bit("DIAG_Portstates", CONN_MSS), false },
+                _storage[_section]->Byte("DIAG_CQ_MSS"),
                 0, 0, _storage[_section]->Byte("DIAG_CQ_IT"), _storage[_section]->Byte("DIAG_CQ_USTA"), _storage[_section]->Byte("DIAG_CQ_BEL") };
 }
 //------------------------------------------------------------------------------
@@ -984,9 +990,7 @@ QJsonArray Processor::getParamMainWindow() {
     };
 }
 //------------------------------------------------------------------------------
-QJsonArray Processor::RejPrT()
-
-{
+QJsonArray Processor::RejPrT() {
     QJsonArray arr;
     int t;
     QString  vzbl_msg, vzbl_tm ;
@@ -1162,4 +1166,27 @@ QStringList Processor::getKdrPrivet() {
     list.append(QString::number(_settings.PressureSensors));
     list.append((_settings.ElInjection) ? "El vp" : "no Elvp");
     return list;
+}
+//------------------------------------------------------------------------------
+QJsonArray Processor::getKdrDevelop() {
+//      _storage[2]->SetBit("123", 2, true);
+
+    QJsonArray vars;
+    QStringList errors = _mainstore.Errors();
+    for (int i = 0; i < errors.length(); i++)
+        vars.append(errors[i]);
+    return {
+        QJsonArray  { _mainstore.Bit("DIAG_Portstates", CONN_BEL), _mainstore.Bit("DIAG_Portstates", CONN_USTA),
+                    _mainstore.Bit("DIAG_Portstates", CONN_IT),_mainstore.Bit("DIAG_Portstates", CONN_MSS) },
+        QJsonArray { _mainstore.Bit("DIAG_Connections", CONN_BEL), _mainstore.Bit("DIAG_Connections", CONN_USTA),
+                    _mainstore.Bit("DIAG_Connections", CONN_IT), _mainstore.Bit("DIAG_Connections", CONN_MSS) },
+        vars,
+        QJsonArray { _storage[_section]->Byte("DIAG_CQ_BEL"), _storage[_section]->Byte("DIAG_CQ_USTA"),
+                    _storage[_section]->Byte("DIAG_CQ_IT"), _storage[_section]->Byte("DIAG_CQ_MSS")},
+        QJsonArray { _diagnostics->SpErrorsCounter(0), _diagnostics->SpErrorsCounter(1), _diagnostics->SpErrorsCounter(2), _diagnostics->SpErrorsCounter(3) },
+        QJsonArray { _diagnostics->SpThreadRunning()->testBit(0), _diagnostics->SpThreadRunning()->testBit(1), _diagnostics->SpThreadRunning()->testBit(2),
+                    _diagnostics->SpThreadRunning()->testBit(3) },
+        QJsonArray { _diagnostics->SpIsBytes()->testBit(0), _diagnostics->SpIsBytes()->testBit(1), _diagnostics->SpIsBytes()->testBit(2),
+                    _diagnostics->SpIsBytes()->testBit(3) }
+    };
 }

@@ -143,6 +143,7 @@ public slots:
     QJsonArray getAnalogArray(int);
     QStringList getKdrTrL();
     QStringList getKdrPrivet();
+    QJsonArray getKdrDevelop();
 
     // Old:
 //    int getReversor();     // реверс

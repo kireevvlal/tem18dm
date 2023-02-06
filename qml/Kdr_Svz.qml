@@ -14,10 +14,10 @@ Rectangle {
 
             ind_Ubs.value = Math.round(params[0] * 10) / 10;
             led_c1.visible = false; //(params[2] & 16); // АСК
-            led_c2.visible = (params[2] & 1); // БЭЛ
-            led_c4.visible = (params[2] & 4); // ТИ
-            led_c5.visible = (params[2] & 2); // УСТА
-            led_c6.visible = (params[2] & 8); // МСС
+            led_c2.visible = params[2][0]; // БЭЛ
+            led_c4.visible = params[2][1]; // ТИ
+            led_c5.visible = params[2][2]; // УСТА
+            led_c6.visible = params[2][3]; // МСС
             led_ASK.visible = false; //params[2] & 16;
             led_BSO.visible = false; //params[2] & 32;
             led_Tii.visible = !params[1][2];
