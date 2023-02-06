@@ -184,8 +184,8 @@ void Diagnostics::Motoresurs() {
     }
 }
 //--------------------------------------------------------------------------------
-void Diagnostics::Connections(QMap<QString, ThreadSerialPort*> serialPorts, Registrator* reg, SlaveLcm* slave) {
-    for (QMap<QString, ThreadSerialPort*>::iterator i = serialPorts.begin(); i != serialPorts.end(); i++) {
+void Diagnostics::Connections(QMap<QString, ExtSerialPort*> serialPorts, Registrator* reg, SlaveLcm* slave) {
+    for (QMap<QString, ExtSerialPort*>::iterator i = serialPorts.begin(); i != serialPorts.end(); i++) {
         // ports state and errors counters
         if (i.key() == "BEL") {
             if (i.value()->isOpen())
@@ -275,7 +275,7 @@ void Diagnostics::Connections(QMap<QString, ThreadSerialPort*> serialPorts, Regi
     }
 }
 //--------------------------------------------------------------------------------
-void Diagnostics::OnLostBel(ThreadSerialPort* port, Registrator* reg, SlaveLcm* slave) {
+void Diagnostics::OnLostBel(ExtSerialPort* port, Registrator* reg, SlaveLcm* slave) {
     QByteArray arr(8, 0);
     _storage->ClearSpData(port);
     _storage->SetBit("DIAG_Connections", CONN_BEL, 0);
@@ -286,7 +286,7 @@ void Diagnostics::OnLostBel(ThreadSerialPort* port, Registrator* reg, SlaveLcm* 
 //    qDebug() << "Lost BEL";
 }
 //--------------------------------------------------------------------------------
-void Diagnostics::OnLostUsta(ThreadSerialPort* port, Registrator* reg, SlaveLcm* slave) {
+void Diagnostics::OnLostUsta(ExtSerialPort* port, Registrator* reg, SlaveLcm* slave) {
     QByteArray arr(80, 0);
     _storage->ClearSpData(port);
     _storage->SetBit("DIAG_Connections", CONN_USTA, 0);
@@ -298,7 +298,7 @@ void Diagnostics::OnLostUsta(ThreadSerialPort* port, Registrator* reg, SlaveLcm*
 //    qDebug() << "Lost USTA";
 }
 //--------------------------------------------------------------------------------
-void Diagnostics::OnLostIt(ThreadSerialPort* port, Registrator* reg, SlaveLcm* slave) {
+void Diagnostics::OnLostIt(ExtSerialPort* port, Registrator* reg, SlaveLcm* slave) {
     QByteArray arr(96, 0);
     _it_packs = 0;
     _storage->ClearSpData(port);

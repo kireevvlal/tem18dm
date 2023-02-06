@@ -5,7 +5,7 @@
 #include <QFileSystemWatcher>
 #include <QQueue>
 #include "zapuso.h"
-#include "threadserialport.h"
+#include "extserialport.h"
 #include "treexml.h"
 #include "datastore.h"
 #include "registrator.h"
@@ -63,7 +63,7 @@ private:
     QMap<int, TrMess*> _tr_messages;
     QStringList _tr_strings;
     DataStore* _storage[2];
-    QMap<QString, ThreadSerialPort*> _serial_ports;
+    QMap<QString, ExtSerialPort*> _serial_ports;
     DataStore _mainstore;
     SlaveLcm _slave; // additional section
     bool _is_active;

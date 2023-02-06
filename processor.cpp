@@ -70,7 +70,7 @@ bool Processor:: Load(QString startPath, QString cfgfile)
     } else
         return false;
     // fill main and additional section storage maps
-    for (QMap<QString, ThreadSerialPort*>::iterator i = _serial_ports.begin(); i != _serial_ports.end(); i++)
+    for (QMap<QString, ExtSerialPort*>::iterator i = _serial_ports.begin(); i != _serial_ports.end(); i++)
         _mainstore.FillMaps(i.value());
     _slave.FillStore(&_mainstore);
     // read motoresurs
@@ -116,7 +116,7 @@ void Processor::Run()
     GPIO();
 #endif
     // start serial ports
-    for (QMap<QString, ThreadSerialPort*>::iterator i = _serial_ports.begin(); i != _serial_ports.end(); i++) {
+    for (QMap<QString, ExtSerialPort*>::iterator i = _serial_ports.begin(); i != _serial_ports.end(); i++) {
         connect(i.value(), SIGNAL(DecodeSignal(QString)), this, SLOT(Unpack(QString)));
 //        connect(i.value(), SIGNAL(LostExchangeSignal(QString)), this, SLOT(LostConnection(QString)));
 //        connect(i.value(), SIGNAL(RestoreExchangeSignal(QString)), this, SLOT(RestoreConnection(QString)));
@@ -652,7 +652,7 @@ void Processor::ParseSerialPorts(NodeXML *node)
 {
     while (node != nullptr) {
         if (node->Name == "spstream") {   // serial port stream
-            ThreadSerialPort *newPort = new ThreadSerialPort;
+            ExtSerialPort *newPort = new ExtSerialPort;
             newPort->Parse(node);
             _serial_ports[newPort->Alias] = newPort; //SerialPorts.append(newPort);
         }
