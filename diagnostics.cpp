@@ -184,15 +184,9 @@ void Diagnostics::Motoresurs() {
     }
 }
 //--------------------------------------------------------------------------------
-<<<<<<< HEAD
-void Diagnostics::Connections(QMap<QString, ThrSerialPort*> serialPorts, Registrator* reg, SlaveLcm* slave) {
-    for (QMap<QString, ThrSerialPort*>::iterator i = serialPorts.begin(); i != serialPorts.end(); i++) {
-        ExtSerialPort* port = &i.value()->Port;
-=======
 void Diagnostics::Connections(QMap<QString, ExtSerialPort*> serialPorts, Registrator* reg, SlaveLcm* slave) {
     for (QMap<QString, ExtSerialPort*>::iterator i = serialPorts.begin(); i != serialPorts.end(); i++) {
         ExtSerialPort* port = i.value();
->>>>>>> bi0504ext
         // ports state and errors counters
         if (i.key() == "BEL") {
             if (port->isOpen())

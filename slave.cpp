@@ -31,11 +31,7 @@ void SlaveLcm::FillStore(DataStore* mainStore)
     }
 }
 //--------------------------------------------------------------------------------
-<<<<<<< HEAD
-void SlaveLcm::GetPacket(QByteArray packet, QMap<QString, ThrSerialPort*> ports)
-=======
 void SlaveLcm::GetPacket(QByteArray packet, QMap<QString, ExtSerialPort*> ports)
->>>>>>> bi0504ext
 {
 //    int i;
 //    for (i = 0; i < 8; i++)
@@ -59,25 +55,21 @@ void SlaveLcm::GetPacket(QByteArray packet, QMap<QString, ExtSerialPort*> ports)
     _storage.SetByte("PROG_Reversor", packet[288]);
     _storage.SetByte("PROG_PKM", packet[289]);
     _storage.SetByte("PROG_Regime", packet[290]);
-<<<<<<< HEAD
-    for (QMap<QString, ThrSerialPort*>::iterator i = ports.begin(); i != ports.end(); i++) {
-=======
     for (QMap<QString, ExtSerialPort*>::iterator i = ports.begin(); i != ports.end(); i++) {
->>>>>>> bi0504ext
         if (i.key() == "USTA") {
 //            QByteArray data = packet.mid(8, 86);
 //            data
-            GetSpData(&i.value()->Port, packet.mid(8, 86), 0);
+            GetSpData(i.value(), packet.mid(8, 86), 0);
         } else if (i.key() == "BEL") {
             QByteArray a;
-            GetSpData(&i.value()->Port, QByteArray("\xC") + packet.mid(0, 8), 0);
+            GetSpData(i.value(), QByteArray("\xC") + packet.mid(0, 8), 0);
         } else if (i.key() == "IT") {
             QByteArray pref(5, '\0');
-            GetSpData(&i.value()->Port, pref + packet.mid(96, 32), 0);
+            GetSpData(i.value(), pref + packet.mid(96, 32), 0);
             pref[0] = 1;
-            GetSpData(&i.value()->Port, pref + packet.mid(128, 32), 1);
+            GetSpData(i.value(), pref + packet.mid(128, 32), 1);
             pref[0] = 2;
-            GetSpData(&i.value()->Port, pref + packet.mid(160, 32), 2);
+            GetSpData(i.value(), pref + packet.mid(160, 32), 2);
         }
     }
 }

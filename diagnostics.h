@@ -46,11 +46,7 @@ public:
     void Adiz(float value) { _a_diz = value; }
     Diagnostics(DataStore*, LcmSettings*);
     void Motoresurs();
-<<<<<<< HEAD
-    void Connections(QMap<QString, ThrSerialPort*>, Registrator* reg, SlaveLcm* slave);
-=======
     void Connections(QMap<QString, ExtSerialPort*>, Registrator* reg, SlaveLcm* slave);
->>>>>>> bi0504ext
     void RizCU(int);
     void APSignalization(int);
 };
