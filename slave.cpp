@@ -31,7 +31,7 @@ void SlaveLcm::FillStore(DataStore* mainStore)
     }
 }
 //--------------------------------------------------------------------------------
-void SlaveLcm::GetPacket(QByteArray packet, QMap<QString, ThreadSerialPort*> ports)
+void SlaveLcm::GetPacket(QByteArray packet, QMap<QString, ExtSerialPort*> ports)
 {
 //    int i;
 //    for (i = 0; i < 8; i++)
@@ -55,7 +55,7 @@ void SlaveLcm::GetPacket(QByteArray packet, QMap<QString, ThreadSerialPort*> por
     _storage.SetByte("PROG_Reversor", packet[288]);
     _storage.SetByte("PROG_PKM", packet[289]);
     _storage.SetByte("PROG_Regime", packet[290]);
-    for (QMap<QString, ThreadSerialPort*>::iterator i = ports.begin(); i != ports.end(); i++) {
+    for (QMap<QString, ExtSerialPort*>::iterator i = ports.begin(); i != ports.end(); i++) {
         if (i.key() == "USTA") {
 //            QByteArray data = packet.mid(8, 86);
 //            data
@@ -74,7 +74,7 @@ void SlaveLcm::GetPacket(QByteArray packet, QMap<QString, ThreadSerialPort*> por
     }
 }
 //--------------------------------------------------------------------------------
-void SlaveLcm::GetSpData(ThreadSerialPort *port, QByteArray data, int index) {
+void SlaveLcm::GetSpData(ExtSerialPort *port, QByteArray data, int index) {
     ParameterList parameters = port->InData.Parameters();
     Parameter *current;
     int tmp;

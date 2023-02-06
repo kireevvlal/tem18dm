@@ -13,8 +13,8 @@ public:
     QByteArray Outdata() { return _outdata; }
     DataStore* Storage() { return &_storage; }
     void FillStore(DataStore*);
-    void GetPacket(QByteArray, QMap<QString, ThreadSerialPort*>);
-    void GetSpData(ThreadSerialPort*, QByteArray, int);
+    void GetPacket(QByteArray, QMap<QString, ExtSerialPort*>);
+    void GetSpData(ExtSerialPort*, QByteArray, int);
     bool UpdatePacket(uint, uint, QByteArray);
     bool SetBytePacket(uint, quint8);
     bool SetWordPacket(uint, quint16);

@@ -70,7 +70,7 @@ bool Processor:: Load(QString startPath, QString cfgfile)
     } else
         return false;
     // fill main and additional section storage maps
-    for (QMap<QString, ThreadSerialPort*>::iterator i = _serial_ports.begin(); i != _serial_ports.end(); i++)
+    for (QMap<QString, ExtSerialPort*>::iterator i = _serial_ports.begin(); i != _serial_ports.end(); i++)
         _mainstore.FillMaps(i.value());
     _slave.FillStore(&_mainstore);
     // read motoresurs
@@ -112,15 +112,20 @@ void Processor::SaveMessagesList() {
 //--------------------------------------------------------------------------------
 void Processor::Run()
 {
+    int j = 0;
 #ifdef Q_OS_UNIX
     GPIO();
 #endif
     // start serial ports
-    for (QMap<QString, ThreadSerialPort*>::iterator i = _serial_ports.begin(); i != _serial_ports.end(); i++) {
+    for (QMap<QString, ExtSerialPort*>::iterator i = _serial_ports.begin(); i != _serial_ports.end(); i++) {
         connect(i.value(), SIGNAL(DecodeSignal(QString)), this, SLOT(Unpack(QString)));
 //        connect(i.value(), SIGNAL(LostExchangeSignal(QString)), this, SLOT(LostConnection(QString)));
 //        connect(i.value(), SIGNAL(RestoreExchangeSignal(QString)), this, SLOT(RestoreConnection(QString)));
+        connect(&_sp_thread[j], SIGNAL(started()), i.value(), SLOT(Process()));
+        i.value()->moveToThread(&_sp_thread[j]);
         i.value()->Start();
+        _sp_thread[j].start();
+        j++;
     }
     // start registration
     _registrator->moveToThread(_reg_thread);
@@ -217,6 +222,8 @@ void Processor::Stop() {
     SaveMessagesList();
     _registrator->Stop();
     _is_active = false;
+    for (i = 0; i < 4; i++)
+        _sp_thread[i].quit();
 }
 //--------------------------------------------------------------------------------
 void Processor::RegTimerStep() {
@@ -652,7 +659,7 @@ void Processor::ParseSerialPorts(NodeXML *node)
 {
     while (node != nullptr) {
         if (node->Name == "spstream") {   // serial port stream
-            ThreadSerialPort *newPort = new ThreadSerialPort;
+            ExtSerialPort *newPort = new ExtSerialPort;
             newPort->Parse(node);
             _serial_ports[newPort->Alias] = newPort; //SerialPorts.append(newPort);
         }

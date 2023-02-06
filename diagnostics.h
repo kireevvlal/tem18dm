@@ -29,9 +29,9 @@ private:
 //    qint8 _ports_state;  // состояние портов. побитно: 1- открыт, 0 - что-то не так
     qint64 _msec; // системное время в миллисекундах
     float _a_diz; // полезная работа дизеля
-    void OnLostBel(ThreadSerialPort*, Registrator* reg, SlaveLcm* slave);
-    void OnLostUsta(ThreadSerialPort*, Registrator* reg, SlaveLcm* slave);
-    void OnLostIt(ThreadSerialPort*, Registrator* reg, SlaveLcm* slave);
+    void OnLostBel(ExtSerialPort*, Registrator* reg, SlaveLcm* slave);
+    void OnLostUsta(ExtSerialPort*, Registrator* reg, SlaveLcm* slave);
+    void OnLostIt(ExtSerialPort*, Registrator* reg, SlaveLcm* slave);
 //    void OnLostMss(ThreadSerialPort*);
 public:
     QBitArray* SpThreadRunning() { return &_sp_thread_running; }
@@ -46,7 +46,7 @@ public:
     void Adiz(float value) { _a_diz = value; }
     Diagnostics(DataStore*, LcmSettings*);
     void Motoresurs();
-    void Connections(QMap<QString, ThreadSerialPort*>, Registrator* reg, SlaveLcm* slave);
+    void Connections(QMap<QString, ExtSerialPort*>, Registrator* reg, SlaveLcm* slave);
     void RizCU(int);
     void APSignalization(int);
 };

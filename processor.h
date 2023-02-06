@@ -5,7 +5,7 @@
 #include <QFileSystemWatcher>
 #include <QQueue>
 #include "zapuso.h"
-#include "threadserialport.h"
+#include "extserialport.h"
 #include "treexml.h"
 #include "datastore.h"
 #include "registrator.h"
@@ -54,6 +54,7 @@ class Processor : public QObject
 {
     Q_OBJECT
 private:
+    QThread _sp_thread[4];
     LcmSettings _settings;
     int _virtual_section; // переключение номера секции (0, 1) в циклах диагностики
     QMap<int, TrBanner> _tr_banner_queue; // очередь на вывод в баннер
@@ -63,7 +64,7 @@ private:
     QMap<int, TrMess*> _tr_messages;
     QStringList _tr_strings;
     DataStore* _storage[2];
-    QMap<QString, ThreadSerialPort*> _serial_ports;
+    QMap<QString, ExtSerialPort*> _serial_ports;
     DataStore _mainstore;
     SlaveLcm _slave; // additional section
     bool _is_active;
