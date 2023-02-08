@@ -18,7 +18,7 @@ struct StructRizCU {
 class Diagnostics
 {
 private:
-    QBitArray _sp_thread_running;
+//    QBitArray _sp_thread_running;
     QBitArray _sp_is_bytes;
     int _sp_error_counters[4] = {0, 0, 0, 0 };
     int _it_packs; // счетчик пакетов от ТИ (связь с ТИ считается установленной помсле прихода четырех пакетов)
@@ -34,7 +34,7 @@ private:
     void OnLostIt(ExtSerialPort*, Registrator* reg, SlaveLcm* slave);
 //    void OnLostMss(ThreadSerialPort*);
 public:
-    QBitArray* SpThreadRunning() { return &_sp_thread_running; }
+//    QBitArray* SpThreadRunning() { return &_sp_thread_running; }
     QBitArray* SpIsBytes() { return &_sp_is_bytes; }
     int SpErrorsCounter(int index) { return _sp_error_counters[index]; }
     void IncrementITPacks();

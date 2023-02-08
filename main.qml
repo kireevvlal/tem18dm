@@ -1,5 +1,6 @@
 import QtQuick 2.7
 import QtQuick.Window 2.2
+import QtMultimedia 5.7
 import "qml"
 
 Window {
@@ -8,8 +9,10 @@ Window {
     height: 480
     visible: true
     color: "black"
+    property bool started: false
     property string lcm_number: "0001"
     property string exitstr: ""
+    property int sound_volume: 100
 //    flags: Qt.FramelessWindowHint | Qt.Window
     title: qsTr("TEM18DM Bi05-04 640x480")
 
@@ -42,6 +45,12 @@ Window {
             kdr_Main_small.opacity = 1; // главный маленький
         }
         onTriggered: {
+            if (!started) {
+                var settings = ioBf.getSettings();
+                lcm_number = qsTr("ТЭМ18ДМ  №" + settings[0])
+                sound_volume = settings[1]
+                started = true;
+            }
             var par = ioBf.getParamMainWindow();
             // frame_Left
             is_slave = par[0][3]; // связь по МСС
@@ -49,14 +58,14 @@ Window {
 
             var is_slave_usta = par[0][3] && par[0][4]; // есть связь МСС и на slave есть связь с УСТА
 
-            pr_Mtg1.value = par[1].toFixed(0); //ioBf.getParamDiap(1500);// заглушка
-            pr_Mtg2.value = par[2].toFixed(0);// ioBf.getParamDiap(1500); // заглушка
+            pr_Mtg1.value = par[1].toFixed(0);
+            pr_Mtg2.value = par[2].toFixed(0);
 
-            indUb0.text = par[3].toFixed(0); //ioBf.getParamDiap(100);// заглушка
-            indUb1.text = par[4].toFixed(0); //ioBf.getParamDiap(100);// заглушка
+            indUb0.text = par[3].toFixed(0);
+            indUb1.text = par[4].toFixed(0);
 
-            indIz0.text = par[5].toFixed(0); //ioBf.getParamDiap(60);// заглушка
-            indIz1.text = par[6].toFixed(0); //ioBf.getParamDiap(60);// заглушка
+            indIz0.text = par[5].toFixed(0);
+            indIz1.text = par[6].toFixed(0);
 
             in1OM2.visible = txt1OM2.visible = par[7][0] && par[0][1];
             in1OM1.visible = txt1OM1.visible = par[7][1] && par[0][1];
@@ -77,32 +86,31 @@ Window {
             txtUb.visible = txtV.visible = txtIz.visible = txtA.visible = par[0][1] || is_slave_usta;
 
             // frame_Top
-            pkm.pkms = par[10][0];
-            revers.value = par[10][1];
-            regim.value = par[10][2]; // режим работы тепловоза
+            pkm.pkms = par[9][0];
+            revers.value = par[9][1];
+            regim.value = par[9][2]; // режим работы тепловоза
 
-            txt_time.text = par[11][0];
-            txt_data.text = par[11][1];
-            lcm_number = qsTr("ТЭМ18ДМ  №" + par[11][2]);
+            txt_time.text = par[10][0];
+            txt_data.text = par[10][1];
 
-            txt_RejPrT.text = par[12][0];
-            txt_RejPro.text = par[12][1]; // прожиг
-            txt_RejAP.text = par[12][2]; // автопрогрев
-            txt_RejPrTime.text = par[13][0]; //ioBf.getRejPrT("value");// --- косяк с разными значениями --че делать то?
-            txt_RejPrTime.color = (par[13][1] == "2") ?  "yellow" : "gray";
-            txt_RejPrT.opacity = (par[13][2] == "1") ? 1 : 0;
+            txt_RejPrT.text = par[11][0];
+            txt_RejPro.text = par[11][1]; // прожиг
+            txt_RejAP.text = par[11][2]; // автопрогрев
+            txt_RejPrTime.text = par[12][0]; //ioBf.getRejPrT("value");// --- косяк с разными значениями --че делать то?
+            txt_RejPrTime.color = (par[12][1] == "2") ?  "yellow" : "gray";
+            txt_RejPrT.opacity = (par[12][2] == "1") ? 1 : 0;
 
             // save to USB
-            insertedUSB.visible = par[14][0];
-            recordUSB.visible = recUSBprBar.visible = par[14][1];
-            recUSBprBar.value = par[14][2];
+            insertedUSB.visible = par[13][0];
+            recordUSB.visible = recUSBprBar.visible = par[13][1];
+            recUSBprBar.value = par[13][2];
 
-            indPt.value = indPt.digitalvalue =  par[15][0];
+            indPt.value = indPt.digitalvalue =  par[14][0];
             if (indPt.digitlvalue < 0)
                 indPt.digitalvalue = 0;
 
-            var start = par[15][1];
-            var finish = par[15][2];
+            var start = par[14][1];
+            var finish = par[14][2];
 
             if (indPt.start != start) {
                 indPt.start = start;
@@ -112,11 +120,11 @@ Window {
                 indPt.finish = finish;
                 indPt.repaint = true;
             }
-            indPm.value = indPm.digitalvalue = par[15][3];
+            indPm.value = indPm.digitalvalue = par[14][3];
             if (indPm.digitalvalue < 0)
                 indPm.digitalvalue = 0;
-            start = par[15][4];
-            finish = par[15][5];
+            start = par[14][4];
+            finish = par[14][5];
 
             if (indPm.start != start) {
                 indPm.start = start;
@@ -126,11 +134,11 @@ Window {
                 indPm.finish = finish;
                 indPm.repaint = true;
             }
-            indFd.value = indFd.digitalvalue = par[15][6];
+            indFd.value = indFd.digitalvalue = par[14][6];
             if (indFd.digitalvalue < 0)
                 indFd.digitalvalue = 0;
-            start = par[15][7];
-            finish = par[15][8];
+            start = par[14][7];
+            finish = par[14][8];
 
             if (indFd.start != start) {
                 indFd.start = start;
@@ -141,16 +149,16 @@ Window {
                 indFd.repaint = true;
             }
 
-            indPt.visible = indPm.visible = indFd.visible = par[9];
+            indPt.visible = indPm.visible = indFd.visible = par[0][1];
             // Trevoga messages
-            if (par[16][0] != "") {
+            if (par[15][0] != "") {
 //                if (!kdr_Tre.opacity)
-                if (!kdr_Tre.opacity || kdr_Tre.str1 != par[16][0] || kdr_Tre.str2 != par[16][1])
-                    ioBf.playSoundOnShowBanner();
+                if (!kdr_Tre.opacity || kdr_Tre.str1 != par[15][0] || kdr_Tre.str2 != par[15][1])
+                    errorSound.play(); //ioBf.playSoundOnShowBanner();
                 kdr_Tre.opacity = 1;
                 kdr_Tre.focus = true;
-                kdr_Tre.str1 = par[16][0];
-                kdr_Tre.str2 = par[16][1];
+                kdr_Tre.str1 = par[15][0];
+                kdr_Tre.str2 = par[15][1];
             } else
             if (kdr_Tre.opacity) {
                 kdr_Tre.opacity = 0;
@@ -205,6 +213,11 @@ Window {
        }
 }
 
+    SoundEffect {
+            id: errorSound
+            source: "error.wav"
+            volume: sound_volume / 100
+        }
 // расставляем компоненты
 
     Item {
@@ -1456,4 +1469,35 @@ Window {
                 if (exitstr.substring(0, 8) == "01010101")
                     Qt.quit();
         }
+
+//        function getKey(key) {
+//            let bi0504 = new Map ([
+//                                      [Qt.Key_0, "0"],
+//                                      [Qt.Key_1, "1"],
+//                                      [Qt.Key_2, "2"],
+//                                      [Qt.Key_3, "3"],
+//                                      [Qt.Key_4, "4"],
+//                                      [Qt.Key_5, "5"],
+//                                      [Qt.Key_6, "6"],
+//                                      [Qt.Key_7, "7"],
+//                                      [Qt.Key_8, "8"],
+//                                      [Qt.Key_9, "9"],
+//                                      [Qt.Key_A, "AUS"],
+//                                      [Qt.Key_B, "S"],
+//                                      [Qt.Key_C, "I"],
+//                                      [Qt.Key_D, "St"],
+//                                      [Qt.Key_E, "V>0"],
+//                                      [Qt.Key_F, "V=0"],
+//                                      [Qt.Key_G, "CONTRAST"],
+//                                      [Qt.Key_H, "BRIGHTNESS"],
+//                                      [Qt.Key_I, "UD"],
+//                                      [Qt.Key_Backspace, "C"],
+//                                      [Qt.Key_Left, "LEFT"],
+//                                      [Qt.Key_Right, "RIGHT"],
+//                                      [Qt.Key_Up, "UP"],
+//                                      [Qt.Key_Down, "DOWN"],
+//                                      [Qt.Key_Return, "E"],
+//                                  ]);
+//            return bi0504.get(key)
+//        }
 }

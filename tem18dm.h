@@ -7,7 +7,11 @@
 
 // Тип дисплейногот модуля (по необходимости)
 #define BI_05_04
+#define TPK
 
+#ifdef Q_OS_UNIX
+#define ATRONIC_UNIX
+#endif
 // номера индексов в словарях битовых массивов
 #define CONN_BEL  0 // Наличие связи с БЭЛ
 #define CONN_USTA 1 // Наличие связи с УСТА
@@ -44,14 +48,8 @@ struct LcmSettings {
     QString Number; // номер локомотива
     int PressureSensors; // номинал двух датчиков давления
     bool ElInjection; // электронный впрыск
-
-    LcmSettings() { Number = "0000"; PressureSensors = 16; ElInjection = false; }
+    int SoundVolume; // громкость звука (%)
+    LcmSettings() { Number = "0000"; PressureSensors = 16; ElInjection = false; SoundVolume = 100; }
 };
-
-struct ThrSerialPort {
-    ExtSerialPort Port;
-    QThread Thread;
-};
-
 
 #endif // TEM18DM_H

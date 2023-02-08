@@ -1,7 +1,8 @@
 #include "processor.h"
 //#include "tem18dm.h"
+#define NO_CONNECTIONS
 
-#ifdef Q_OS_UNIX
+#ifdef ATRONIC_UNIX
 #include <string>
 #include <cstring>
 
@@ -112,8 +113,8 @@ void Processor::SaveMessagesList() {
 //--------------------------------------------------------------------------------
 void Processor::Run()
 {
-    int j = 0;
-#ifdef Q_OS_UNIX
+//    int j = 0;
+#ifdef ATRONIC_UNIX
     GPIO();
 #endif
     // start serial ports
@@ -121,11 +122,14 @@ void Processor::Run()
         connect(i.value(), SIGNAL(DecodeSignal(QString)), this, SLOT(Unpack(QString)));
 //        connect(i.value(), SIGNAL(LostExchangeSignal(QString)), this, SLOT(LostConnection(QString)));
 //        connect(i.value(), SIGNAL(RestoreExchangeSignal(QString)), this, SLOT(RestoreConnection(QString)));
-        connect(&_sp_thread[j], SIGNAL(started()), i.value(), SLOT(Process()));
-        i.value()->moveToThread(&_sp_thread[j]);
-        i.value()->Start();
-        _sp_thread[j].start();
-        j++;
+//        connect(&_sp_thread[j], SIGNAL(started()), i.value(), SLOT(Process()));
+//        if (j < NUM_SERIAL_PORTS) {
+//            i.value()->moveToThread(this->thread());//&_sp_thread[j]);
+            i.value()->Start();
+            i.value()->Process();
+//            _sp_thread[j].start();
+//        }
+//        j++;
     }
     // start registration
     _registrator->moveToThread(_reg_thread);
@@ -163,7 +167,7 @@ void Processor::Run()
 //    QSound::play("/home/user/tada.wav");
 }
 //--------------------------------------------------------------------------------
-#ifdef Q_OS_UNIX
+#ifdef ATRONIC_UNIX
 void Processor::GPIO() {
     string s = "/dev/GpioCom1Mode";
     int port_f = open(s.c_str(),O_RDWR | O_SYNC);
@@ -222,8 +226,9 @@ void Processor::Stop() {
     SaveMessagesList();
     _registrator->Stop();
     _is_active = false;
-    for (i = 0; i < 4; i++)
-        _sp_thread[i].quit();
+//    for (i = 0; i < NUM_SERIAL_PORTS; i++)
+//        if (_sp_thread->isRunning())
+//            _sp_thread[i].quit();
 }
 //--------------------------------------------------------------------------------
 void Processor::RegTimerStep() {
@@ -486,10 +491,10 @@ void Processor::kvitTrBanner() {
         _tr_banner_queue.remove(first);
     }
 }
-//--------------------------------------------------------------------------------
-void Processor::playSoundOnShowBanner() {
-    QSound::play(_start_path + "/error.wav");
-}
+////--------------------------------------------------------------------------------
+//void Processor::playSoundOnShowBanner() {
+//    QSound::play(_start_path + "/error.wav");
+//}
 //--------------------------------------------------------------------------------
 void Processor::Unpack(QString alias) {
     QByteArray data = _serial_ports[alias]->InData.Data();
@@ -558,6 +563,14 @@ void Processor::ParseCfg(NodeXML *node)
                     _settings.ElInjection = (attr->Value.toLower() == "on") ? true : false;
                 if (attr->Name == "psensor")
                     _settings.PressureSensors = attr->Value.toInt();
+                if (attr->Name == "svolume") {
+                    _settings.SoundVolume = attr->Value.toInt();
+                    if (_settings.SoundVolume > 100)
+                        _settings.SoundVolume = 100;
+                    else
+                        if (_settings.SoundVolume < 10)
+                            _settings.SoundVolume = 10;
+                }
             }
         } else
             if (node->Name == "files") {
@@ -715,6 +728,10 @@ void Processor::ParseRegistration(NodeXML* node) {
     }
     _registrator->SetParameters(path, alias, extention, regtype, quantity, recordsize, interval, sector_size);
     _saver->SetParameters(drive, path, save_interval);
+}
+//------------------------------------------------------------------------------
+QJsonArray Processor::getSettings() {
+    return { _settings.Number, _settings.SoundVolume };
 }
 //------------------------------------------------------------------------------
 // New realisation
@@ -930,12 +947,18 @@ QJsonArray Processor::getParamKdrSmlMain()
         ogrUgMax = 800;
     if (_storage[_section]->Bit("USTA_Inputs", USTA_INPUTS_KV)) // Признак КВ
         ogrIgMax = 2000;
-    return { QJsonArray  { _storage[_section]->Bit("DIAG_Connections", CONN_USTA), _storage[_section]->Bit("DIAG_Connections", CONN_IT) },
+    return {
+#ifdef NO_CONNECTIONS
+        QJsonArray  { 1, 1 },
+#else
+        QJsonArray  { _storage[_section]->Bit("DIAG_Connections", CONN_USTA), _storage[_section]->Bit("DIAG_Connections", CONN_IT) },
+#endif
         Ig, Ug, _storage[_section]->Float("IT_TSM6"), _storage[_section]->Float("IT_TSM3"),
                 ogrIgMax, ogrUgMax, _control->KdrSmlMain(_section) };
 }
 //------------------------------------------------------------------------------
 QJsonArray Processor::getParamMainWindow() {
+
     bool iKVmain_own = _storage[0]->Bit("USTA_Inputs", USTA_INPUTS_KV);
     bool iKVmain_add = _storage[1]->Bit("USTA_Inputs", USTA_INPUTS_KV);
     //bool iKVadd = _storage[1]->Bit("USTA_Inputs", USTA_INPUTS_KV);
@@ -974,8 +997,12 @@ QJsonArray Processor::getParamMainWindow() {
     }
     return {
         // frame left
+#ifdef NO_CONNECTIONS
+        QJsonArray  { 1, 1, 1, 1, 1 },
+#else
         QJsonArray { _storage[0]->Bit("DIAG_Connections", CONN_BEL), _storage[0]->Bit("DIAG_Connections", CONN_USTA), _storage[0]->Bit("DIAG_Connections", CONN_IT),
                     _storage[0]->Bit("DIAG_Connections", CONN_MSS), _storage[1]->Bit("DIAG_Connections", CONN_USTA)},
+#endif
         (_storage[0]->Bit("USTA_Inputs", USTA_INPUTS_KV)) ? _storage[0]->Float("USTA_Ug_filtr") * _storage[0]->Float("USTA_Ig_filtr") * 0.001 : 0,
         (_storage[1]->Bit("USTA_Inputs", USTA_INPUTS_KV)) ?_storage[1]->Float("USTA_Ug_filtr") * _storage[1]->Float("USTA_Ig_filtr") * 0.001 : 0,
         _storage[0]->Float("USTA_Ubs_filtr"), _storage[1]->Float("USTA_Ubs_filtr"),
@@ -985,9 +1012,9 @@ QJsonArray Processor::getParamMainWindow() {
         QJsonArray { iKVmain_add && !_storage[1]->Bit("USTA_Inputs", USTA_INPUTS_OM2), iKVmain_add && !_storage[1]->Bit("USTA_Inputs", USTA_INPUTS_OM1), _storage[1]->Bit("USTA_Outputs", USTA_OUTPUTS_BOKS), // OM1, OM2, боксование
                 _storage[1]->Bit("USTA_Inputs", USTA_INPUTS_URV), _storage[1]->Bit("USTA_Inputs", USTA_INPUTS_RZ), _storage[1]->Bit("USTA_Inputs", USTA_INPUTS_OBTM) } , // ур. воды, реле земли,обрыв ТМ
         // frame top
-        _storage[_section]->Bit("DIAG_Connections", CONN_USTA),
+//        _storage[_section]->Bit("DIAG_Connections", CONN_USTA),
         QJsonArray { pkm,  _mainstore.Byte("PROG_Reversor"), _mainstore.Byte("PROG_Regime") },
-        QJsonArray { _diagnostics->Time().toString("HH:mm:ss"), _diagnostics->Date().toString("dd/MM/yy"), _settings.Number },
+        QJsonArray { _diagnostics->Time().toString("HH:mm:ss"), _diagnostics->Date().toString("dd/MM/yy") },
         QJsonArray { "", // RejPrT
             (bt == 0x00) ? "" : ((bt == 0x10) ? "Прожиг коллектора": "Завершение прожига"), // RejPro
             (dsk_iAPvkl1 == 00) ? "" : ((dsk_iSA1 == 01) ? "Режим АвтоПрогрева" : ((dsk_iKMv0 == 00) ? "АП: Установи ПКМ в 0" : ((dsk_iDizZ == 00) ? "АП: Запусти дизель" : ""))), },
@@ -995,7 +1022,11 @@ QJsonArray Processor::getParamMainWindow() {
         QJsonArray { _saver->MediaInserted(), _saver->Recording(),  _saver->PercentRecorded() }, // load usb indicator
         QJsonArray { _storage[_section]->Float("USTA_Pf_tnvd") * 0.1, pt_min * 0.01, pt_max * 0.01,
                     _storage[_section]->Float("USTA_Po_diz") * 0.1, pm_min * 0.01, pm_max * 0.01,  n_diz, nd_min, nd_max },
-        QJsonArray { tr_banner[0], tr_banner[1], /*_tr_banner_queue.first().section, _tr_banner_queue.first().index*/ }
+//#ifdef NO_CONNECTIONS
+//          QJsonArray  { "Probe", "Message" },
+//#else
+        QJsonArray { tr_banner[0], tr_banner[1] }
+//#endif
     };
 }
 //------------------------------------------------------------------------------
@@ -1193,8 +1224,8 @@ QJsonArray Processor::getKdrDevelop() {
         QJsonArray { _storage[_section]->Byte("DIAG_CQ_BEL"), _storage[_section]->Byte("DIAG_CQ_USTA"),
                     _storage[_section]->Byte("DIAG_CQ_IT"), _storage[_section]->Byte("DIAG_CQ_MSS")},
         QJsonArray { _diagnostics->SpErrorsCounter(0), _diagnostics->SpErrorsCounter(1), _diagnostics->SpErrorsCounter(2), _diagnostics->SpErrorsCounter(3) },
-        QJsonArray { _diagnostics->SpThreadRunning()->testBit(0), _diagnostics->SpThreadRunning()->testBit(1), _diagnostics->SpThreadRunning()->testBit(2),
-                    _diagnostics->SpThreadRunning()->testBit(3) },
+//        QJsonArray { _diagnostics->SpThreadRunning()->testBit(0), _diagnostics->SpThreadRunning()->testBit(1), _diagnostics->SpThreadRunning()->testBit(2),
+//                    _diagnostics->SpThreadRunning()->testBit(3) },
         QJsonArray { _diagnostics->SpIsBytes()->testBit(0), _diagnostics->SpIsBytes()->testBit(1), _diagnostics->SpIsBytes()->testBit(2),
                     _diagnostics->SpIsBytes()->testBit(3) }
     };

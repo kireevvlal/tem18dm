@@ -33,6 +33,7 @@ DISTFILES += \
     ../build-tem18dm-Desktop_Qt_5_15_2_MSVC2019_64bit-Debug/debug/diagnostic.xml \
     ../build-tem18dm-Desktop_Qt_5_15_2_MSVC2019_64bit-Debug/debug/registration.xml \
     ../build-tem18dm-Desktop_Qt_5_15_2_MSVC2019_64bit-Debug/debug/serialports.xml \
+    error.wav \
     qml/ExtBeadItem.qml \
     qml/ExtBeads.qml \
     qml/ExtCircularGauge.qml \

@@ -101,5 +101,6 @@
         <file>Pictogram/0_dn.png</file>
         <file>Pictogram/0_up.png</file>
         <file>qml/Kdr_Develop.qml</file>
+        <file>error.wav</file>
     </qresource>
 </RCC>

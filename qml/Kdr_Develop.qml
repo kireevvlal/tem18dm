@@ -39,15 +39,10 @@ Rectangle {
             errors_TI.text = par[4][2];
             errors_MSS.text = par[4][3];
 
-            li_BEL_thr.val = !par[5][0]
-            li_USTA_thr.val = !par[5][1]
-            li_TI_thr.val = !par[5][2]
-            li_MSS_thr.val = !par[5][3]
-
-            li_BEL_isbytes.val = !par[6][0]
-            li_USTA_isbytes.val = !par[6][1]
-            li_TI_isbytes.val = !par[6][2]
-            li_MSS_isbytes.val = !par[6][3]
+            li_BEL_isbytes.val = !par[5][0]
+            li_USTA_isbytes.val = !par[5][1]
+            li_TI_isbytes.val = !par[5][2]
+            li_MSS_isbytes.val = !par[5][3]
         }
     }
 
@@ -189,50 +184,9 @@ Rectangle {
     }
 
     Text {
-        id: text3
-        x: 14
-        y: 80
-        color: "#ffffff"
-        text: qsTr("Thread")
-        font.pixelSize: 12
-    }
-
-    LedIndicator {
-        id: li_BEL_thr
-        x: 70
-        y: 80
-        width: ledsize
-        height: ledsize
-    }
-
-    LedIndicator {
-        id: li_USTA_thr
-        x: 120
-        y: 80
-        width: ledsize
-        height: ledsize
-    }
-
-    LedIndicator {
-        id: li_TI_thr
-        x: 170
-        y: 80
-        width: ledsize
-        height: ledsize
-    }
-
-    LedIndicator {
-        id: li_MSS_thr
-        x: 220
-        y: 80
-        width: ledsize
-        height: ledsize
-    }
-
-    Text {
         id: text4
         x: 15
-        y: 100
+        y: 80
         color: "#ffffff"
         text: qsTr("Quality")
         font.pixelSize: 12
@@ -241,7 +195,7 @@ Rectangle {
     Text {
         id: qual_BEL
         x: 70
-        y: 100
+        y: 80
         width: 48
         height: 22
         color: "#ffffff"
@@ -252,7 +206,7 @@ Rectangle {
     Text {
         id: qual_USTA
         x: 120
-        y: 100
+        y: 80
         width: 48
         height: 22
         color: "#ffffff"
@@ -263,7 +217,7 @@ Rectangle {
     Text {
         id: qual_TI
         x: 170
-        y: 100
+        y: 80
         width: 48
         height: 22
         color: "#ffffff"
@@ -274,7 +228,7 @@ Rectangle {
     Text {
         id: qual_MSS
         x: 220
-        y: 100
+        y: 80
         width: 48
         height: 22
         color: "#ffffff"
@@ -285,7 +239,7 @@ Rectangle {
     Text {
         id: text5
         x: 15
-        y: 120
+        y: 100
         color: "#ffffff"
         text: qsTr("Errors")
         font.pixelSize: 12
@@ -294,7 +248,7 @@ Rectangle {
     Text {
         id: errors_BEL
         x: 70
-        y: 120
+        y: 100
         width: 48
         height: 22
         color: "#ffffff"
@@ -305,7 +259,7 @@ Rectangle {
     Text {
         id: errors_USTA
         x: 120
-        y: 120
+        y: 100
         width: 48
         height: 22
         color: "#ffffff"
@@ -316,7 +270,7 @@ Rectangle {
     Text {
         id: errors_TI
         x: 170
-        y: 120
+        y: 100
         width: 48
         height: 22
         color: "#ffffff"
@@ -327,7 +281,7 @@ Rectangle {
     Text {
         id: errors_MSS
         x: 220
-        y: 120
+        y: 100
         width: 48
         height: 22
         color: "#ffffff"

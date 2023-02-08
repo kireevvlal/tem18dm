@@ -13,7 +13,7 @@ Diagnostics::Diagnostics(DataStore* storage, LcmSettings *settings)
     _date_time = QDateTime::currentDateTime();
     _msec = _date_time.toMSecsSinceEpoch();
     _it_packs = 0;
-    _sp_thread_running.resize(4);
+//    _sp_thread_running.resize(4);
     _sp_is_bytes.resize(4);
 }
 //--------------------------------------------------------------------------------

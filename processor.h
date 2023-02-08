@@ -50,11 +50,12 @@ struct TrBanner {
     TrBanner(QString s1, QString s2, int s, int i) { str1 = s1; str2 = s2; section = s; index = i; };
 };
 
+
 class Processor : public QObject
 {
     Q_OBJECT
 private:
-    QThread _sp_thread[4];
+//    QThread _sp_thread[NUM_SERIAL_PORTS];
     LcmSettings _settings;
     int _virtual_section; // переключение номера секции (0, 1) в циклах диагностики
     QMap<int, TrBanner> _tr_banner_queue; // очередь на вывод в баннер
@@ -96,7 +97,7 @@ private:
     void SetSlaveData();
     QString FormMessage(int, int);
     void SaveMessagesList();
-#ifdef Q_OS_UNIX
+#ifdef ATRONIC_UNIX
     void GPIO();
 #endif
 public:
@@ -120,8 +121,8 @@ public slots:
     void querySaveToUSB();
     bool changeKdr(int);
     void kvitTrBanner();
-    void playSoundOnShowBanner();
-    // New:
+//    void playSoundOnShowBanner();
+    QJsonArray getSettings();
     QJsonArray getParamKdrFoot();
     QJsonArray getParamKdrFtDzl();
     QJsonArray getParamKdrFtElektr();
