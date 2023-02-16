@@ -53,8 +53,6 @@
         <file>Pictogram/flesh zapis1.png</file>
         <file>Pictogram/flesh1.png</file>
         <file>Pictogram/ind_box.png</file>
-        <file>Pictogram/m0_lok.png</file>
-        <file>Pictogram/m1_lok.png</file>
         <file>qml/Kdr_Ted.qml</file>
         <file>qml/Kdr_Tre.qml</file>
         <file>Shem_TEM18DM/kdrBos_lin.png</file>
@@ -102,5 +100,9 @@
         <file>Pictogram/0_up.png</file>
         <file>qml/Kdr_Develop.qml</file>
         <file>error.wav</file>
+        <file>qml/scripts.js</file>
+        <file>Pictogram/m_lok.png</file>
+        <file>qml/Kdr_FtNstr.qml</file>
+        <file>Pictogram/save.png</file>
     </qresource>
 </RCC>

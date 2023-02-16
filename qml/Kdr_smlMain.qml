@@ -83,6 +83,7 @@ Rectangle {
         parameter: "Iг кА"
         start: 0
         finish: 0
+        labelTextSize: 13
     }
 
     ExtCircularGauge {
@@ -96,6 +97,7 @@ Rectangle {
         parameter: "Uг В"
         start: 0
         finish: 0
+        labelTextSize: 13
     }
 
     ExtGauge {

@@ -2,6 +2,7 @@ import QtQuick 2.7
 import QtQuick.Window 2.2
 import QtMultimedia 5.7
 import "qml"
+import "qml/scripts.js" as Scripts
 
 Window {
     id: main_window
@@ -9,18 +10,21 @@ Window {
     height: 480
     visible: true
     color: "black"
-    property bool started: false
-    property string lcm_number: "0001"
-    property string exitstr: ""
-    property int sound_volume: 100
-//    flags: Qt.FramelessWindowHint | Qt.Window
-    title: qsTr("TEM18DM Bi05-04 640x480")
 
-    property int cnt: 0;
+    property bool started: false
+    property int moduleType: 1 // 1- Atronic BI0504, 2 - TPK
+    property string lcm_number: "0001"
+    property string passwordstr: ""
+    property int sound_volume: 100
+//    property string deffont: "Times New Roman"
+
     property int current_section: 1; // 1 - own, 2 - extra
     property bool is_slave: false; // true - is exchange with slave locomotive
     property bool is_links: false; // true - is exchange with BEL or USTA or TI
     property int current_system: 0; // 0 - not 1 - diesel, 2 - electro, 3 - links
+
+        flags: Qt.FramelessWindowHint | Qt.Window
+    title: qsTr("TEM18DM Bi05-04 640x480")
 
     Timer {
         triggeredOnStart: true
@@ -30,7 +34,7 @@ Window {
         running:  true
         Component.onCompleted: {
             // KVA Fix screen blink
-            opastyNul(); // все экраны в невидимое состояние
+            Scripts.opacityNul(); // все экраны в невидимое состояние
             // все менюшки в начальное невидимое состояние
             kdr_FootDizel.opacity=0;
             kdr_FootElektrooborud.opacity=0;
@@ -46,9 +50,11 @@ Window {
         }
         onTriggered: {
             if (!started) {
+//                var fonts = Qt.fontFamilies()
                 var settings = ioBf.getSettings();
-                lcm_number = qsTr("ТЭМ18ДМ  №" + settings[0])
-                sound_volume = settings[1]
+                moduleType = settings[0]
+                lcm_number = qsTr("ТЭМ18ДМ  №" + settings[1])
+                sound_volume = settings[2]
                 started = true;
             }
             var par = ioBf.getParamMainWindow();
@@ -181,7 +187,7 @@ Window {
                     kdr_FootUso.focus = true;
                     break;
                 case 4:
-                    kdr_Foot.opacity = 1;
+                    kdr_FootNstr.opacity = 1;
                     kdr_Foot.focus = true;
                     break;
                 case 5:
@@ -388,6 +394,7 @@ Window {
             finish: 1.2
             valuePrecision: 2
             labelPrecision: 1
+            labelTextSize: 11
         }
 
         ExtCircularGauge {
@@ -403,6 +410,7 @@ Window {
             finish: 1.2
             valuePrecision: 2
             labelPrecision: 1
+            labelTextSize: 11
         }
         ExtCircularGauge {
             id: indFd
@@ -415,6 +423,7 @@ Window {
             parameter: "F об/мин"
             start: 600
             finish: 750
+            labelTextSize: 12
         }
     }
 
@@ -988,7 +997,7 @@ Window {
         x: 128
         y: 219
         opacity: 1
-        z: -3
+        z: 18
 
     }
 
@@ -1168,28 +1177,23 @@ Window {
             focus: false
 
             onSwitchDzl_Cilindr: {
-                opastyNul();
+                Scripts.opacityNul();
                 kdr_Dizl.opacity = 1;
-//                setSubsystem(6);
             } // цилиндры
             onSwitchDzl_Maslo:   {
-                opastyNul();
+                Scripts.opacityNul();
                 kdr_Masl.opacity = 1;
-//                setSubsystem(7);
             }
             onSwitchDzl_Toplivo: {
-                opastyNul();
+                Scripts.opacityNul();
                 kdr_Toplivo.opacity = 1;
-//                setSubsystem(8);
             }
             onSwitchDzl_Holod:   {
-                opastyNul();
+                Scripts.opacityNul();
                 kdr_Ohl.opacity = 1;
-//                setSubsystem(9);
             }
             onSwitchDzl_Exit:    {
                 go_Exit();
-//                setSubsystem(0);
             }// возврат на главный экран
             onKnopaS: { showKdr_Nastroiki();   } // сигнал о нажатии клавиши ДМ "S"  /alt+b
             onKnopai: { showKdr_ArhivMessage();} // сигнал о нажатии клавиши ДМ "i"  /alt+c
@@ -1208,22 +1212,22 @@ Window {
             focus: false
 
             onSwitchEl_Bortovay:    {
-                opastyNul();
+                Scripts.opacityNul();
                 kdr_Bos.opacity = 1;
 //                setSubsystem(6);
             }    // бортовая сеть
             onSwitchEl_Vozbugdenie: {
-                opastyNul();
+                Scripts.opacityNul();
                 kdr_Vzb.opacity = 1;
 //                setSubsystem(7);
             }    // система возбуждения
             onSwitchEl_Tagovie:     {
-                opastyNul();
+                Scripts.opacityNul();
                 kdr_TED.opacity = 1;
 //                setSubsystem(8);
             }    // тяговые двигатели
             onSwitchEl_Motores:     {
-                opastyNul();
+                Scripts.opacityNul();
                 kdr_Mot.opacity = 1;
 //                setSubsystem(9);
             }    // моторесурс
@@ -1247,16 +1251,24 @@ Window {
             opacity: 0
             z: 36
             onSwitchUso_TI: {  // переход на меню Температурного измерителя
-                opastyNul(); kdr_FootUso.opacity=0;  kdr_Main_small.opacity=1;
+                Scripts.opacityNul();
+                kdr_FootUso.opacity=0;
+                kdr_Main_small.opacity=1;
                 kdr_Foot_TI.opacity=1; kdr_Foot_TI.focus=true;}
 
             onSwitchUso_USTA: { // переход на меню УСТА
-                opastyNul(); kdr_FootUso.opacity=0; kdr_Main_small.opacity=1;
-                kdr_Foot_Usta.opacity=1; kdr_Foot_Usta.focus=true;   }
+                Scripts.opacityNul();
+                kdr_FootUso.opacity=0;
+                kdr_Main_small.opacity=1;
+                kdr_Foot_Usta.opacity=1;
+                kdr_Foot_Usta.focus=true;   }
 
             onSwitchUso_BEL: { // переход на меню БЭЛ
-                opastyNul(); kdr_FootUso.opacity=0; kdr_Main_small.opacity=1;
-                kdr_FootBEL.opacity=1; kdr_FootBEL.focus=true;   }
+                Scripts.opacityNul();
+                kdr_FootUso.opacity=0;
+                kdr_Main_small.opacity=1;
+                kdr_FootBEL.opacity=1;
+                kdr_FootBEL.focus=true;   }
 
 
             onSwitchUso_Exit: {   go_Exit();   }
@@ -1286,7 +1298,7 @@ Window {
                         kdr_TI_TXA.numPage++;
                     }
                 }
-                opastyNul();
+                Scripts.opacityNul();
                 kdr_TI_TXA.opacity = 1;
             }
             onSwitchUso_TI_TCM: function(offset) {
@@ -1300,7 +1312,7 @@ Window {
                         kdr_TI_TCM.numPage++;
                     }
                 }
-                opastyNul();
+                Scripts.opacityNul();
                 kdr_TI_TCM.opacity = 1;
             }
 
@@ -1322,8 +1334,8 @@ Window {
             opacity: 0
             z: 37 //!!!
 
-            onSwitchUso_USTA_DisVih:  { opastyNul(); kdr_USTA_DskrVihodi.opacity = 1; }
-            onSwitchUso_USTA_DisVhod: { opastyNul(); kdr_USTA_DskrVh.opacity = 1;     }
+            onSwitchUso_USTA_DisVih:  { Scripts.opacityNul(); kdr_USTA_DskrVihodi.opacity = 1; }
+            onSwitchUso_USTA_DisVhod: { Scripts.opacityNul(); kdr_USTA_DskrVh.opacity = 1;     }
             onSwitchUso_USTA_Analogi: function(/*offset*/) {
                 if (kdr_USTA_Analog.opacity) {
                     if (kdr_USTA_Analog.offset == 30) {
@@ -1336,7 +1348,7 @@ Window {
                     }
                 } else
                     kdr_USTA_Analog.offset = 0;
-                opastyNul();
+                Scripts.opacityNul();
                 kdr_USTA_Analog.opacity = 1;
             }
 
@@ -1361,9 +1373,9 @@ Window {
             opacity: 0
             z: 38
 
-            onSwitchUso_BEL_DisVih:  { opastyNul(); kdr_BEL_DskrVihodi.opacity = 1; }
-            onSwitchUso_BEL_DisVhod: { opastyNul(); kdr_BEL_DskrVh.opacity = 1; }
-            onSwitchUso_BEL_Analogi: { opastyNul(); kdr_BEL_Analog.opacity = 1; }
+            onSwitchUso_BEL_DisVih:  { Scripts.opacityNul(); kdr_BEL_DskrVihodi.opacity = 1; }
+            onSwitchUso_BEL_DisVhod: { Scripts.opacityNul(); kdr_BEL_DskrVh.opacity = 1; }
+            onSwitchUso_BEL_Analogi: { Scripts.opacityNul(); kdr_BEL_Analog.opacity = 1; }
 
             onSwitchUso_Exit: { go_Exit(); }
             onKnopaS: { showKdr_Nastroiki();   } // сигнал о нажатии клавиши ДМ "S"  /alt+b
@@ -1373,14 +1385,29 @@ Window {
 
         }
 
+        Kdr_FtNstr { // верхнее меню УСО - появляется с экраном "СВЯЗИ" вызывается с любого экрана по "UD"
+            id: kdr_FootNstr
+            x: 0
+            y: 416
+            width: 640
+            height: 64
+            opacity: 0
+            z: 36
+
+            onSwitchNstr_Exit: go_Exit()
+
+        }
+
     function  showKdr_Nastroiki()    // сигнал о нажатии клавиши ДМ "S"  /alt+b
     {
-    opastyNul(); kdr_Nastroika.opacity = 1;
+    Scripts.opacityNul();
+        kdr_Nastroika.opacity = 1;
+        kdr_FootNstr.opacity = 1;
+        kdr_FootNstr.focus = true;
     }
 
     function  showKdr_ArhivMessage() // сигнал о нажатии клавиши ДМ "i"  /alt+c
     {
-//        opastyNul();
         kdr_FootDizel.opacity=0;
         kdr_FootElektrooborud.opacity=0;
         kdr_FootUso.opacity = 0;
@@ -1391,13 +1418,13 @@ Window {
 
     function showKdr_Reostat()      // сигнал о нажатии клавиши ДМ "St"/alt+d
     {
-        opastyNul(); kdr_Reostat.opacity = 1;
+        Scripts.opacityNul(); kdr_Reostat.opacity = 1;
 
     }
 
     function showKdr_Svazi()        // сигнал о нажатии клавиши ДМ "UD"/alt+i
     {
-        opastyNul();
+        Scripts.opacityNul();
 
         kdr_FootDizel.opacity=0;
         kdr_FootElektrooborud.opacity=0;
@@ -1413,7 +1440,7 @@ Window {
     function  go_Exit()    // выход из меню
     {
         kdr_TrLs.first = -1; // ????????????????????????????????????????
-        opastyNul(); // все экраны в невидимое состояние
+        Scripts.opacityNul(); // все экраны в невидимое состояние
         // все менюшки в начальное невидимое состояние
         kdr_FootDizel.opacity=0;
         kdr_FootElektrooborud.opacity=0;
@@ -1421,6 +1448,7 @@ Window {
         kdr_Foot_Usta.opacity=0;
         kdr_FootBEL.opacity=0;
         kdr_Foot_TI.opacity=0;
+        kdr_FootNstr.opacity=0;
 
         // главный экран показываем
         //kdr_Foot.is_exit = true;
@@ -1432,72 +1460,5 @@ Window {
 
     }
 
-        function opastyNul()  { // гасим-гасим все экраны
 
-            kdr_Vzb.opacity = 0;
-            kdr_Mot.opacity = 0;
-            kdr_AvProgrev.opacity = 0;
-            kdr_Bos.opacity = 0;
-            kdr_TED.opacity = 0;
-            kdr_Svz.opacity = 0;
-            kdr_Toplivo.opacity = 0;
-            kdr_Masl.opacity = 0;
-            kdr_Ohl.opacity = 0;
-            kdr_TrLs.opacity = 0;
-            kdr_Dizl.opacity = 0;
-
-            kdr_Reostat.opacity = 0;
-            kdr_Nastroika.opacity = 0;
-
-            kdr_TI_TXA.opacity = 0;
-            kdr_TI_TCM.opacity = 0;
-            kdr_USTA_DskrVihodi.opacity = 0;
-            kdr_USTA_DskrVh.opacity = 0;
-            kdr_USTA_Analog.opacity = 0;
-
-            kdr_BEL_DskrVihodi.opacity = 0;
-            kdr_BEL_DskrVh.opacity = 0;
-            kdr_BEL_Analog.opacity = 0;
-
-            kdr_Main_small.opacity = 0;
-            kdr_Develop.opacity = 0;
-
-    }
-
-        function exitPasswd(str) {
-                exitstr += str;
-                if (exitstr.substring(0, 8) == "01010101")
-                    Qt.quit();
-        }
-
-//        function getKey(key) {
-//            let bi0504 = new Map ([
-//                                      [Qt.Key_0, "0"],
-//                                      [Qt.Key_1, "1"],
-//                                      [Qt.Key_2, "2"],
-//                                      [Qt.Key_3, "3"],
-//                                      [Qt.Key_4, "4"],
-//                                      [Qt.Key_5, "5"],
-//                                      [Qt.Key_6, "6"],
-//                                      [Qt.Key_7, "7"],
-//                                      [Qt.Key_8, "8"],
-//                                      [Qt.Key_9, "9"],
-//                                      [Qt.Key_A, "AUS"],
-//                                      [Qt.Key_B, "S"],
-//                                      [Qt.Key_C, "I"],
-//                                      [Qt.Key_D, "St"],
-//                                      [Qt.Key_E, "V>0"],
-//                                      [Qt.Key_F, "V=0"],
-//                                      [Qt.Key_G, "CONTRAST"],
-//                                      [Qt.Key_H, "BRIGHTNESS"],
-//                                      [Qt.Key_I, "UD"],
-//                                      [Qt.Key_Backspace, "C"],
-//                                      [Qt.Key_Left, "LEFT"],
-//                                      [Qt.Key_Right, "RIGHT"],
-//                                      [Qt.Key_Up, "UP"],
-//                                      [Qt.Key_Down, "DOWN"],
-//                                      [Qt.Key_Return, "E"],
-//                                  ]);
-//            return bi0504.get(key)
-//        }
 }

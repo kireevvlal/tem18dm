@@ -10,6 +10,7 @@ CircularGauge {
     property string parameter
     property int valuePrecision: 0
     property int labelPrecision: 0
+    property int labelTextSize: 12
     property color limitcolor: "gray"
     property real oldvalue: 0;
     property real digitalvalue: 0;
@@ -19,7 +20,7 @@ CircularGauge {
         maximumValueAngle: 140
         tickmarkInset: toPixels(0.1)
         minorTickmarkInset: tickmarkInset
-        labelInset: toPixels(0.35)
+        labelInset: toPixels(0.34)
         tickmarkStepSize: (maximumValue - minimumValue) / 12
         //minorTickmarkCount: 9
 
@@ -35,24 +36,37 @@ CircularGauge {
             ctx.reset();
             // internal arc
             ctx.beginPath();
-            ctx.lineWidth =  1;//tickmarkInset / 2;
+            ctx.lineWidth =  1;
             ctx.strokeStyle = "lightgray";
             ctx.arc(outerRadius, outerRadius, outerRadius - toPixels(0.1),
                     degreesToRadians(minimumValueAngle - 90), degreesToRadians(maximumValueAngle - 90));
             ctx.stroke();
             // external arc
             ctx.beginPath();
-            ctx.lineWidth =  1;//tickmarkInset / 2;
+            ctx.lineWidth =  1;
             ctx.strokeStyle = "lightgray";
             ctx.arc(outerRadius, outerRadius, outerRadius,
                     degreesToRadians(minimumValueAngle - 90), degreesToRadians(maximumValueAngle - 90));
              ctx.stroke();
             // lines
-//            ctx.beginPath();
-//            ctx.lineWidth =  1;//tickmarkInset / 2;
-//            ctx.strokeStyle = "lightgray";
-//            ctx.moveTo()
-//            ctx.stroke();
+            // left
+            ctx.beginPath();
+            ctx.lineWidth =  1;
+            ctx.strokeStyle = "lightgray";
+            ctx.moveTo(outerRadius -  outerRadius * Math.sin(degreesToRadians(minimumValueAngle +180)),
+                       outerRadius + outerRadius * Math.cos(degreesToRadians(minimumValueAngle + 180)))
+            ctx.lineTo(outerRadius - (outerRadius - toPixels(0.1)) * Math.sin(degreesToRadians(minimumValueAngle + 180)),
+                       outerRadius + (outerRadius - toPixels(0.1)) * Math.cos(degreesToRadians(minimumValueAngle + 180)))
+            ctx.stroke()
+            // right
+            ctx.beginPath();
+            ctx.lineWidth =  1;
+            ctx.strokeStyle = "lightgray";
+            ctx.moveTo(outerRadius + outerRadius * Math.sin(degreesToRadians(180 - maximumValueAngle)),
+                       outerRadius + outerRadius * Math.cos(degreesToRadians(180 - maximumValueAngle)))
+            ctx.lineTo(outerRadius + (outerRadius - toPixels(0.1)) * Math.sin(degreesToRadians(180 - maximumValueAngle)),
+                       outerRadius + (outerRadius - toPixels(0.1)) * Math.cos(degreesToRadians(180 - maximumValueAngle)))
+            ctx.stroke()
 
             // red sector
             if (begin !== end) {
@@ -132,7 +146,7 @@ CircularGauge {
         }
 
         tickmarkLabel:  Text {
-            font.pixelSize: toPixels(0.15) //(0.12)
+            font.pixelSize: labelTextSize //toPixels(0.15) //(0.12)
             //font.bold: true
             //font.italic: true
             text: labelPrecision ? styleData.value.toFixed(labelPrecision) : styleData.value

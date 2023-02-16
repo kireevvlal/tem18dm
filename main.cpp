@@ -112,11 +112,11 @@ int main(int argc, char *argv[])
     signal(SIGBUS, handleErrorsSignals);
 #endif
 
-    QFont fon("Arial");
+//    QFont fon("Gigi");
+//    app.setFont(fon);
 #ifndef Q_OS_WIN
     app.setOverrideCursor(QCursor(Qt::BlankCursor));
 #endif
-    app.setFont(fon);
     try {
         ret = app.exec();
     } catch (const std::exception &e) {

@@ -1,6 +1,5 @@
 #include "processor.h"
-//#include "tem18dm.h"
-#define NO_CONNECTIONS
+//#define NO_CONNECTIONS
 
 #ifdef ATRONIC_UNIX
 #include <string>
@@ -55,8 +54,6 @@ Processor::~Processor() {
 bool Processor:: Load(QString startPath, QString cfgfile)
 {
     int i;
-    char data[12];
-    UnionUInt32 par;
     // read configs
     _start_path = startPath;
     if (_tree.ReadFile(_start_path + "/" + cfgfile)) { // read start configuration file
@@ -75,19 +72,10 @@ bool Processor:: Load(QString startPath, QString cfgfile)
         _mainstore.FillMaps(i.value());
     _slave.FillStore(&_mainstore);
     // read motoresurs
-    if (_mtr_file.open(QIODevice::ReadOnly)) {
-        _mtr_file.read(data, 12);
-        for (i = 0; i < 4; i++)
-            par.Array[i] = data[i];
-        _mainstore.SetUInt32("DIAG_Motoresurs", par.Value);
-        for (i = 0; i < 4; i++)
-            par.Array[i] = data[i + 4];
-        _mainstore.SetUInt32("DIAG_Adiz", par.Value);
-        _diagnostics->Adiz((float)par.Value / 10);
-        for (i = 0; i < 4; i++)
-            par.Array[i] = data[i + 8];
-        _mainstore.SetUInt32("DIAG_Tt", par.Value);
-        _mtr_file.close();
+    if (!ReadMotoresurs(&_mtr_file)) { // not on card => read from app folder
+        QFile appdirfile;
+        appdirfile.setFileName(_start_path + "/mot.re");
+        ReadMotoresurs(&appdirfile);
     }
 #ifdef Q_OS_WIN
     _fswatcher->addPath("D:/_USB");
@@ -99,15 +87,37 @@ bool Processor:: Load(QString startPath, QString cfgfile)
     return true;
 }
 //--------------------------------------------------------------------------------
-void Processor::SaveMessagesList() {
+bool Processor::ReadMotoresurs(QFile *file) {
+    int i;
+    char data[12];
+    UnionUInt32 par;
+    if (file->open(QIODevice::ReadOnly)) {
+        file->read(data, 12);
+        for (i = 0; i < 4; i++)
+            par.Array[i] = data[i];
+        _mainstore.SetUInt32("DIAG_Motoresurs", par.Value);
+        for (i = 0; i < 4; i++)
+            par.Array[i] = data[i + 4];
+        _mainstore.SetUInt32("DIAG_Adiz", par.Value);
+        _diagnostics->Adiz((float)par.Value / 10);
+        for (i = 0; i < 4; i++)
+            par.Array[i] = data[i + 8];
+        _mainstore.SetUInt32("DIAG_Tt", par.Value);
+        file->close();
+        return true;
+    } else
+        return false;
+}
+//--------------------------------------------------------------------------------
+void Processor::SaveMessagesList(QFile *file) {
     // save tr messages list to file
-    if (_trmess_file.open(QIODevice::WriteOnly)) {
-        QTextStream stream(&_trmess_file);
+    if (file->open(QIODevice::WriteOnly)) {
+        QTextStream stream(file);
         stream.setCodec("UTF-8");
         foreach (QString s, _tr_strings) {
             stream << s << endl;
         }
-        _trmess_file.close();
+        file->close();
     }
 }
 //--------------------------------------------------------------------------------
@@ -126,7 +136,7 @@ void Processor::Run()
 //        if (j < NUM_SERIAL_PORTS) {
 //            i.value()->moveToThread(this->thread());//&_sp_thread[j]);
             i.value()->Start();
-            i.value()->Process();
+//            i.value()->Process();
 //            _sp_thread[j].start();
 //        }
 //        j++;
@@ -149,13 +159,10 @@ void Processor::Run()
     _saver->Run();
 
     // read tr meaasges
-    if (_trmess_file.open(QIODevice::ReadOnly)) {
-        while (!_trmess_file.atEnd()) {
-            QString str = _trmess_file.readLine();
-            str.truncate(str.lastIndexOf("\n"));
-            _tr_strings.append(str);
-        }
-        _trmess_file.close();
+    if (!ReadMessagesList(&_trmess_file)) {
+        QFile apptrlfile;
+        apptrlfile.setFileName(_start_path + "/messages.txt");
+        ReadMessagesList(&apptrlfile);
     }
     if (_tr_strings.count() >= 300)
         _tr_strings.removeFirst();
@@ -165,6 +172,19 @@ void Processor::Run()
     _is_active = true;
 
 //    QSound::play("/home/user/tada.wav");
+}
+//--------------------------------------------------------------------------------
+bool Processor::ReadMessagesList(QFile* file) {
+    if (file->open(QIODevice::ReadOnly)) {
+        while (!file->atEnd()) {
+            QString str = file->readLine();
+            str.truncate(str.lastIndexOf("\n"));
+            _tr_strings.append(str);
+        }
+        file->close();
+        return true;
+    } else
+        return false;
 }
 //--------------------------------------------------------------------------------
 #ifdef ATRONIC_UNIX
@@ -206,11 +226,31 @@ void Processor::querySaveToUSB() {
 //#endif
 }
 //--------------------------------------------------------------------------------
+void Processor::saveSettings(QString number, int psensors, bool elinj, int svolume) {
+    _settings.Number = number;
+    _settings.PressureSensors = psensors;
+    _settings.ElInjection = elinj;
+    _settings.SoundVolume = svolume;
+    SaveSettings();
+}
+//--------------------------------------------------------------------------------
 void Processor::Stop() {
+     QFile appmrfile, apptrlfile;
+    SaveMotoresurs(&_mtr_file);
+    appmrfile.setFileName(_start_path + "/mot.re");
+    SaveMotoresurs(&appmrfile);
+    SaveMessagesList(&_trmess_file);
+    apptrlfile.setFileName(_start_path + "/messages.txt");
+    SaveMessagesList(&apptrlfile);
+    _registrator->Stop();
+    _is_active = false;
+}
+//--------------------------------------------------------------------------------
+void Processor::SaveMotoresurs(QFile *file) {
     char data[12];
     UnionUInt32 par;
     int i;
-    if (_mtr_file.open(QIODevice::WriteOnly)) {
+    if (file->open(QIODevice::WriteOnly)) {
         par.Value = _mainstore.UInt32("DIAG_Motoresurs");
         for (i = 0; i < 4; i++)
             data[i] = par.Array[i];
@@ -220,15 +260,9 @@ void Processor::Stop() {
         par.Value = _mainstore.UInt32("DIAG_Tt");
         for (i = 0; i < 4; i++)
             data[i + 8] = par.Array[i];
-        _mtr_file.write(data, 12);
-        _mtr_file.close();
+        file->write(data, 12);
+        file->close();
     }
-    SaveMessagesList();
-    _registrator->Stop();
-    _is_active = false;
-//    for (i = 0; i < NUM_SERIAL_PORTS; i++)
-//        if (_sp_thread->isRunning())
-//            _sp_thread[i].quit();
 }
 //--------------------------------------------------------------------------------
 void Processor::RegTimerStep() {
@@ -474,13 +508,8 @@ void Processor::SetSlaveData()
     _slave.SetBytePacket(290, _mainstore.Byte("PROG_Regime"));
 }
 //--------------------------------------------------------------------------------
-bool Processor::changeKdr(int kdr) {
-    int section = kdr - 1;
-    if ((section == 0) || (section == 1 && _mainstore.Bit("DIAG_Connections", CONN_MSS))) {
-        _section = section;
-        return true;
-    } else
-        return false;
+void Processor::setSection(int section) {
+        _section = section - 1;
 }
 //--------------------------------------------------------------------------------
 void Processor::kvitTrBanner() {
@@ -541,6 +570,27 @@ void Processor::Unpack(QString alias) {
     }
 }
 //--------------------------------------------------------------------------------
+bool Processor::SaveSettings() {
+    QFile file;
+    file.setFileName(_start_path + "/settings.xml");
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        return false;
+    }
+    else {
+        QXmlStreamWriter xml(&file);
+        xml.setAutoFormatting(true);
+        xml.writeStartDocument();
+        xml.writeStartElement("settings");
+        xml.writeTextElement("number", _settings.Number);
+        xml.writeTextElement("psensor", QString::number(_settings.PressureSensors));
+        xml.writeTextElement("elinj", _settings.ElInjection ? "on" : "off");
+        xml.writeTextElement("svolume", QString::number(_settings.SoundVolume));
+        xml.writeEndElement();
+        xml.writeEndDocument();
+    }
+    return true;
+}
+//--------------------------------------------------------------------------------
 void Processor::Parse(NodeXML *node)
 {
     while (node != nullptr) {
@@ -554,28 +604,8 @@ void Processor::Parse(NodeXML *node)
 void Processor::ParseCfg(NodeXML *node)
 {
     while (node != nullptr) {
-        if (node->Name == "settings") {
-            _settings.Number = node->Text.rightJustified(4, '0');
-
-            for (int i = 0; i < node->Attributes.count(); i++) {
-                AttributeXML *attr = node->Attributes[i];
-                if (attr->Name == "elinj")
-                    _settings.ElInjection = (attr->Value.toLower() == "on") ? true : false;
-                if (attr->Name == "psensor")
-                    _settings.PressureSensors = attr->Value.toInt();
-                if (attr->Name == "svolume") {
-                    _settings.SoundVolume = attr->Value.toInt();
-                    if (_settings.SoundVolume > 100)
-                        _settings.SoundVolume = 100;
-                    else
-                        if (_settings.SoundVolume < 10)
-                            _settings.SoundVolume = 10;
-                }
-            }
-        } else
-            if (node->Name == "files") {
-                ParseFiles(node->Child);
-            }
+        if (node->Name == "files")
+            ParseFiles(node->Child);
         node = node->Next;
     }
 }
@@ -593,18 +623,37 @@ void Processor::ParseFiles(NodeXML *node)
 void Processor::ParseObjects(NodeXML *node)
 {
     while (node != nullptr) {
-        if (node->Name == "serialports") {
+        if (node->Name == "settings") {
+            ParseSettings(node->Child);
+        } else if (node->Name == "serialports") {
             ParseSerialPorts(node->Child);
-        }
-        if (node->Name == "registration") {
+        } else if (node->Name == "registration") {
             ParseRegistration(node);
-//            _registrator->SetRecordSize();
-        }
-        if (node->Name == "diagnostic") {
+        } else if (node->Name == "diagnostic") {
             ParseDiagnostic(node);
-        }
-        if (node->Name == "trmess") {
+        } else if (node->Name == "trmess") {
             ParseTrMess(node);
+        }
+        node = node->Next;
+    }
+}
+//--------------------------------------------------------------------------------
+void Processor::ParseSettings(NodeXML *node)
+{
+    while (node != nullptr) {
+        if (node->Name == "number")
+            _settings.Number = node->Text.rightJustified(4, '0');
+        else if (node->Name == "elinj")
+            _settings.ElInjection = (node->Text.toLower() == "on") ? true : false;
+        else if (node->Name == "psensor")
+            _settings.PressureSensors = node->Text.toInt();
+         else if (node->Name == "svolume") {
+            _settings.SoundVolume = node->Text.toInt();
+            if (_settings.SoundVolume > 100)
+                _settings.SoundVolume = 100;
+            else
+                if (_settings.SoundVolume < 10)
+                    _settings.SoundVolume = 10;
         }
         node = node->Next;
     }
@@ -731,7 +780,11 @@ void Processor::ParseRegistration(NodeXML* node) {
 }
 //------------------------------------------------------------------------------
 QJsonArray Processor::getSettings() {
-    return { _settings.Number, _settings.SoundVolume };
+int module = 1; // atronik
+#ifdef TPK
+    module = 2;
+#endif
+    return {  module, _settings.Number, _settings.SoundVolume };
 }
 //------------------------------------------------------------------------------
 // New realisation
@@ -1229,4 +1282,8 @@ QJsonArray Processor::getKdrDevelop() {
         QJsonArray { _diagnostics->SpIsBytes()->testBit(0), _diagnostics->SpIsBytes()->testBit(1), _diagnostics->SpIsBytes()->testBit(2),
                     _diagnostics->SpIsBytes()->testBit(3) }
     };
+}
+//------------------------------------------------------------------------------
+QJsonArray Processor::getKdrNastroyka() {
+    return { _settings.Number, _settings.ElInjection, _settings.PressureSensors, _settings.SoundVolume };
 }

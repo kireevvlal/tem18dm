@@ -73,7 +73,8 @@ DISTFILES += \
     qml/TRegm.qml \
     qml/TRevers.qml \
     qml/USOAnalog.qml \
-    qml/USODiskrt.qml
+    qml/USODiskrt.qml \
+    qml/scripts.js
 
 HEADERS += \
     control.h \
