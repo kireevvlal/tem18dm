@@ -19,6 +19,7 @@ private:
     QString _save_path; // путь к каталогу (диску) для записи (с именем устройства)
     QString _reg_path; // путь к каталогу регистрации
     int _state; // состояние задачи 0 - простой
+    bool _is_running; // состояние этапа
     QDir _directory;
     QString _current_dir;
     QFileInfoList _files;
@@ -34,7 +35,7 @@ public:
     bool MediaInserted() { return _media_inserted; }
     bool Recording() { return _state; }
     int PercentRecorded();
-//    QString MediaPath() { return _media_path; }
+    QString MediaPath() { return _media_path; }
 public slots:
     void Save();
     void MediaChange();

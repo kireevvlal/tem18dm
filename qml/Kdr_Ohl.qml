@@ -81,6 +81,7 @@ Rectangle {
             color: "silver"
             text: qsTr("об/мин")
             font.pixelSize: 12
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -91,6 +92,7 @@ Rectangle {
             text: qsTr("ОХЛАЖДЕНИЕ")
             font.bold: true
             font.pixelSize: 14
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -101,6 +103,7 @@ Rectangle {
             text: qsTr("Запрет работы под нагрузкой (t воды < 45°C)")
             font.bold: true
             font.pixelSize: 12
+            font.family: main_window.deffntfam
         }
         Text {
             id: zTp
@@ -110,6 +113,7 @@ Rectangle {
             text: qsTr("Предельно допустимая t воды (>86°C)")
             font.bold: true
             font.pixelSize: 12
+            font.family: main_window.deffntfam
         }
     }
 }

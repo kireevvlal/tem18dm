@@ -148,14 +148,17 @@ void Registrator::SetParameters(QString path, QString alias, QString extention, 
 //--------------------------------------------------------------------------------
 void Registrator::Prepare() {
     QDir directory(_path);
+#ifndef TPK
     QStorageInfo si = QStorageInfo(directory);
     qint64 available = si.bytesAvailable();
-    while (available <= (_quantity + 100) * _record_size) { // + 100 - доп размер на 100 записей
+    available <= (_quantity + 100) * _record_size) { // + 100 - доп размер на 100 записей
+
         QStringList files = directory.entryList(QStringList() << "*.rez", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time | QDir::Reversed);
         if (files.size())
            directory.remove(files[0]);
          available = si.bytesAvailable();
     }
+#endif
     QDateTime dt = QDateTime::currentDateTime();
     QString name = _path + "/" + _alias + "_" + _settings->Number + "_" + dt.date().toString("yyMMdd") + dt.time().toString("hhmmss") + "." + _extention;
     _file.setFileName(name);

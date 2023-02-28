@@ -45,6 +45,7 @@ Rectangle {
         anchors.topMargin: 0
         font.bold: true
         font.pixelSize: 12
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -59,6 +60,7 @@ Rectangle {
         anchors.topMargin: 0
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
 
@@ -73,6 +75,7 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         font.bold: true
         font.pixelSize: 12
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -85,6 +88,7 @@ Rectangle {
         horizontalAlignment: Text.AlignHCenter
         font.bold: true
         font.pixelSize: 7
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -97,6 +101,7 @@ Rectangle {
         horizontalAlignment: Text.AlignHCenter
         font.bold: true
         font.pixelSize: 7
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -111,6 +116,7 @@ Rectangle {
         anchors.topMargin: 0
         font.bold: true
         font.pixelSize: 8
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -125,6 +131,7 @@ Rectangle {
         anchors.topMargin: 0
         font.bold: true
         font.pixelSize: 8
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -139,6 +146,7 @@ Rectangle {
         anchors.topMargin: 0
         font.bold: true
         font.pixelSize: 8
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -153,6 +161,7 @@ Rectangle {
         anchors.topMargin: 0
         font.bold: true
         font.pixelSize: 8
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -165,6 +174,7 @@ Rectangle {
         horizontalAlignment: Text.AlignHCenter
         font.bold: true
         font.pixelSize: 7
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -177,6 +187,7 @@ Rectangle {
         horizontalAlignment: Text.AlignHCenter
         font.bold: true
         font.pixelSize: 7
+        font.family: main_window.deffntfam
     }
 }
 

@@ -35,6 +35,7 @@ Rectangle {
         anchors.fill: parent
         verticalAlignment: Text.AlignVCenter
         font.pixelSize: 20
+        font.family: main_window.deffntfam
 }
 
 }

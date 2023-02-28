@@ -6,12 +6,12 @@
 #include "extserialport.h"
 
 // Тип дисплейногот модуля (по необходимости)
-#define BI_05_04
+//#define ATRONIC
+//#define ATRONIC_UNIX
 #define TPK
 
-#ifdef Q_OS_UNIX
-#define ATRONIC_UNIX
-#endif
+//#define NO_CONNECTIONS
+
 // номера индексов в словарях битовых массивов
 #define CONN_BEL  0 // Наличие связи с БЭЛ
 #define CONN_USTA 1 // Наличие связи с УСТА

@@ -55,6 +55,7 @@ Rectangle {
         text: qsTr("РЕОСТАТ")
         font.bold: true
         font.pixelSize: 16
+        font.family: main_window.deffntfam
     }
 
     TInd {
@@ -74,6 +75,7 @@ Rectangle {
         text: qsTr("t газов цилиндров, С")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -84,6 +86,7 @@ Rectangle {
         text: qsTr("1")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -94,6 +97,7 @@ Rectangle {
         text: qsTr("2")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -104,6 +108,7 @@ Rectangle {
         text: qsTr("3")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -114,6 +119,7 @@ Rectangle {
         text: qsTr("4")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -126,6 +132,7 @@ Rectangle {
         text: qsTr("5")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -136,6 +143,7 @@ Rectangle {
         text: qsTr("вход в ТК1")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -146,6 +154,7 @@ Rectangle {
         text: qsTr("вход в ТК2")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     TInd {
@@ -248,6 +257,7 @@ Rectangle {
         text: qsTr("6")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     TInd {
@@ -321,6 +331,7 @@ Rectangle {
         text: qsTr("тг:")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -331,6 +342,7 @@ Rectangle {
         text: qsTr("задание:")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -341,6 +353,7 @@ Rectangle {
         text: qsTr("тг:")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -351,6 +364,7 @@ Rectangle {
         text: qsTr("задание:")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -361,6 +375,7 @@ Rectangle {
         text: qsTr("борт.сети:")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -371,6 +386,7 @@ Rectangle {
         text: qsTr("тг:")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -381,6 +397,7 @@ Rectangle {
         text: qsTr("тележка 1:")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -391,6 +408,7 @@ Rectangle {
         text: qsTr("тележка 2:")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -401,6 +419,7 @@ Rectangle {
         text: qsTr("возбужд:")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -411,6 +430,7 @@ Rectangle {
         text: qsTr("заряда:")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -421,6 +441,7 @@ Rectangle {
         text: qsTr("M")
         font.bold: true
         font.pixelSize: 25
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -431,6 +452,7 @@ Rectangle {
         text: qsTr("U")
         font.bold: true
         font.pixelSize: 25
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -441,6 +463,7 @@ Rectangle {
         text: qsTr("I")
         font.bold: true
         font.pixelSize: 25
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -453,6 +476,7 @@ Rectangle {
         text: qsTr("кВт")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -465,6 +489,7 @@ Rectangle {
         text: qsTr("В")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -477,6 +502,7 @@ Rectangle {
         text: qsTr("А")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     TInd {
@@ -572,6 +598,7 @@ Rectangle {
         text: qsTr("масла:")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -582,6 +609,7 @@ Rectangle {
         text: qsTr("топлива:")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -592,6 +620,7 @@ Rectangle {
         text: qsTr("воды:")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -602,6 +631,7 @@ Rectangle {
         text: qsTr("масла:")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -612,6 +642,7 @@ Rectangle {
         text: qsTr("Угол возб:")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -622,6 +653,7 @@ Rectangle {
         text: qsTr("выпр:")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -632,6 +664,7 @@ Rectangle {
         text: qsTr("ОП1:")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -642,6 +675,7 @@ Rectangle {
         text: qsTr("ОП2:")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -662,6 +696,7 @@ Rectangle {
         text: qsTr("t")
         font.bold: true
         font.pixelSize: 25
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -672,6 +707,7 @@ Rectangle {
         text: qsTr("F")
         font.bold: true
         font.pixelSize: 25
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -684,6 +720,7 @@ Rectangle {
         text: qsTr("МПа")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -696,6 +733,7 @@ Rectangle {
         text: qsTr("С")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -708,6 +746,7 @@ Rectangle {
         text: qsTr("о/м")
         font.bold: true
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 }
 

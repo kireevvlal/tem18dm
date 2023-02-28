@@ -41,6 +41,7 @@ Rectangle {
             text: qsTr("ВОЗБУЖДЕНИЕ")
             font.bold: true
             font.pixelSize: 14
+            font.family: main_window.deffntfam
         }
 
         TInd {
@@ -114,6 +115,7 @@ Rectangle {
             text: qsTr("Неисправна система возбуждения (ШИМ 1)")
             font.bold: true
             font.pixelSize: 12
+            font.family: main_window.deffntfam
         }
         Text {
             id: xtG
@@ -123,6 +125,7 @@ Rectangle {
             text: qsTr("Неисправен генератор")
             font.bold: true
             font.pixelSize: 12
+            font.family: main_window.deffntfam
         }
     }
 }

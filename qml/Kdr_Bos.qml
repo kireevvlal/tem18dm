@@ -52,6 +52,7 @@ Rectangle {
             text: qsTr("БОРТОВАЯ СЕТЬ")
             font.bold: true
             font.pixelSize: 16
+            font.family: main_window.deffntfam
         }
 
         TInd {
@@ -156,6 +157,7 @@ Rectangle {
             text: qsTr("Неисправна система энергоснабжения")
             font.bold: true
             font.pixelSize: 12
+            font.family: main_window.deffntfam
         }
         Text {
             id: z_Rp
@@ -165,6 +167,7 @@ Rectangle {
             text: qsTr("R цепей [+]-корпус меньше 250 кОм")
             font.bold: true
             font.pixelSize: 12
+            font.family: main_window.deffntfam
         }
         Text {
             id: z_Rm
@@ -174,6 +177,7 @@ Rectangle {
             text: qsTr("R цепей [-]-корпус меньше 250 кОм")
             font.bold: true
             font.pixelSize: 12
+            font.family: main_window.deffntfam
         }
         Text {
             id: z_Rpk
@@ -183,6 +187,7 @@ Rectangle {
             text: qsTr("Цепи управления [+] на корпусе")
             font.bold: true
             font.pixelSize: 12
+            font.family: main_window.deffntfam
         }
         Text {
             id: z_Rmk
@@ -192,6 +197,7 @@ Rectangle {
             text: qsTr("Цепи управления [-] на корпусе")
             font.bold: true
             font.pixelSize: 12
+            font.family: main_window.deffntfam
         }
         Text {
             id: z_Iz
@@ -203,6 +209,7 @@ Rectangle {
             text: qsTr("Нет заряда батареи")
             font.bold: true
             font.pixelSize: 12
+            font.family: main_window.deffntfam
         }
     }
 }

@@ -10,15 +10,9 @@ Rectangle {
     property string cltxtSelect:"#1bb7e4"; // цвет текста нажатой кнопки
     property string cltxt:"white";         // штатный цвет текста всех кнопок
 
-    signal switchUso_TI();      // переход на меню
-    signal switchUso_USTA();    //
-    signal switchUso_BEL();     //
-    signal switchUso_Exit();    // переход на уровень ввех
+    signal switchNstr_Exit();    // переход на уровень ввех
+    signal saveNstr();
 
-    signal knopaS();  // сигнал о нажатии клавиши ДМ "S"
-    signal knopai();  // сигнал о нажатии клавиши ДМ "i"
-    signal knopaSt(); // сигнал о нажатии клавиши ДМ "St"
-    signal knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
 
     Keys.onPressed: {
         var key = Scripts.getKey(event.key)
@@ -27,55 +21,77 @@ Rectangle {
 
         case "0":
             btn1.border.color = btn2.border.color = "black"
-            img7.source = "../Pictogram/uso/0_ti.png"
-            img8.source = "../Pictogram/uso/0_ust.png"
-            img9.source = "../Pictogram/uso/0_bel.png"
-            switchUso_Exit();
-            break;
-        case "1":
-            if (Scripts.setSection(1)) {
-                btn1.border.color = "silver"
-                btn2.border.color = "black"
-                txt_1.color = cltxtSelect;
-                txt_2.color = cltxt;
-            }
-            break;
-        case "2":
-            if (Scripts.setSection(2)) {
-                btn1.border.color = "black"
-                btn2.border.color = "silver"
-
-                txt_2.color = cltxtSelect;
-                txt_1.color = cltxt;
-            }
-            break;
-        case "7":
-            main_window.current_system = 11;
-            switchUso_TI();
-            break;
-        case "8":
-            main_window.current_system = 12;
-            switchUso_USTA();
+            switchNstr_Exit();
             break;
         case "9":
-            main_window.current_system = 13;
-            switchUso_BEL();
+            ioBf.saveSettings(kdr_Nastroika.number, kdr_Nastroika.psensors, kdr_Nastroika.elinj, kdr_Nastroika.svolume)
+            main_window.lcm_number =qsTr("ТЭМ18ДМ  №" + kdr_Nastroika.number)
+            main_window.sound_volume = kdr_Nastroika.svolume
             break;
-        case "I":  //67 :
-            kdr_Foot.doTrMessList();
-            knopai(); // сигнал о нажатии клавиши ДМ "i"
+        case "UP":
+            if (kdr_Nastroika.active > 0)
+                kdr_Nastroika.active--
+            kdr_Nastroika.pos = 0;
             break;
-        case "V>0":  //68 :
-            knopaSt(); // сигнал о нажатии клавиши ДМ "St"
+        case "DOWN":
+            if (kdr_Nastroika.active < 3)
+                kdr_Nastroika.active++
+            kdr_Nastroika.pos = 0;
             break;
-        case "UD":  //73 :
-            knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
+        case "LEFT":
+            switch (kdr_Nastroika.active) {
+            case 0:
+                if (kdr_Nastroika.pos > 0)
+                    kdr_Nastroika.pos--
+                break;
+            case 1: kdr_Nastroika.elinj = (kdr_Nastroika.elinj) ? false : true
+                break;
+            case 2: kdr_Nastroika.psensors = (kdr_Nastroika.psensors == 16) ? 6 : 16
+                break;
+            case 3:
+                if (kdr_Nastroika.svolume - 10 >= 10)
+                    kdr_Nastroika.svolume -= 10;
+                else
+                    kdr_Nastroika.svolume = 10;
+                break;
+            }
             break;
-        case "V=0":
-            main_window.saveToUSB();
+        case "RIGHT":
+            switch (kdr_Nastroika.active) {
+            case 0:
+                if (kdr_Nastroika.pos < 3)
+                    kdr_Nastroika.pos++
+                break;
+            case 1: kdr_Nastroika.elinj = (kdr_Nastroika.elinj) ? false : true
+                break;
+            case 2: kdr_Nastroika.psensors = (kdr_Nastroika.psensors == 16) ? 6 : 16
+                break;
+            case 3:
+                if (kdr_Nastroika.svolume + 10 <= 100)
+                    kdr_Nastroika.svolume += 10;
+                else
+                    kdr_Nastroika.svolume = 100;
+                break;
+            }
+            break;
+        case "E":
+            if (!kdr_Nastroika.active) {
+                var digit = parseInt(kdr_Nastroika.number.charAt(kdr_Nastroika.pos))
+                if (digit > 0) {
+                    digit--;
+                    kdr_Nastroika.number = kdr_Nastroika.number.substring(0, kdr_Nastroika.pos) + digit.toString(10)
+                        + kdr_Nastroika.number.substring(kdr_Nastroika.pos + 1)
+                }
+            }
             break;
         case "C":
-            kdr_Privet.opacity = 1;
+            if (!kdr_Nastroika.active) {
+                var dig = parseInt(kdr_Nastroika.number.charAt(kdr_Nastroika.pos))
+                if (dig < 9)
+                    dig++;
+                kdr_Nastroika.number = kdr_Nastroika.number.substring(0, kdr_Nastroika.pos) + dig.toString(10)
+                        + kdr_Nastroika.number.substring(kdr_Nastroika.pos + 1)
+            }
             break;
         }
     }
@@ -174,28 +190,7 @@ Rectangle {
         height: 64
         opacity: 1
         z: 4
-        source: "../Pictogram/uso/0_bel.png"
+        source: "../Pictogram/save.png"
     }
 
-    Image {
-        id: img8
-        x: 448
-        y: 0
-        width: 64
-        height: 64
-        source: "../Pictogram/uso/0_ust.png"
-        opacity: 1
-        z: 4
-    }
-
-    Image {
-        id: img7
-        x: 384
-        y: 0
-        width: 64
-        height: 64
-        source: "../Pictogram/uso/0_ti.png"
-        opacity: 1
-        z: 4
-    }
 }

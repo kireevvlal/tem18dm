@@ -1,4 +1,5 @@
 import QtQuick 2.7
+import "scripts.js" as Scripts
 
 
 // переключение между экранами
@@ -25,30 +26,35 @@ Rectangle {
 
     //** переключение
     Keys.onPressed: {
-        if (event.key == Qt.Key_Return)
-            main_window.exitPasswd("1");
-        else if (event.key == Qt.Key_A)
-            main_window.exitPasswd("0");
-        else
-            if (event.key != 16777249 && event.key != 16777251)
-                main_window.exitstr = "";
-        switch(event.key){
+        var key = Scripts.getKey(event.key)
+        if (key === "3" || key === "4"|| key === "5"|| key === "6"|| key === "7") {
+            main_window.passwordstr += key
+            if (main_window.passwordstr == "45764576")
+                Qt.quit();
+            else if (main_window.passwordstr == "35746") {
+                knopaS() // settings
+                main_window.current_system = 4
+            }
+        } else if (key !== "SPECIAL")
+                main_window.passwordstr = ""
 
-        case Qt.Key_0:
-            img1.source = "../Pictogram/m0_lok.png"; // err.vz1 = 1;
-            img2.source = "../Pictogram/m0_lok.png"; //err.vz2 = main_window.is_slave;
+        switch(key) {
+
+        case "0":
+            btn1.border.color = btn2.border.color = "black"
             img8.source = "../Pictogram/0_diz.png";
             img9.source = "../Pictogram/0_ele.png";
             img0.opacity = 0;
             img8.opacity = 0; err.vz8 = 0;
             img9.opacity = 0; err.vz9 = 0;
             txt_1.color = txt_2.color = cltxt;
+            kdr_TrLs.opacity = kdr_Nastroika.opacity = kdr_Develop.opacity = 0;
             switchFoot_Exit();
             break;
-        case Qt.Key_1:
-            if (setSection(1)) {
-                img1.source = "../Pictogram/m1_lok.png"; // err.vz1 = 1;
-                img2.source = "../Pictogram/m0_lok.png"; //err.vz2 = main_window.is_slave;
+        case "1":
+            if (Scripts.setSection(1)) {
+                btn1.border.color = "silver"
+                btn2.border.color = "black"
                 img8.source = "../Pictogram/0_diz.png";
                 img9.source = "../Pictogram/0_ele.png";
                 img0.opacity = 1;
@@ -58,10 +64,10 @@ Rectangle {
                 txt_2.color = cltxt;
             }
             break;
-        case Qt.Key_2:
-            if (setSection(2)) {
-                img1.source = "../Pictogram/m0_lok.png"; //err.vz1 = 1;
-                img2.source = "../Pictogram/m1_lok.png"; //err.vz2 = main_window.is_slave;
+        case "2":
+            if (Scripts.setSection(2)) {
+                btn1.border.color = "black"
+                btn2.border.color = "silver"
                 img8.source = "../Pictogram/0_diz.png";
                 img9.source = "../Pictogram/0_ele.png";
                 img0.opacity = 1;
@@ -71,35 +77,35 @@ Rectangle {
                 txt_1.color = cltxt;
             }
             break;
-        case Qt.Key_3:
+        case "3":
             break;
-        case Qt.Key_4:
+        case "4":
             break;
-        case Qt.Key_5:
+        case "5":
             break;
-        case Qt.Key_6:
+        case "6":
             break;
-        case Qt.Key_7:
+        case "7":
             break;
-        case Qt.Key_8:
+        case "8":
             if (kdr_TrLs.opacity)  // кадр тревожных сообщений
                 trListUp();
             else {
                 if (img8.opacity == 1)  // будем переключаться на меню ДИЗЕЛЬ
                 {
                     switchFootDizel();
-                    main_window.current_system = 1;
+                    current_system = 1;
                 }
             }
             break;
-        case Qt.Key_9:
+        case "9":
             if (kdr_TrLs.opacity)   // кадр тревожных сообщений
                 trListDown();
             else {
                 if (img9.opacity == 1) // будем переключаться на меню ЭЛЕКТРООБОРУДОВАНИЕ
                 {
                     switchFootElektr();
-                    main_window.current_system = 2;
+                    current_system = 2;
                 }
             }
             break;
@@ -109,41 +115,41 @@ Rectangle {
 //            main_window.current_system = 4;
 //            break;
 
-        case Qt.Key_C:  //67 :
+        case "I":  //67 :
             doTrMessList();
             knopai(); // сигнал о нажатии клавиши ДМ "i"
-            main_window.current_system = 5;
+            current_system = 5;
             break;
 
-        case Qt.Key_E: //Qt.Key_D:  //68 :
+        case "V>0": //Qt.Key_D:  //68 :
             img0.opacity = 1;
             knopaSt(); // сигнал о нажатии клавиши ДМ "St"
-            main_window.current_system = 6;
+            current_system = 6;
             break;
 
-        case Qt.Key_I:  //73 :
+        case "UD":  //73 :
             knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
-            main_window.current_system = 3;
+            current_system = 3;
             break;
 
-        case Qt.Key_F:
+        case "V=0":
 //            main_window.current_system = 7;
             saveToUSB();
             break;
 
-        case Qt.Key_Down:
+        case "DOWN":
             if (kdr_TrLs.opacity)
                 trListDown();
             break;
 
-        case Qt.Key_Up:
+        case "UP":
             if (kdr_TrLs.opacity)
                 trListUp();
             break;
-        case Qt.Key_Backspace:
+        case "C":
             kdr_Privet.opacity = 1;
             break;
-        case Qt.Key_G:
+        case "CONTRAST":
             kdr_Develop.opacity = 1;
             break;
         }
@@ -172,9 +178,9 @@ Rectangle {
         color: "silver"
         text: qsTr("НЕТ СВЯЗИ")
         font.bold: true
-        font.family: "Times New Roman"
+        font.family: main_window.deffntfam
         font.pixelSize: 30
-        visible: !main_window.is_links && !main_window.is_slave
+        visible: !is_links && !is_slave
     }
 
     Text {
@@ -188,11 +194,11 @@ Rectangle {
         z: 3
         font.italic: false
         font.bold: true
-        font.family: "Times New Roman"
+        font.family: main_window.deffntfam
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
         font.pixelSize: 30
-        visible: main_window.is_links
+        visible: is_links
     }
 
     Text {
@@ -210,8 +216,8 @@ Rectangle {
         verticalAlignment: Text.AlignVCenter
         font.bold: true
         horizontalAlignment: Text.AlignHCenter
-        font.family: "Times New Roman"
-        visible: main_window.is_slave
+        font.family: main_window.deffntfam
+        visible: is_slave
     }
 
 
@@ -226,26 +232,42 @@ Rectangle {
         source: "../Pictogram/0_out.png"
     }
 
-    Image {
-        id: img1
+    Rectangle {
+        id: btn1
         x: 0
         y: 0
         width: 64
         height: 64
-        z: 2
-        source: "../Pictogram/m0_lok.png"
-        visible: main_window.is_links
+        border.width: 1
+        border.color: "black"
+        Image {
+            id: img1
+            x: 1
+            y: 1
+            width: 62
+            height: 62
+            source: "../Pictogram/m_lok.png"
+        }
+        visible: is_links
     }
 
-    Image {
-        id: img2
+    Rectangle {
+        id: btn2
         x: 64
         y: 0
         width: 64
         height: 64
-        z: 4
-        source: "../Pictogram/m0_lok.png"
-        visible: main_window.is_slave
+        border.width: 1
+        border.color: "black"
+        Image {
+            id: img2
+            x: 1
+            y: 1
+            width: 62
+            height: 62
+            source: "../Pictogram/m_lok.png"
+        }
+        visible: is_links
     }
 
     Image {
@@ -297,48 +319,37 @@ Rectangle {
             err.tr2 = trs[1]; // 1
             err.tr8 = trs[2]; // 7
             err.tr9 = trs[3]; // 8
-            if (main_window.current_section == 2 && !main_window.is_slave) {
-                setSection(1);
+            if (current_section == 2 && !is_slave) {
+                Scripts.setSection(1);
                 switchFoot_Exit();
             }
-            if (main_window.current_section == 1 && !main_window.is_links && start_counter >= 4) {
-                setSection(2);
-                if (kdr_TrLs.opacity) {
-                    switchFoot_Exit();
-                    kdr_TrLs.opacity = 1; // restore
-                } else
+            if (current_section == 1 && !is_links && start_counter >= 4) {
+                Scripts.setSection(2);
+//                if (kdr_TrLs.opacity || kdr_Nastroika.opacity || kdr_Develop.opacity) {
+//                    switchFoot_Exit();
+//                    kdr_TrLs.opacity = 1; // restore
+//                } else
                     switchFoot_Exit();
             }
         }
 
-    }
-
-    function setSection(section) {
-        if (!kdr_TrLs.opacity) {
-            if (ioBf.changeKdr(section)) {
-                main_window.current_section = section;
-                return true;
-            }
-        }
-        return false;
     }
 
     function doExit() {
-        setSection(1);
-        main_window.current_system = 0;
-        img1.source = "../Pictogram/m0_lok.png";
-        img2.source = "../Pictogram/m0_lok.png";
+        Scripts.setSection(1);
+        current_system = 0;
+        btn1.border.color = btn2.border.color = "black"
+        if (!kdr_TrLs.opacity)
         img0.opacity = img8.opacity = img9.opacity = 0;
         err.vz8 = err.vz9 = 0;
         txt_1.color = txt_2.color = cltxt;
     }
 
     function doTrMessList() {
-        main_window.opastyNul();
-        setSection(1);
-        main_window.current_system = 0;
-        img1.source = "../Pictogram/m0_lok.png";
-        img2.source = "../Pictogram/m0_lok.png";
+        Scripts.opacityNul();
+        Scripts.setSection(1);
+        current_system = 0;
+        btn1.border.color = btn2.border.color = "black"
         img8.opacity = img9.opacity = 0;
         img0.opacity = 1;
         err.vz8 = err.vz9 = 0;

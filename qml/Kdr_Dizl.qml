@@ -81,6 +81,7 @@ Rectangle {
             text: qsTr("спай:")
             font.pixelSize: 12
             font.bold: true
+            font.family: main_window.deffntfam
         }
 
         TInd {
@@ -107,6 +108,7 @@ Rectangle {
             styleColor: "#8877e4"
             font.bold: true
             font.pixelSize: 14
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -120,6 +122,7 @@ Rectangle {
             verticalAlignment: Text.AlignBottom
             font.pixelSize: 12
             font.bold: false
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -133,6 +136,7 @@ Rectangle {
             verticalAlignment: Text.AlignBottom
             font.pixelSize: 12
             font.bold: false
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -146,6 +150,7 @@ Rectangle {
             verticalAlignment: Text.AlignBottom
             font.pixelSize: 12
             font.bold: false
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -159,6 +164,7 @@ Rectangle {
             verticalAlignment: Text.AlignBottom
             font.pixelSize: 12
             font.bold: false
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -171,11 +177,9 @@ Rectangle {
             z: 5
             font.pixelSize: 12
             font.bold: false
+            font.family: main_window.deffntfam
             verticalAlignment: Text.AlignBottom
-            //            Stolbik {
         }
-
-
 
         PrBar {
             id: g1
@@ -431,6 +435,7 @@ Rectangle {
             text: qsTr("min")
             font.pixelSize: 10
             font.bold: true
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -441,6 +446,7 @@ Rectangle {
             text: qsTr("ср")
             font.pixelSize: 10
             font.bold: true
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -451,6 +457,7 @@ Rectangle {
             text: qsTr("вход в ТК1:")
             font.pixelSize: 10
             font.bold: true
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -461,8 +468,8 @@ Rectangle {
             text: qsTr("вход в ТК2:")
             font.pixelSize: 10
             font.bold: true
+            font.family: main_window.deffntfam
         }
-
 
         TInd {
             id: tk1
@@ -488,8 +495,6 @@ Rectangle {
             value: "000"
         }
 
-
-
             Text {
                 id: txt_Zyl
                 x: 314
@@ -498,6 +503,7 @@ Rectangle {
                 text: qsTr("t газов цилиндров больше нормы")
                 font.pixelSize: 12
                 font.bold: true
+                font.family: main_window.deffntfam
                 visible: false
             }
 
@@ -509,6 +515,7 @@ Rectangle {
                 text: qsTr("Нарушение t режима цилиндров")
                 font.pixelSize: 12
                 font.bold: true
+                font.family: main_window.deffntfam
                 visible: false
             }
 
@@ -520,6 +527,7 @@ Rectangle {
                 text: qsTr("t газов перед ТК больше нормы")
                 font.pixelSize: 12
                 font.bold: true
+                font.family: main_window.deffntfam
                 visible: false
             }
             // N (F)
@@ -532,6 +540,7 @@ Rectangle {
                 styleColor: "#0f0c0c"
                 font.bold: true
                 font.pixelSize: 20
+                font.family: main_window.deffntfam
             }
 
             TInd {
@@ -555,13 +564,8 @@ Rectangle {
                 text: qsTr("об/мин")
                 font.bold: true
                 font.pixelSize: 16
+                font.family: main_window.deffntfam
             }
     }
 }
 
-
-/*##^##
-Designer {
-    D{i:0;formeditorZoom:1.5}
-}
-##^##*/

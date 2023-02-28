@@ -60,6 +60,7 @@ Rectangle {
         text: qsTr("1")
         font.bold: true
         font.pixelSize: 20
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -70,6 +71,7 @@ Rectangle {
         text: qsTr("2")
         font.bold: true
         font.pixelSize: 20
+        font.family: main_window.deffntfam
     }
 
     ExtCircularGauge {
@@ -83,6 +85,7 @@ Rectangle {
         parameter: "Iг кА"
         start: 0
         finish: 0
+        labelTextSize: 13
     }
 
     ExtCircularGauge {
@@ -96,6 +99,7 @@ Rectangle {
         parameter: "Uг В"
         start: 0
         finish: 0
+        labelTextSize: 13
     }
 
     ExtGauge {

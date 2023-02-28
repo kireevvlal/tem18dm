@@ -15,6 +15,7 @@ Rectangle {
         text: qsTr("всего сообщений:")
         font.bold: true
         font.pixelSize: 12
+        font.family: main_window.deffntfam
     }
 
     TInd {
@@ -33,6 +34,7 @@ Rectangle {
         text: qsTr("(")
         font.bold: true
         font.pixelSize: 12
+        font.family: main_window.deffntfam
     }
 
     TInd {
@@ -51,6 +53,7 @@ Rectangle {
         text: qsTr(")")
         font.bold: true
         font.pixelSize: 12
+        font.family: main_window.deffntfam
     }
 
     ListModel {
@@ -68,6 +71,7 @@ Rectangle {
             text: message
             color: "silver"
             font.pixelSize: 10
+            font.family: main_window.deffntfam
         }
     }
 

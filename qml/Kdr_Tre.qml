@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import "scripts.js" as Scripts
 
 Rectangle {
 //    id: kdr_tre
@@ -16,6 +17,7 @@ Rectangle {
         font.underline: true
         font.bold: true
         font.pixelSize: 20
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -25,23 +27,27 @@ Rectangle {
         color: "white"
         text: qsTr(str2)
         font.pixelSize: 16
+        font.family: main_window.deffntfam
     }
 
    // NumberAnimation on opacity { from:0; to: 1;duration: 3000;loops: Animation.Infinite}
     Keys.onPressed: {
         // console.log("код нажатой клавиши ===>" + event.key);
-        switch(event.key){
+        var key = Scripts.getKey(event.key)
+//        Scripts.processKeys(key)
 
-        case Qt.Key_0:
-        case Qt.Key_1:
-        case Qt.Key_2:
-        case Qt.Key_3:
-        case Qt.Key_4:
-        case Qt.Key_5:
-        case Qt.Key_6:
-        case Qt.Key_7:
-        case Qt.Key_8:
-        case Qt.Key_9:
+        switch(key) {
+
+        case "0":
+        case "1":
+        case "2":
+        case "3":
+        case "4":
+        case "5":
+        case "6":
+        case "7":
+        case "8":
+        case "9":
         {
             ioBf.kvitTrBanner();
             break;

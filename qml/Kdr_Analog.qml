@@ -30,6 +30,7 @@ Rectangle {// Экран отображения аналоговых сигна�
         text:  qsTr(namePage+ ": окно " + numPage + "[" + cntPage + "]");
         font.bold: true
         font.pixelSize: 14
+        font.family: main_window.deffntfam
     }
 
     //************************************
@@ -72,6 +73,7 @@ Rectangle {// Экран отображения аналоговых сигна�
                 Text{
                     color: "white";
                     font.pixelSize: 12
+                    font.family: main_window.deffntfam
                     text: "  Разъем                          Обозн.        Наименование                      Значение   Ед.изм.";
                 }
 
@@ -94,20 +96,8 @@ Rectangle {// Экран отображения аналоговых сигна�
         }
     }
 
-//    function usoTxtAng(j,str_r, str_n, str_o, str_i, str_a) {
-//        // значения нужно вытащить из структуры
-//        // присвоение свойствам значений
-
-//        usoModelAnalog.setProperty(j, "Anlg_r", str_r);
-//        usoModelAnalog.setProperty(j, "Anlg_n", str_n);
-//        usoModelAnalog.setProperty(j, "Anlg_o", str_o);
-//        usoModelAnalog.setProperty(j, "Anlg_i", str_i);
-//        usoModelAnalog.setProperty(j, "Anlg_a", str_a);
-//    }
 
     function usoTxtAng(j, strarr) {
-        // значения нужно вытащить из структуры
-        // присвоение свойствам значений
         usoModelAnalog.setProperty(j, "Anlg_r", strarr[0]);
         usoModelAnalog.setProperty(j, "Anlg_n", strarr[1]);
         usoModelAnalog.setProperty(j, "Anlg_o", strarr[2]);
@@ -153,51 +143,6 @@ Rectangle {// Экран отображения аналоговых сигна�
             }
         }
     }
-
-//    Text {  // текст подсказка
-//        id: text2
-//        x: 266
-//        y: 3
-//        color: "#808080"
-//        text: "переход по страницам стрелки вверх/вниз"
-//        font.pixelSize: 12
-//        font.bold: false
-//    }
-
-
-    // ** не пригодилось ** переключение страниц
-    //    Keys.onPressed: {
-    //        switch(event.key){
-    //            case Qt.Key_Down:
-    //            {
-    //                numPage = numPage + 1;
-    //                if (numPage>cntPage) {numPage=1};
-    //                console.log("стрелка вниз/перевели фокус на внутр QML/ num_page==" + numPage);
-    //                text1.text = qsTr(namePage+ ": окно " + numPage + "[" + cntPage + "]");
-    //                offset = bazaoffset + (numPage-1)*cntRowTabl;
-
-    //                // перерисовываем таблицу
-    //                timer_text.restart();
-
-    //                break;
-    //            }
-    //            case Qt.Key_Up:
-    //            {
-    //                numPage = numPage - 1;
-    //                if (numPage<1) {numPage=cntPage};
-    //                console.log("стрелка вверх/перевели фокус на внутр QML/ numPage==" + numPage);
-
-    //                text1.text= qsTr(namePage+ ": окно " + numPage + "[" + cntPage + "]");
-
-    //                offset = bazaoffset + (numPage-1)*cntRowTabl;
-
-    //                // перерисовываем таблицу
-    //                timer_text.restart();
-
-    //                break;
-    //            }
-    //        }
-    //    }
 
 }
 

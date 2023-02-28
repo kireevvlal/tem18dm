@@ -10,7 +10,6 @@ Rectangle {
     property int txtSize: 16
     property color txtColor: "cyan"
 
-
     Text {
         id: text1
         text: value
@@ -21,6 +20,7 @@ Rectangle {
         horizontalAlignment: Text.AlignHCenter
         font.pixelSize: txtSize
         color: txtColor
+        font.family: main_window.deffntfam
     }
 }
 

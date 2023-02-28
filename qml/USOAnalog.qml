@@ -53,6 +53,7 @@ Rectangle {
             color: "#ffffff"
             text: edit1value
             font.pixelSize: 12
+            font.family: main_window.deffntfam
             horizontalAlignment: Text.AlignLeft
         }
         border.width: 1
@@ -85,6 +86,7 @@ Rectangle {
             color: "#ffffff"
             text: edit2value
             font.pixelSize: 12
+            font.family: main_window.deffntfam
             horizontalAlignment: Text.AlignHCenter
         }
         border.width: 1
@@ -117,6 +119,7 @@ Rectangle {
             color: "#ffffff"
             text: edit3value
             font.pixelSize: 12
+            font.family: main_window.deffntfam
             horizontalAlignment: Text.AlignHCenter
         }
         border.width: 1
@@ -149,6 +152,7 @@ Rectangle {
             color: "#ffffff"
             text: edit4value
             font.pixelSize: 12
+            font.family: main_window.deffntfam
             horizontalAlignment: Text.AlignLeft
         }
         border.width: 1
@@ -181,6 +185,7 @@ Rectangle {
             color: "#ffffff"
             text: edit6value
             font.pixelSize: 12
+            font.family: main_window.deffntfam
             horizontalAlignment: Text.AlignHCenter
         }
         border.width: 1

@@ -1,4 +1,5 @@
 import QtQuick 2.7
+import "scripts.js" as Scripts
 // переключение между ДИЗЕЛЬНЫМИ экранами
 // сверху накладываем панель с лампочками
 Rectangle {
@@ -24,53 +25,46 @@ Rectangle {
     signal knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
 
     Keys.onPressed: {
-        if (event.key == Qt.Key_Return)
-            main_window.exitPasswd("1");
-        else if (event.key == Qt.Key_A)
-            main_window.exitPasswd("0");
-        else
-            main_window.exitPasswd("2");
+        var key = Scripts.getKey(event.key)
 
-        switch(event.key){
-        case Qt.Key_0:
+        switch(key) {
+
+        case "0":
+            btn1.border.color = btn2.border.color = "black"
             img7.source = "../Pictogram/disel/0_msl.png"
             img8.source = "../Pictogram/disel/0_tpl.png"
             img9.source = "../Pictogram/disel/0_oxl.png"
 
             switchDzl_Exit();
             break;
-        case Qt.Key_1:
+        case "1":
             // ?? надо подать сигнал о смене секций, а может и не надо?
-            if (kdr_Foot.setSection(1)) {
-                img1.source = "../Pictogram/m1_lok.png";
-                img2.source = "../Pictogram/m0_lok.png";
-                img8.source = "../Pictogram/disel/0_tpl.png"
-                img9.source = "../Pictogram/disel/0_oxl.png"
+            if (Scripts.setSection(1)) {
+                btn1.border.color = "silver"
+                btn2.border.color = "black"
 
                 txt_1.color = cltxtSelect;
                 txt_2.color = cltxt;
             }
             break;
-        case Qt.Key_2:
+        case "2":
             // ?? надо подать сигнал о смене секций или не надо?
-            if (kdr_Foot.setSection(2)) {
-                img1.source = "../Pictogram/m0_lok.png";
-                img2.source = "../Pictogram/m1_lok.png";
-                img8.source = "../Pictogram/disel/0_tpl.png"
-                img9.source = "../Pictogram/disel/0_oxl.png"
+            if (Scripts.setSection(2)) {
+                btn1.border.color = "black"
+                btn2.border.color = "silver"
 
                 txt_2.color = cltxtSelect;
                 txt_1.color = cltxt;
             }
             break;
-        case Qt.Key_6:
+        case "6":
             img6.source = "../Pictogram/disel/1_zil.png"
             img7.source = "../Pictogram/disel/0_msl.png"
             img8.source = "../Pictogram/disel/0_tpl.png"
             img9.source = "../Pictogram/disel/0_oxl.png"
             switchDzl_Cilindr();
             break;
-        case Qt.Key_7:
+        case "7":
             img6.source = "../Pictogram/disel/0_zil.png"
             img7.source = "../Pictogram/disel/1_msl.png"
             img8.source = "../Pictogram/disel/0_tpl.png"
@@ -78,7 +72,7 @@ Rectangle {
 
             switchDzl_Maslo();
              break;
-        case Qt.Key_8:
+        case "8":
             img6.source = "../Pictogram/disel/0_zil.png"
             img7.source = "../Pictogram/disel/0_msl.png"
             img8.source = "../Pictogram/disel/1_tpl.png"
@@ -86,7 +80,7 @@ Rectangle {
 
             switchDzl_Toplivo();
             break;
-        case Qt.Key_9:
+        case "9":
             img6.source = "../Pictogram/disel/0_zil.png"
             img7.source = "../Pictogram/disel/0_msl.png"
             img8.source = "../Pictogram/disel/0_tpl.png"
@@ -94,24 +88,20 @@ Rectangle {
 
             switchDzl_Holod();
             break;
-        // *** ! кодировка на ТПК может отличаться
-        case Qt.Key_B:  //66 :
-            knopaS(); // сигнал о нажатии клавиши ДМ "S"
-            break;
-        case Qt.Key_C:  //67 :
+        case "I":  //67 :
             kdr_Foot.doTrMessList();
             knopai(); // сигнал о нажатии клавиши ДМ "i"
             break;
-        case Qt.Key_D:  //68 :
+        case "V>0":  //68 :
              knopaSt(); // сигнал о нажатии клавиши ДМ "St"
             break;
-        case Qt.Key_I:  //73 :
+        case "UD":  //73 :
             knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
             break;
-        case Qt.Key_F:
+        case "V=0":
             main_window.saveToUSB();
             break;
-        case Qt.Key_Backspace:
+        case "C":
             kdr_Privet.opacity = 1;
             break;
         }
@@ -128,7 +118,7 @@ Rectangle {
         z: 3
         font.italic: false
         font.bold: true
-        font.family: "Times New Roman"
+        font.family: main_window.deffntfam
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
         font.pixelSize: 30
@@ -150,7 +140,7 @@ Rectangle {
         verticalAlignment: Text.AlignVCenter
         font.bold: true
         horizontalAlignment: Text.AlignHCenter
-        font.family: "Times New Roman"
+        font.family: main_window.deffntfam
         visible: main_window.is_slave
     }
 
@@ -165,26 +155,53 @@ Rectangle {
         source: "../Pictogram/0_out.png"
     }
 
-    Image {
-        id: img1
+    Rectangle {
+        id: btn1
         x: 0
         y: 0
         width: 64
         height: 64
-        z: 2
-        source: (main_window.current_section == 1) ? "../Pictogram/m1_lok.png" : "../Pictogram/m0_lok.png"
+        border.width: 1
+        border.color: (main_window.current_section == 1) ? "silver" : "black"
+        Image {
+            id: img1
+            x: 1
+            y: 1
+            width: 62
+            height: 62
+            source: "../Pictogram/m_lok.png"
+        }
         visible: main_window.is_links
     }
 
-    Image {
-        id: img2
+    Rectangle {
+        id: btn2
         x: 64
         y: 0
         width: 64
         height: 64
-        z: 4
-        source: (main_window.current_section == 2) ? "../Pictogram/m1_lok.png" : "../Pictogram/m0_lok.png"
+        border.width: 1
+        border.color: (main_window.current_section == 2) ? "silver" : "black"
+        Image {
+            id: img2
+            x: 1
+            y: 1
+            width: 62
+            height: 62
+            source: "../Pictogram/m_lok.png"
+        }
         visible: main_window.is_slave
+    }
+
+    Image {
+        id: img8
+        x: 448
+        y: 0
+        width: 64
+        height: 64
+        source: "../Pictogram/disel/0_tpl.png"
+        opacity: 1
+        z: 4
     }
 
     Image {
@@ -198,16 +215,6 @@ Rectangle {
         source: "../Pictogram/disel/0_oxl.png"
     }
 
-    Image {
-        id: img8
-        x: 448
-        y: 0
-        width: 64
-        height: 64
-        source: "../Pictogram/disel/0_tpl.png"
-        opacity: 1
-        z: 4
-    }
 
     Image {
         id: img7

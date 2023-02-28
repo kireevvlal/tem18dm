@@ -27,6 +27,7 @@ Rectangle {
         color: "#b18e8e"
         text: "0"
         font.bold: true
+        font.family: main_window.deffntfam
         horizontalAlignment: Text.AlignHCenter
         anchors.fill: parent
         verticalAlignment: Text.AlignVCenter

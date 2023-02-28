@@ -26,6 +26,7 @@ Item {
         y: 0
         x: 0
         font.pixelSize: 14
+        font.family: main_window.deffntfam
         color: "lightgray"
         text: name
         visible: isHeader
@@ -37,6 +38,7 @@ Item {
         width: barWidth
         horizontalAlignment: Text.AlignHCenter
         font.pixelSize: 14
+        font.family: main_window.deffntfam
         color: "lightgray"
         text: parameter
         visible: isHeader
@@ -52,6 +54,7 @@ Item {
         x: 32
         horizontalAlignment: Text.AlignHCenter
         font.pixelSize: 14
+        font.family: main_window.deffntfam
         //font.bold: true
         color: "#00d7d7" //isHeader ? (value > errorValue ? "red" : (value > warningValue ? "yellow" : "lightblue")) : "blue"
         text:  extgauge.digitalvalue //gauge.value
@@ -107,6 +110,7 @@ Item {
                 implicitHeight: 28
                 Text {
                     font.pixelSize: 15
+                    font.family: main_window.deffntfam
                     text: styleData.value < gauge.maximumValue ? styleData.value : ""
                     color: "lightgray"
                     visible: visibleLabels

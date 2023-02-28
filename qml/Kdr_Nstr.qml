@@ -4,16 +4,25 @@ Rectangle {
     width: 512
     height: 197
     color: "#000000"
-
+    property int active: 0
+    property int pos: 0
+    property string number: "0001"
+    property bool elinj: true
+    property int psensors: 16
+    property int svolume: 100
     Timer {
         triggeredOnStart: true
 
         interval: 500
-        repeat: true
-        running: kdr_AvProgrev.opacity
+//        repeat: true
+        running: kdr_Nastroika.opacity
 
         onTriggered: {
-
+            var par = ioBf.getKdrNastroyka()
+            number = par[0]
+            elinj = par[1]
+            psensors = par[2]
+            svolume = par[3]
         }
 
     }
@@ -35,182 +44,123 @@ Rectangle {
     }
 
     Text {
-        id: text3
-        x: 410
-        y: 28
-        color: "#d3d3d3"
-        text: qsTr("запись")
-        z: 1
-        font.pixelSize: 12
-        font.bold: true
-    }
-
-    Text {
         id: text12
-        x: 261
-        y: 8
+        x: 0
+        y: 0
         color: "#f9f8f8"
         text: qsTr("НАСТРОЙКИ")
         textFormat: Text.AutoText
         styleColor: "#8877e4"
         font.bold: true
         font.pixelSize: 14
+        font.family: main_window.deffntfam
     }
 
     Text {
-        id: text4
-        x: 338
-        y: 85
-        color: "#d3d3d3"
-        text: qsTr("сигнал тревоги:")
-        z: 14
+        id: txt1
+        x: 10
+        y: 30
+        color: (active == 0) ? "yellow" : "silver"
+        text: qsTr("Номер тепловоза")
+        textFormat: Text.AutoText
         font.bold: true
-        font.pixelSize: 12
+        font.pixelSize: 14
+        font.family: main_window.deffntfam
     }
 
     Text {
-        id: text5
-        x: 309
-        y: 102
-        width: 123
-        height: 17
-        color: "#d3d3d3"
-        text: qsTr("время                      час:")
-        z: 13
+        id: txt_number
+        x: 200
+        y: 30
+        color: "cyan"
+        textFormat: Text.AutoText
         font.bold: true
-        font.pixelSize: 12
+        font.pixelSize: 14
+        font.family: main_window.deffntfam
+        text: number
+    }
+    Text {
+        id: txt_undrln
+        x: (!pos) ? 200 : ((pos == 1) ? 209 : ((pos == 2) ? 218 : 227))
+        y: 30
+        color: "cyan"
+        textFormat: Text.AutoText
+        font.bold: true
+        font.pixelSize: 14
+        font.family: main_window.deffntfam
+        text: active ? "" : "_"
     }
 
     Text {
-        id: text6
-        x: 382
-        y: 121
-        width: 50
-        height: 17
-        color: "#d3d3d3"
-        text: qsTr("минуты:")
-        z: 12
+        id: txt2
+        x: 10
+        y: 60
+        color: (active == 1) ? "yellow" : "silver"
+        text: qsTr("Электронный впрыск")
+        textFormat: Text.AutoText
         font.bold: true
-        font.pixelSize: 12
+        font.pixelSize: 14
+        font.family: main_window.deffntfam
     }
 
     Text {
-        id: text7
-        x: 327
-        y: 141
-        width: 105
-        height: 17
-        color: "#d3d3d3"
-        text: qsTr("дата                день:")
-        z: 11
+        id:txt_elinj
+        x: 200
+        y: 60
+        color: "cyan"
+        textFormat: Text.AutoText
         font.bold: true
-        font.pixelSize: 12
+        font.pixelSize: 14
+        font.family: main_window.deffntfam
+        text: elinj ? qsTr("ЕСТЬ") : qsTr("НЕТ")
     }
 
     Text {
-        id: text8
-        x: 409
-        y: 180
-        width: 23
-        height: 17
-        color: "#d3d3d3"
-        text: qsTr("год:")
-        z: 10
+        id: txt3
+        x: 10
+        y: 90
+        color: (active == 2) ? "yellow" : "silver"
+        text: qsTr("Датчики давления")
+        textFormat: Text.AutoText
         font.bold: true
-        font.pixelSize: 12
+        font.pixelSize: 14
+        font.family: main_window.deffntfam
     }
 
     Text {
-        id: text9
-        x: 394
-        y: 161
-        width: 38
-        height: 17
-        color: "#d3d3d3"
-        text: qsTr("месяц:")
-        z: 9
+        id: txt_psensors
+        x: 200
+        y: 90
+        color: "cyan"
+        textFormat: Text.AutoText
         font.bold: true
-        font.pixelSize: 12
+        font.pixelSize: 14
+        font.family: main_window.deffntfam
+        text: psensors
     }
 
     Text {
-        id: text14
-        x: 460
-        y: 85
-        width: 47
-        height: 16
-        color: "#00ffff"
-        text: qsTr("откл")
-        z: 8
+        id: txt4
+        x: 10
+        y: 120
+        color: (active == 3) ? "yellow" : "silver"
+        text: qsTr("Громкость звука, %")
+        textFormat: Text.AutoText
         font.bold: true
-        font.pixelSize: 12
+        font.pixelSize: 14
+        font.family: main_window.deffntfam
     }
 
     Text {
-        id: text15
-        x: 460
-        y: 102
-        width: 47
-        height: 16
-        color: "#00ffff"
-        text: qsTr("12")
-        z: 7
-        font.pixelSize: 12
+        id: txt_svolume
+        x: 200
+        y: 120
+        color: "cyan"
+        textFormat: Text.AutoText
         font.bold: true
+        font.pixelSize: 14
+        font.family: main_window.deffntfam
+        text: svolume
     }
-
-    Text {
-        id: text16
-        x: 460
-        y: 121
-        width: 47
-        height: 16
-        color: "#00ffff"
-        text: qsTr("55")
-        z: 6
-        font.pixelSize: 12
-        font.bold: true
-    }
-
-    Text {
-        id: text17
-        x: 460
-        y: 141
-        width: 47
-        height: 16
-        color: "#00ffff"
-        text: qsTr("07")
-        z: 5
-        font.pixelSize: 12
-        font.bold: true
-    }
-
-    Text {
-        id: text18
-        x: 460
-        y: 161
-        width: 47
-        height: 16
-        color: "#00ffff"
-        text: qsTr("май")
-        z: 4
-        font.pixelSize: 12
-        font.bold: true
-    }
-
-    Text {
-        id: text19
-        x: 460
-        y: 180
-        width: 47
-        height: 16
-        color: "#00ffff"
-        text: qsTr("2020")
-        z: 3
-        font.pixelSize: 12
-        font.bold: true
-    }
-
-
 }
 

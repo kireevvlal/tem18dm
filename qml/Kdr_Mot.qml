@@ -45,6 +45,7 @@ Rectangle {
         z: 1
         font.bold: true
         font.pixelSize: 14
+        font.family: main_window.deffntfam
     }
     // motoresurs
     Text {
@@ -56,6 +57,7 @@ Rectangle {
            font.bold: true
            verticalAlignment: Text.AlignVCenter
            font.pixelSize: 14
+           font.family: main_window.deffntfam
     }
 
     TInd {
@@ -74,6 +76,7 @@ Rectangle {
         text: qsTr("ч")
         font.pixelSize: 16
         font.bold: true
+        font.family: main_window.deffntfam
         verticalAlignment: Text.AlignVCenter
     }
 
@@ -95,6 +98,7 @@ Rectangle {
         font.bold: true
         verticalAlignment: Text.AlignVCenter
         font.pixelSize: 16
+        font.family: main_window.deffntfam
     }
 
     TInd {
@@ -114,6 +118,7 @@ Rectangle {
         text: qsTr("с")
         font.pixelSize: 16
         font.bold: true
+        font.family: main_window.deffntfam
         verticalAlignment: Text.AlignVCenter
     }
 
@@ -126,6 +131,7 @@ Rectangle {
         text: qsTr("в тяге:")
         font.pixelSize: 16
         font.bold: true
+        font.family: main_window.deffntfam
         verticalAlignment: Text.AlignVCenter
     }
 
@@ -144,6 +150,7 @@ Rectangle {
         text: qsTr("ч")
         font.pixelSize: 16
         font.bold: true
+        font.family: main_window.deffntfam
         verticalAlignment: Text.AlignVCenter
     }
 
@@ -165,6 +172,7 @@ Rectangle {
         font.bold: true
         verticalAlignment: Text.AlignVCenter
         font.pixelSize: 15
+        font.family: main_window.deffntfam
     }
 
     TInd {
@@ -184,6 +192,7 @@ Rectangle {
         text: qsTr("с")
         font.pixelSize: 16
         font.bold: true
+        font.family: main_window.deffntfam
         verticalAlignment: Text.AlignVCenter
     }
 
@@ -196,6 +205,7 @@ Rectangle {
         text: qsTr("работа:")
         font.pixelSize: 16
         font.bold: true
+        font.family: main_window.deffntfam
         verticalAlignment: Text.AlignVCenter
     }
 
@@ -217,6 +227,7 @@ Rectangle {
         text: qsTr("кВт * ч")
         font.pixelSize: 16
         font.bold: true
+        font.family: main_window.deffntfam
         verticalAlignment: Text.AlignVCenter
     }
 
@@ -230,6 +241,7 @@ Rectangle {
         styleColor: "#0f0c0c"
         font.pixelSize: 20
         font.bold: true
+        font.family: main_window.deffntfam
     }
 
     TInd {
@@ -252,6 +264,7 @@ Rectangle {
         text: qsTr("об/мин")
         font.pixelSize: 16
         font.bold: true
+        font.family: main_window.deffntfam
         styleColor: "#0f0c0c"
     }
 }

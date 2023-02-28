@@ -73,7 +73,8 @@ DISTFILES += \
     qml/TRegm.qml \
     qml/TRevers.qml \
     qml/USOAnalog.qml \
-    qml/USODiskrt.qml
+    qml/USODiskrt.qml \
+    qml/scripts.js
 
 HEADERS += \
     control.h \
@@ -86,13 +87,13 @@ HEADERS += \
     zapuso.h
 
 win32:INCLUDEPATH += D:/Development/Qt/vktoolslib
-unix:INCLUDEPATH += /home/user/develop/vktoolslib
+unix:INCLUDEPATH += /home/kont/develop/vktoolslib
 
 win32:LIBS+=  D:/Development/Qt/vktoolslib/vktreexml.lib
 win32:LIBS+=  D:/Development/Qt/vktoolslib/vkserialport.lib
 win32:LIBS+=  D:/Development/Qt/vktoolslib/vkdatastore.lib
-unix:LIBS += -L/home/user/develop/vktoolslib -lvktreexml
-unix:LIBS += -L/home/user/develop/vktoolslib -lvkserialport
-unix:LIBS += -L/home/user/develop/vktoolslib -lvkdatastore
+unix:LIBS += -L/home/kont/develop/vktoolslib -lvktreexml
+unix:LIBS += -L/home/kont/develop/vktoolslib -lvkserialport
+unix:LIBS += -L/home/kont/develop/vktoolslib -lvkdatastore
 
 win32:RC_FILE = ico.rc

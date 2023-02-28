@@ -59,6 +59,7 @@ Rectangle {
             text:  edit1value
             horizontalAlignment: Text.AlignHCenter
             font.pixelSize: 10//12
+            font.family: main_window.deffntfam
         }
     }
 
@@ -76,6 +77,7 @@ Rectangle {
             color: "#ffffff"
             text: edit2value
             font.pixelSize: 10
+            font.family: main_window.deffntfam
             horizontalAlignment: Text.AlignHCenter
         }
         border.width: 1
@@ -107,6 +109,7 @@ Rectangle {
             color: "#ffffff"
             text: edit3value
             font.pixelSize: 10
+            font.family: main_window.deffntfam
             horizontalAlignment: Text.AlignHCenter
         }
         border.width: 1
@@ -138,6 +141,7 @@ Rectangle {
             color: "#ffffff"
             text: edit4value
             font.pixelSize: 10
+            font.family: main_window.deffntfam
             horizontalAlignment: Text.AlignLeft
         }
         border.width: 1

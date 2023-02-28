@@ -122,6 +122,7 @@ Rectangle {
         text: "СВЯЗИ"
         font.bold: true
         font.pixelSize: 12
+        font.family: main_window.deffntfam
     }
 
     LedIndicator {

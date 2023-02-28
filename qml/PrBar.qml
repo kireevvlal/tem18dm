@@ -45,6 +45,7 @@ Rectangle {
         font.bold: true
         horizontalAlignment: Text.AlignHCenter
         font.pixelSize: 12
+        font.family: main_window.deffntfam
         opacity: if (txtvzbl) { 1 } else { 0 } // видимость
     }
 }

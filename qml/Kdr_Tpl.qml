@@ -99,6 +99,7 @@ Rectangle {
             color: "silver"
             text: qsTr("об/мин")
             font.pixelSize: 12
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -109,6 +110,7 @@ Rectangle {
             text: qsTr("ТОПЛИВО")
             font.bold: true
             font.pixelSize: 14
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -119,6 +121,7 @@ Rectangle {
             text: qsTr("P топлива ниже нормы")
             font.bold: true
             font.pixelSize: 12
+            font.family: main_window.deffntfam
         }
     }
 

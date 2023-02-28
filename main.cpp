@@ -22,16 +22,21 @@ Processor *pProcessor;
 void handleExitSignals(int signal) {
     switch (signal) {
     case SIGABRT:
+        qDebug("SIGABRT");
 //        break;
     case SIGTERM:
+        qDebug("SIGTERM");
 //        break;
 #ifndef Q_OS_WIN
     case SIGHUP:
+        qDebug("SIGHUP");
 //        break;
     case SIGQUIT:
+        qDebug("SIGQUIT");
 //        break;
 #endif
     case SIGINT:
+        qDebug("SIGINT");
         pProcessor->Stop();
         exit(0);
         break;
@@ -112,11 +117,11 @@ int main(int argc, char *argv[])
     signal(SIGBUS, handleErrorsSignals);
 #endif
 
-    QFont fon("Arial");
+//    QFont fon("Gigi");
+//    app.setFont(fon);
 #ifndef Q_OS_WIN
     app.setOverrideCursor(QCursor(Qt::BlankCursor));
 #endif
-    app.setFont(fon);
     try {
         ret = app.exec();
     } catch (const std::exception &e) {

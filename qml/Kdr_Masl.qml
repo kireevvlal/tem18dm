@@ -42,6 +42,7 @@ Rectangle {
             text: qsTr("МАСЛО")
             font.bold: true
             font.pixelSize: 14
+            font.family: main_window.deffntfam
         }
 
         TInd {
@@ -95,6 +96,7 @@ Rectangle {
             color: "silver"
             text: qsTr("об/мин")
             font.pixelSize: 12
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -105,6 +107,7 @@ Rectangle {
             text: qsTr("P масла ниже нормы")
             font.bold: true
             font.pixelSize: 12
+            font.family: main_window.deffntfam
         }
         Text {
             id: zTm
@@ -114,13 +117,7 @@ Rectangle {
             text: qsTr("Запрет работы под нагрузкой (t масла < 45°C)")
             font.bold: true
             font.pixelSize: 12
+            font.family: main_window.deffntfam
         }
     }
 }
-
-
-/*##^##
-Designer {
-    D{i:0;formeditorZoom:2}
-}
-##^##*/

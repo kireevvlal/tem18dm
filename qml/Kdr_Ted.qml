@@ -67,6 +67,7 @@ Rectangle {
             anchors.topMargin: 0
             font.bold: true
             font.pixelSize: 14
+            font.family: main_window.deffntfam
         }
 
         Image {

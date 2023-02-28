@@ -26,6 +26,7 @@ Rectangle {
         text: namePage
         font.bold: true
         font.pixelSize: 14
+        font.family: main_window.deffntfam
     }
     //************************************
     // подготовка данных
@@ -69,6 +70,7 @@ Rectangle {
                 Text{
                     color: "white";
                     font.pixelSize: 12
+                    font.family: main_window.deffntfam
                     text: " Разъем   №   Обозн.   Наименование";
                 }
             }
@@ -113,6 +115,7 @@ Rectangle {
                 Text{
                     color: "white";
                     font.pixelSize: 12
+                    font.family: main_window.deffntfam
                     text: " Разъем   №   Обозн.   Наименование";
                 }
             }

@@ -44,6 +44,7 @@ Rectangle {
             text: qsTr("F")
             font.bold: true
             font.pixelSize: 38
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -54,6 +55,7 @@ Rectangle {
             text: qsTr("Uбс:")
             font.pixelSize: 14
             font.bold: true
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -64,6 +66,7 @@ Rectangle {
             text: qsTr("о/м")
             font.bold: true
             font.pixelSize: 16
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -76,6 +79,7 @@ Rectangle {
             styleColor: "#8877e4"
             font.bold: true
             font.pixelSize: 16
+            font.family: main_window.deffntfam
         }
 
 
@@ -87,6 +91,7 @@ Rectangle {
             text: qsTr("Iзб:")
             font.bold: true
             font.pixelSize: 14
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -99,6 +104,7 @@ Rectangle {
             text: qsTr("воды (выход дизеля):")
             font.bold: true
             font.pixelSize: 14
+            font.family: main_window.deffntfam
 
             Text {
                 id: text5
@@ -110,6 +116,7 @@ Rectangle {
                 text: qsTr("масла (выход дизеля):")
                 font.bold: true
                 font.pixelSize: 14
+                font.family: main_window.deffntfam
             }
 
             Text {
@@ -120,6 +127,7 @@ Rectangle {
                 text: qsTr("t")
                 font.bold: true
                 font.pixelSize: 44
+                font.family: main_window.deffntfam
             }
         }
 
@@ -133,6 +141,7 @@ Rectangle {
             text: qsTr("воды (вход калорифера):")
             font.bold: true
             font.pixelSize: 14
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -145,6 +154,7 @@ Rectangle {
             text: qsTr("воздуха окружающего:")
             font.bold: true
             font.pixelSize: 14
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -157,6 +167,7 @@ Rectangle {
             text: qsTr("воды (выход калорифера):")
             font.bold: true
             font.pixelSize: 14
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -167,6 +178,7 @@ Rectangle {
             text: qsTr("В")
             font.bold: true
             font.pixelSize: 14
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -179,6 +191,7 @@ Rectangle {
             text: qsTr("А")
             font.bold: true
             font.pixelSize: 14
+            font.family: main_window.deffntfam
         }
 
         Text {
@@ -191,10 +204,9 @@ Rectangle {
             text: qsTr("С")
             font.bold: true
             font.pixelSize: 14
+            font.family: main_window.deffntfam
         }
     }
-
-
 
     TInd {
         id: ind_Ubs

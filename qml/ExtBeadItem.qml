@@ -21,6 +21,7 @@ Rectangle {
         text: textvalue
         font.pixelSize: 10
         font.bold: true
+        font.family: main_window.deffntfam
         color: "blue"
         horizontalAlignment: Text.AlignHCenter
         visible: textvisible

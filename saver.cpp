@@ -7,7 +7,8 @@ Saver::Saver(LcmSettings *settings, QObject *parent) : QObject(parent) {
     _media_path = _reg_path = _current_dir = "";
     _state = _index= _quantity = 0;
     _media_inserted = false;
-    _devices = ScanDev();
+    _is_running = false;
+//    _devices = ScanDev();
 }
 //--------------------------------------------------------------------------------
 void Saver::Run() {
@@ -21,37 +22,45 @@ void Saver::TaskTimerStep() {
     case 0: // простой
         break;
     case 1: // начальная обработка
-        _save_path = _media_path + _devices.last();
-        _directory.setPath(_save_path);
-        _storage_info = QStorageInfo(_directory);
-        if (_storage_info.isValid() && _storage_info.isReady()) {
-            available = _storage_info.bytesAvailable();
-            if (available > 2600000) {
-                QDateTime dt(QDateTime::currentDateTime());
-                _current_dir = "tm18" + _settings->Number + dt.toString("yyMMddhhmmss");
-                if (_directory.mkdir(_current_dir)) {
-                    _files = QDir(_reg_path).entryInfoList(QStringList() << "*.rez", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time);
-                    _index = 1;
-                    _state = 2;
-                    _quantity = _files.size();
-                } else
-                    Reset();
-            }
-        } else
-            Reset();
-        break;
-    case 2: // копирование файла
-        available = _storage_info.bytesAvailable();
-        if (available > 2600000) {
-            if (_index < _quantity) {
-                QFile file(_files[_index].filePath());
-                file.copy(_save_path + "/" + _current_dir + "/" + _files[_index].fileName());
-                _index++;
-
+        if (!_is_running) {
+            _is_running = true;
+            _save_path = _media_path + _devices.last();
+            _directory.setPath(_save_path);
+            _storage_info = QStorageInfo(_directory);
+            if (_storage_info.isValid() && _storage_info.isReady()) {
+                available = _storage_info.bytesAvailable();
+                if (available > 2600000) {
+                    QDateTime dt(QDateTime::currentDateTime());
+                    _current_dir = "tm18" + _settings->Number + dt.toString("yyMMddhhmmss");
+                    if (_directory.mkdir(_current_dir)) {
+                        _files = QDir(_reg_path).entryInfoList(QStringList() << "*.rez", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time);
+                        _index = 1;
+                        _state = 2;
+                        _quantity = _files.size();
+                    } else
+                        Reset();
+                }
             } else
                 Reset();
-        } else
-            Reset();
+            _is_running = false;
+        }
+        break;
+    case 2: // копирование файла
+        if (!_is_running) {
+            _is_running = true;
+            available = _storage_info.bytesAvailable();
+            if (available > 2600000) {
+                if (_index < _quantity) {
+                    QFile file(_files[_index].filePath());
+                    file.copy(_save_path + "/" + _current_dir + "/" + _files[_index].fileName());
+                    _index++;
+
+                } else
+                    Reset();
+            } else
+                Reset();
+            _is_running = false;
+        }
         break;
     }
 }
@@ -71,18 +80,21 @@ void Saver::Save() {
 }
 //--------------------------------------------------------------------------------
 void Saver::MediaChange() {
-#ifdef Q_OS_WIN
-    _media_inserted = true;
-#endif
-#ifdef Q_OS_UNIX
+//#ifdef Q_OS_WIN
+//    _media_inserted = true;
+//#endif
+//#ifdef Q_OS_UNIX
     QStringList devs = ScanDev();
     if (devs.length() != _devices.length()) {
         if (devs.length() > _devices.length()) {
+            _media_inserted = true;
+//#ifndef TPK
             QString dev = devs.last();
             if (dev[dev.length() - 1] == '1')
                 _media_inserted = true;
             else
                 _media_inserted = false;
+//#endif
         } else
             _media_inserted = false;
         if (!_media_inserted && _state)
@@ -91,12 +103,34 @@ void Saver::MediaChange() {
         foreach (QString str, devs)
             _devices.append(str);
     }
-#endif
+
+
+//    QStringList devs = ScanDev();
+//    if (devs.length() != _devices.length()) {
+//        if (devs.length() > _devices.length()) {
+//            QString dev = devs.last();
+//            if (dev[dev.length() - 1] == '1')
+//                _media_inserted = true;
+//            else
+//                _media_inserted = false;
+//        } else
+//            _media_inserted = false;
+//        if (!_media_inserted && _state)
+//            Reset();
+//        _devices.clear();
+//        foreach (QString str, devs)
+//            _devices.append(str);
+//    }
+//#endif
 }
 //--------------------------------------------------------------------------------
 QStringList Saver::ScanDev() {
     QStringList res;
+//#ifdef TPK
+//    QFileInfoList files = QDir(_media_path).entryInfoList(QStringList() << "sd*", QDir::Dirs);
+//#else
     QFileInfoList files = QDir("/dev").entryInfoList(QStringList() << "sd*", QDir::System);
+//#endif
     foreach (QFileInfo item, files) {
         res.append(item.fileName());
     }
@@ -107,4 +141,5 @@ void Saver::SetParameters(QString mpath, QString rpath, int interval) {
     _media_path = mpath;
     _reg_path = rpath;
     _task_interval = interval;
+    _devices = ScanDev();
 }

@@ -61,6 +61,7 @@ Rectangle {
             text: variable
             color: "silver"
             font.pixelSize: 10
+            font.family: main_window.deffntfam
         }
     }
 
@@ -70,6 +71,7 @@ Rectangle {
         y: 0
         text: qsTr("БЭЛ")
         font.pixelSize: 12
+        font.family: main_window.deffntfam
         color: "#ffffff"
     }
 
@@ -79,6 +81,7 @@ Rectangle {
         y: 0
         text: qsTr("УСТА")
         font.pixelSize: 12
+        font.family: main_window.deffntfam
         color: "#ffffff"
     }
 
@@ -89,6 +92,7 @@ Rectangle {
         y: 0
         text: qsTr("ТИ")
         font.pixelSize: 12
+        font.family: main_window.deffntfam
         color: "#ffffff"
     }
 
@@ -98,6 +102,7 @@ Rectangle {
         y: 0
         text: qsTr("МСС")
         font.pixelSize: 12
+        font.family: main_window.deffntfam
         color: "#ffffff"
     }
 
@@ -107,6 +112,7 @@ Rectangle {
         y: 20
         color: "#ffffff"
         text: qsTr("Open")
+        font.family: main_window.deffntfam
         font.pixelSize: 12
     }
 
@@ -148,6 +154,7 @@ Rectangle {
         y: 40
         color: "#ffffff"
         text: qsTr("Conn")
+        font.family: main_window.deffntfam
         font.pixelSize: 12
     }
 
@@ -189,6 +196,7 @@ Rectangle {
         y: 80
         color: "#ffffff"
         text: qsTr("Quality")
+        font.family: main_window.deffntfam
         font.pixelSize: 12
     }
 
@@ -200,6 +208,7 @@ Rectangle {
         height: 22
         color: "#ffffff"
         font.pixelSize: 10
+        font.family: main_window.deffntfam
         text: "0"
     }
 
@@ -211,6 +220,7 @@ Rectangle {
         height: 22
         color: "#ffffff"
         font.pixelSize: 10
+        font.family: main_window.deffntfam
         text: "0"
     }
 
@@ -222,6 +232,7 @@ Rectangle {
         height: 22
         color: "#ffffff"
         font.pixelSize: 10
+        font.family: main_window.deffntfam
         text: "0"
     }
 
@@ -233,6 +244,7 @@ Rectangle {
         height: 22
         color: "#ffffff"
         font.pixelSize: 10
+        font.family: main_window.deffntfam
         text: "0"
     }
 
@@ -242,6 +254,7 @@ Rectangle {
         y: 100
         color: "#ffffff"
         text: qsTr("Errors")
+        font.family: main_window.deffntfam
         font.pixelSize: 12
     }
 
@@ -254,6 +267,7 @@ Rectangle {
         color: "#ffffff"
         text: "0"
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -265,6 +279,7 @@ Rectangle {
         color: "#ffffff"
         text: "0"
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -276,6 +291,7 @@ Rectangle {
         color: "#ffffff"
         text: "0"
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -287,6 +303,7 @@ Rectangle {
         color: "#ffffff"
         text: "0"
         font.pixelSize: 10
+        font.family: main_window.deffntfam
     }
 
     Text {
@@ -296,6 +313,7 @@ Rectangle {
         color: "#ffffff"
         text: qsTr("IsBytes")
         font.pixelSize: 12
+        font.family: main_window.deffntfam
     }
 
     LedIndicator {
