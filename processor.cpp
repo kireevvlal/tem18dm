@@ -1292,3 +1292,4 @@ QJsonArray Processor::getKdrDevelop() {
 QJsonArray Processor::getKdrNastroyka() {
     return { _settings.Number, _settings.ElInjection, _settings.PressureSensors, _settings.SoundVolume };
 }
+

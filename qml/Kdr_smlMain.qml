@@ -126,6 +126,4 @@ Rectangle {
         barWidth: 30
         visibleMinorTickmarks: false
     }
-
 }
-
