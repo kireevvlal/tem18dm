@@ -1,6 +1,6 @@
 #include "processor.h"
 
-#ifdef ATRONIC_UNIX
+#ifdef Q_OS_LINUX
 #include <string>
 #include <cstring>
 
@@ -125,8 +125,9 @@ void Processor::SaveMessagesList(QFile *file) {
 void Processor::Run()
 {
 //    int j = 0;
-#ifdef ATRONIC_UNIX
-    GPIO();
+#ifdef Q_OS_LINUX
+    if (_settings.DmType == DisplayType::Atronic)
+        GPIO();
 #endif
     // start serial ports
     for (QMap<QString, ExtSerialPort*>::iterator i = _serial_ports.begin(); i != _serial_ports.end(); i++) {
@@ -188,7 +189,7 @@ bool Processor::ReadMessagesList(QFile* file) {
         return false;
 }
 //--------------------------------------------------------------------------------
-#ifdef ATRONIC_UNIX
+#ifdef Q_OS_LINUX
 void Processor::GPIO() {
     string s = "/dev/GpioCom1Mode";
     int port_f = open(s.c_str(),O_RDWR | O_SYNC);
@@ -236,17 +237,17 @@ void Processor::saveSettings(QString number, int psensors, bool elinj, int svolu
 }
 //--------------------------------------------------------------------------------
 void Processor::Stop() {
-     QFile appmrfile, apptrlfile;
+    QFile appmrfile, apptrlfile;
     SaveMotoresurs(&_mtr_file);
-#ifndef TPK
-    appmrfile.setFileName(_start_path + "/mot.re");
-    SaveMotoresurs(&appmrfile);
-#endif
+    if (_settings.DmType == DisplayType::Atronic) {
+        appmrfile.setFileName(_start_path + "/mot.re");
+        SaveMotoresurs(&appmrfile);
+    }
     SaveMessagesList(&_trmess_file);
-#ifndef TPK
-    apptrlfile.setFileName(_start_path + "/messages.txt");
-    SaveMessagesList(&apptrlfile);
-#endif
+    if (_settings.DmType == DisplayType::Atronic) {
+        apptrlfile.setFileName(_start_path + "/messages.txt");
+        SaveMessagesList(&apptrlfile);
+    }
     _registrator->Stop();
     _is_active = false;
 }
@@ -586,6 +587,7 @@ bool Processor::SaveSettings() {
         xml.setAutoFormatting(true);
         xml.writeStartDocument();
         xml.writeStartElement("settings");
+        xml.writeTextElement("dm", QString::number((_settings.DmType == DisplayType::Atronic) ? 1 : 2));
         xml.writeTextElement("number", _settings.Number);
         xml.writeTextElement("psensor", QString::number(_settings.PressureSensors));
         xml.writeTextElement("elinj", _settings.ElInjection ? "on" : "off");
@@ -659,7 +661,8 @@ void Processor::ParseSettings(NodeXML *node)
             else
                 if (_settings.SoundVolume < 10)
                     _settings.SoundVolume = 10;
-        }
+        } else if (node->Name == "dm")
+            _settings.DmType = (node->Text == "1") ? DisplayType::Atronic : ((node->Text == "2") ? DisplayType::TPK : DisplayType::Atronic);
         node = node->Next;
     }
 }
@@ -785,11 +788,11 @@ void Processor::ParseRegistration(NodeXML* node) {
 }
 //------------------------------------------------------------------------------
 QJsonArray Processor::getSettings() {
-int module = 1; // atronik
-#ifdef TPK
-    module = 2;
-#endif
-    return {  module, _settings.Number, _settings.SoundVolume };
+//int module = 1; // atronik
+//#ifdef TPK
+//    module = 2;
+//#endif
+    return { _settings.DmType + 1, _settings.Number, _settings.SoundVolume };
 }
 //------------------------------------------------------------------------------
 // New realisation

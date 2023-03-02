@@ -47,7 +47,7 @@ struct TrBanner {
     int section; // номер секции
     int index;   // индекс тревожного сообщения
     TrBanner() { str1 = str2 = ""; section = index = 0; }
-    TrBanner(QString s1, QString s2, int s, int i) { str1 = s1; str2 = s2; section = s; index = i; };
+    TrBanner(QString s1, QString s2, int s, int i) { str1 = s1; str2 = s2; section = s; index = i; }
 };
 
 
@@ -102,7 +102,7 @@ private:
      bool ReadMessagesList(QFile*);
     void SaveMotoresurs(QFile*);
     bool ReadMotoresurs(QFile*);
-#ifdef ATRONIC_UNIX
+#ifdef Q_OS_LINUX
     void GPIO();
 #endif
 public:

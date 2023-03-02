@@ -187,7 +187,7 @@ Window {
                     kdr_FootUso.focus = true;
                     break;
                 case 4:
-                    kdr_FootNstr.opacity = 1;
+                    kdr_Foot.opacity = 1;
                     kdr_Foot.focus = true;
                     break;
                 case 5:
@@ -892,6 +892,7 @@ Window {
         x: 128
         y: 219
         z: 1
+        opacity: 0
     }
 
     Kdr_Tre {
@@ -901,6 +902,7 @@ Window {
         width: 640
         height: 64
         z: 99
+        opacity: 0
     }
 
     Kdr_Privet {
@@ -918,12 +920,14 @@ Window {
         x: 128
         y: 219
         z: 9
+        opacity: 0
     }
 
     Kdr_Vzb {
         id: kdr_Vzb
         x: 128
         y: 219
+        opacity: 0
     }
 
     Kdr_Mot {
@@ -931,6 +935,7 @@ Window {
         x: 128
         y: 219
         z: 2
+        opacity: 0
     }
 
     Kdr_Tpl {
@@ -940,6 +945,7 @@ Window {
         width: 512
         height: 197
         z: 39
+        opacity: 0
     }
 
     Kdr_Svz {
@@ -947,6 +953,7 @@ Window {
         x: 128
         y: 219
         z: 255
+        opacity: 0
     }
 
     Kdr_Masl {
@@ -957,6 +964,7 @@ Window {
         height: 197
         border.width: 0
         z: 10
+        opacity: 0
     }
 
     Kdr_Ohl {
@@ -966,6 +974,7 @@ Window {
         width: 512
         height: 197
         z: 11
+        opacity: 0
     }
 
     Kdr_Trl {
@@ -984,6 +993,7 @@ Window {
         x: 128
         y: 219
         z: 14
+        opacity: 0
     }
 
     Kdr_Dizl {
@@ -991,6 +1001,7 @@ Window {
         x: 128
         y: 219
         z: 15
+        opacity: 0
     }
 
     Kdr_AvProgrev {
@@ -1000,15 +1011,15 @@ Window {
         width: 512
         height: 197
         z: 17
+        opacity: 0
     }
 
     Kdr_Nstr {
         id: kdr_Nastroika
         x: 128
         y: 219
-        opacity: 1
+        opacity: 0
         z: 300
-
     }
 
     Kdr_Analog {
@@ -1145,35 +1156,7 @@ Window {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 0
             focus: true
-
-            onSwitchFootDizel:  { // переход на дизельное меню
-                kdr_FootDizel.opacity = 1;
-                kdr_FootDizel.focus = true;
-//                setSystem(1);
-            }
-
-            onSwitchFootElektr:  { // переход на электрическое меню
-                       kdr_FootElektrooborud.opacity = 1;
-                       kdr_FootElektrooborud.focus = true;
-//                setSystem(2);
-                      }
-
-            onKnopaS: { showKdr_Nastroiki();
-                     //   if (kdr_Main.color == "steelblue" ) { kdr_Main.color = "red";} // условие не читается
-                     //    else kdr_Main.color = "black";
-                                               } // сигнал о нажатии клавиши ДМ "S"  /alt+b
-            onKnopai: { showKdr_ArhivMessage();} // сигнал о нажатии клавиши ДМ "i"  /alt+c
-            onKnopaSt:{ showKdr_Reostat();     } // сигнал о нажатии клавиши ДМ "St" /alt+d
-            onKnopaUD: { // сигнал о нажатии клавиши ДМ "UD" /alt+i
-                showKdr_Svazi();
-            }
-            onSaveToUSB: { ioBf.querySaveToUSB(); }  // сигнал о необходимости записи на USB (для отработки под Windows)
-
-            onSwitchFoot_Exit: {  // в начальное состояние
-                go_Exit(kdr_TrLs.opacity || kdr_Nastroika.opacity || kdr_Develop.opacity || kdr_Svz);
-            }
         }
-
 
         Kdr_FtDzl {//дизельное меню
             id: kdr_FootDizel
@@ -1184,30 +1167,6 @@ Window {
             opacity: 0
             z: 33
             focus: false
-
-            onSwitchDzl_Cilindr: {
-                Scripts.opacityNul();
-                kdr_Dizl.opacity = 1;
-            } // цилиндры
-            onSwitchDzl_Maslo:   {
-                Scripts.opacityNul();
-                kdr_Masl.opacity = 1;
-            }
-            onSwitchDzl_Toplivo: {
-                Scripts.opacityNul();
-                kdr_Toplivo.opacity = 1;
-            }
-            onSwitchDzl_Holod:   {
-                Scripts.opacityNul();
-                kdr_Ohl.opacity = 1;
-            }
-            onSwitchDzl_Exit:    {
-                go_Exit(0);
-            }// возврат на главный экран
-            onKnopaS: { showKdr_Nastroiki();   } // сигнал о нажатии клавиши ДМ "S"  /alt+b
-            onKnopai: { showKdr_ArhivMessage();} // сигнал о нажатии клавиши ДМ "i"  /alt+c
-            onKnopaSt:{ showKdr_Reostat();     } // сигнал о нажатии клавиши ДМ "St" /alt+d
-            onKnopaUD:{ showKdr_Svazi();       } // сигнал о нажатии клавиши ДМ "UD" /alt+i
         }
 
         Kdr_FtElektr {//меню электрооборудование
@@ -1219,36 +1178,6 @@ Window {
             opacity: 0;
             z: 34
             focus: false
-
-            onSwitchEl_Bortovay:    {
-                Scripts.opacityNul();
-                kdr_Bos.opacity = 1;
-//                setSubsystem(6);
-            }    // бортовая сеть
-            onSwitchEl_Vozbugdenie: {
-                Scripts.opacityNul();
-                kdr_Vzb.opacity = 1;
-//                setSubsystem(7);
-            }    // система возбуждения
-            onSwitchEl_Tagovie:     {
-                Scripts.opacityNul();
-                kdr_TED.opacity = 1;
-//                setSubsystem(8);
-            }    // тяговые двигатели
-            onSwitchEl_Motores:     {
-                Scripts.opacityNul();
-                kdr_Mot.opacity = 1;
-//                setSubsystem(9);
-            }    // моторесурс
-            onSwitchEl_Exit: {
-                go_Exit(0);
-//                setSubsystem(0);
-            }
-            onKnopaS: { showKdr_Nastroiki();   } // сигнал о нажатии клавиши ДМ "S"  /alt+b
-            onKnopai: { showKdr_ArhivMessage();} // сигнал о нажатии клавиши ДМ "i"  /alt+c
-            onKnopaSt:{ showKdr_Reostat();     } // сигнал о нажатии клавиши ДМ "St" /alt+d
-            onKnopaUD:{ showKdr_Svazi();       } // сигнал о нажатии клавиши ДМ "UD" /alt+i
-
         }
 
         Kdr_FtUso { // верхнее меню УСО - появляется с экраном "СВЯЗИ" вызывается с любого экрана по "UD"
@@ -1259,33 +1188,6 @@ Window {
             height: 64
             opacity: 0
             z: 36
-            onSwitchUso_TI: {  // переход на меню Температурного измерителя
-                Scripts.opacityNul();
-                kdr_FootUso.opacity=0;
-                kdr_Main_small.opacity=1;
-                kdr_Foot_TI.opacity=1; kdr_Foot_TI.focus=true;}
-
-            onSwitchUso_USTA: { // переход на меню УСТА
-                Scripts.opacityNul();
-                kdr_FootUso.opacity=0;
-                kdr_Main_small.opacity=1;
-                kdr_Foot_Usta.opacity=1;
-                kdr_Foot_Usta.focus=true;   }
-
-            onSwitchUso_BEL: { // переход на меню БЭЛ
-                Scripts.opacityNul();
-                kdr_FootUso.opacity=0;
-                kdr_Main_small.opacity=1;
-                kdr_FootBEL.opacity=1;
-                kdr_FootBEL.focus=true;   }
-
-
-            onSwitchUso_Exit: {   go_Exit(0);   }
-            onKnopaS: { showKdr_Nastroiki();   } // сигнал о нажатии клавиши ДМ "S"  /alt+b
-            onKnopai: { showKdr_ArhivMessage();} // сигнал о нажатии клавиши ДМ "i"  /alt+c
-            onKnopaSt:{ showKdr_Reostat();     } // сигнал о нажатии клавиши ДМ "St" /alt+d
-            onKnopaUD:{ showKdr_Svazi();       } // сигнал о нажатии клавиши ДМ "UD" /alt+i
-
         }
 
         Kdr_FtTI {
@@ -1296,42 +1198,6 @@ Window {
             height: 64
             opacity: 0
             z: 37
-            onSwitchUso_TI_TXA: function(offset) {
-                if (offset) {
-                    if (kdr_TI_TXA.offset == 100) {
-                        kdr_TI_TXA.offset = 80;
-                        kdr_TI_TXA.numPage = 1;
-                    }
-                    else {
-                        kdr_TI_TXA.offset += 10;
-                        kdr_TI_TXA.numPage++;
-                    }
-                }
-                Scripts.opacityNul();
-                kdr_TI_TXA.opacity = 1;
-            }
-            onSwitchUso_TI_TCM: function(offset) {
-                if (offset) {
-                    if (kdr_TI_TCM.offset == 70) {
-                        kdr_TI_TCM.offset = 50;
-                        kdr_TI_TCM.numPage = 1;
-                    }
-                    else {
-                        kdr_TI_TCM.offset += 10;
-                        kdr_TI_TCM.numPage++;
-                    }
-                }
-                Scripts.opacityNul();
-                kdr_TI_TCM.opacity = 1;
-            }
-
-            onSwitchUso_Exit:  { go_Exit(0);    }
-            onKnopaS: { showKdr_Nastroiki();   } // сигнал о нажатии клавиши ДМ "S"  /alt+b
-            onKnopai: { showKdr_ArhivMessage();} // сигнал о нажатии клавиши ДМ "i"  /alt+c
-            onKnopaSt:{ showKdr_Reostat();     } // сигнал о нажатии клавиши ДМ "St" /alt+d
-            onKnopaUD:{ showKdr_Svazi();       } // сигнал о нажатии клавиши ДМ "UD" /alt+i
-
-
         }
 
         Kdr_FtUsta {// меню просмотра УСО УСТА
@@ -1342,35 +1208,6 @@ Window {
             height: 64
             opacity: 0
             z: 37 //!!!
-
-            onSwitchUso_USTA_DisVih:  { Scripts.opacityNul(); kdr_USTA_DskrVihodi.opacity = 1; }
-            onSwitchUso_USTA_DisVhod: { Scripts.opacityNul(); kdr_USTA_DskrVh.opacity = 1;     }
-            onSwitchUso_USTA_Analogi: function(/*offset*/) {
-                if (kdr_USTA_Analog.opacity) {
-                    if (kdr_USTA_Analog.offset == 30) {
-                        kdr_USTA_Analog.offset = 0;
-                        kdr_USTA_Analog.numPage = 1;
-                    }
-                    else {
-                        kdr_USTA_Analog.offset += 10;
-                        kdr_USTA_Analog.numPage++;
-                    }
-                } else
-                    kdr_USTA_Analog.offset = 0;
-                Scripts.opacityNul();
-                kdr_USTA_Analog.opacity = 1;
-            }
-
-//            onKnopaDwn: { kdr_USTA_Analog.numPage = kdr_USTA_Analog.numPage + 1;  }
-//            onKnopaUp:  { kdr_USTA_Analog.numPage = kdr_USTA_Analog.numPage - 1;  }
-
-
-            onSwitchUso_Exit: { go_Exit(0); }
-            onKnopaS: { showKdr_Nastroiki();   } // сигнал о нажатии клавиши ДМ "S"  /alt+b
-            onKnopai: { showKdr_ArhivMessage();} // сигнал о нажатии клавиши ДМ "i"  /alt+c
-            onKnopaSt:{ showKdr_Reostat();     } // сигнал о нажатии клавиши ДМ "St" /alt+d
-            onKnopaUD:{ showKdr_Svazi();       } // сигнал о нажатии клавиши ДМ "UD" /alt+i
-
         }
 
         Kdr_FtBEL { // меню просмотра УСО БЭЛ
@@ -1381,71 +1218,8 @@ Window {
             height: 64
             opacity: 0
             z: 38
-
-            onSwitchUso_BEL_DisVih:  { Scripts.opacityNul(); kdr_BEL_DskrVihodi.opacity = 1; }
-            onSwitchUso_BEL_DisVhod: { Scripts.opacityNul(); kdr_BEL_DskrVh.opacity = 1; }
-            onSwitchUso_BEL_Analogi: { Scripts.opacityNul(); kdr_BEL_Analog.opacity = 1; }
-
-            onSwitchUso_Exit: { go_Exit(0); }
-            onKnopaS: { showKdr_Nastroiki();   } // сигнал о нажатии клавиши ДМ "S"  /alt+b
-            onKnopai: { showKdr_ArhivMessage();} // сигнал о нажатии клавиши ДМ "i"  /alt+c
-            onKnopaSt:{ showKdr_Reostat();     } // сигнал о нажатии клавиши ДМ "St" /alt+d
-            onKnopaUD:{ showKdr_Svazi();       } // сигнал о нажатии клавиши ДМ "UD" /alt+i
-
         }
 
-        Kdr_FtNstr { // верхнее меню УСО - появляется с экраном "СВЯЗИ" вызывается с любого экрана по "UD"
-            id: kdr_FootNstr
-            x: 0
-            y: 416
-            width: 640
-            height: 64
-            opacity: 0
-            z: 36
-
-            onSwitchNstr_Exit: go_Exit(0)
-
-        }
-
-    function  showKdr_Nastroiki()    // сигнал о нажатии клавиши ДМ "S"  /alt+b
-    {
-        Scripts.opacityNul();
-        kdr_Nastroika.opacity = 1;
-        kdr_FootNstr.opacity = 1;
-        kdr_FootNstr.focus = true;
-    }
-
-    function  showKdr_ArhivMessage() // сигнал о нажатии клавиши ДМ "i"  /alt+c
-    {
-        kdr_FootDizel.opacity=0;
-        kdr_FootElektrooborud.opacity=0;
-        kdr_FootUso.opacity = 0;
-        kdr_Foot_Usta.opacity=0;
-        kdr_FootBEL.opacity=0;
-        kdr_Foot_TI.opacity=0;
-    }
-
-    function showKdr_Reostat()      // сигнал о нажатии клавиши ДМ "St"/alt+d
-    {
-        Scripts.opacityNul();
-        kdr_Reostat.opacity = 1;
-
-    }
-
-    function showKdr_Svazi()        // сигнал о нажатии клавиши ДМ "UD"/alt+i
-    {
-        Scripts.opacityNul();
-
-        kdr_FootDizel.opacity=0;
-        kdr_FootElektrooborud.opacity=0;
-        kdr_Foot_TI.opacity=0;
-
-        kdr_Svz.opacity = 1;
-        kdr_FootUso.opacity = 1;
-        kdr_FootUso.focus = true;
-
-
-    }
 
     function  go_Exit(special)    // выход из меню
     {        
@@ -1459,7 +1233,7 @@ Window {
         kdr_Foot_Usta.opacity=0;
         kdr_FootBEL.opacity=0;
         kdr_Foot_TI.opacity=0;
-        kdr_FootNstr.opacity=0;
+//        kdr_FootNstr.opacity=0;
 
         // главный экран показываем
         //kdr_Foot.is_exit = true;
@@ -1473,5 +1247,8 @@ Window {
 
     }
 
+    function saveToUSB() {
+        ioBf.querySaveToUSB()
+    }
 
 }

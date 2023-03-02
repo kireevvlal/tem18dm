@@ -10,16 +10,6 @@ Rectangle {
     property string cltxtSelect:"#1bb7e4"; // цвет текста нажатой кнопки
     property string cltxt:"white";         // штатный цвет текста всех кнопок
 
-    signal switchUso_TI();      // переход на меню
-    signal switchUso_USTA();    //
-    signal switchUso_BEL();     //
-    signal switchUso_Exit();    // переход на уровень ввех
-
-    signal knopaS();  // сигнал о нажатии клавиши ДМ "S"
-    signal knopai();  // сигнал о нажатии клавиши ДМ "i"
-    signal knopaSt(); // сигнал о нажатии клавиши ДМ "St"
-    signal knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
-
     Keys.onPressed: {
         var key = Scripts.getKey(event.key)
 
@@ -30,7 +20,7 @@ Rectangle {
             img7.source = "../Pictogram/uso/0_ti.png"
             img8.source = "../Pictogram/uso/0_ust.png"
             img9.source = "../Pictogram/uso/0_bel.png"
-            switchUso_Exit();
+            main_window.go_Exit()
             break;
         case "1":
             if (Scripts.setSection(1)) {
@@ -51,25 +41,40 @@ Rectangle {
             break;
         case "7":
             main_window.current_system = 11;
-            switchUso_TI();
+            Scripts.opacityNul();
+            kdr_FootUso.opacity=0;
+            kdr_Main_small.opacity=1;
+            kdr_Foot_TI.opacity=1;
+            kdr_Foot_TI.focus=true;
             break;
         case "8":
             main_window.current_system = 12;
-            switchUso_USTA();
+            Scripts.opacityNul();
+            kdr_FootUso.opacity=0;
+            kdr_Main_small.opacity=1;
+            kdr_Foot_Usta.opacity=1;
+            kdr_Foot_Usta.focus=true;
             break;
         case "9":
             main_window.current_system = 13;
-            switchUso_BEL();
+            Scripts.opacityNul();
+            kdr_FootUso.opacity=0;
+            kdr_Main_small.opacity=1;
+            kdr_FootBEL.opacity=1;
+            kdr_FootBEL.focus=true;
             break;
         case "I":  //67 :
             kdr_Foot.doTrMessList();
-            knopai(); // сигнал о нажатии клавиши ДМ "i"
             break;
         case "V>0":  //68 :
-            knopaSt(); // сигнал о нажатии клавиши ДМ "St"
+            Scripts.opacityNul();
+            kdr_Reostat.opacity = 1;
             break;
         case "UD":  //73 :
-            knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
+            Scripts.opacityNul();
+            kdr_Svz.opacity = 1;
+            kdr_FootUso.opacity = 1;
+            kdr_FootUso.focus = true;
             break;
         case "V=0":
             main_window.saveToUSB();
