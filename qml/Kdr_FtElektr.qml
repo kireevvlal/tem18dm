@@ -11,17 +11,6 @@ Rectangle {
     property string cltxtSelect:"#1bb7e4"; // цвет текста нажатой кнопки
     property string cltxt:"white";         // штатный цвет текста всех кнопок
 
-    signal switchEl_Bortovay();       // бортовая сеть
-    signal switchEl_Vozbugdenie();    // система возбуждения
-    signal switchEl_Tagovie();        // тяговые двигатели
-    signal switchEl_Motores();        // моторесурс
-    signal switchEl_Exit();           // переход на уровень ввех
-
-    signal knopaS(); // сигнал о нажатии клавиши ДМ "S"
-    signal knopai(); // сигнал о нажатии клавиши ДМ "i"
-    signal knopaSt(); // сигнал о нажатии клавиши ДМ "St"
-    signal knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
-
     Keys.onPressed: {
         var key = Scripts.getKey(event.key)
 
@@ -36,7 +25,7 @@ Rectangle {
             img8.source = "../Pictogram/elektr/0_ted.png"
             img9.source = "../Pictogram/elektr/0_rgm.png"
 
-            switchEl_Exit();
+            main_window.go_Exit()
             break;
         case "1":
             if (Scripts.setSection(1)) {
@@ -61,42 +50,46 @@ Rectangle {
             img7.source = "../Pictogram/elektr/0_vzb.png"
             img8.source = "../Pictogram/elektr/0_ted.png"
             img9.source = "../Pictogram/elektr/0_rgm.png"
-
-            switchEl_Bortovay();
+            Scripts.opacityNul();
+            kdr_Bos.opacity = 1;
             break;
         case "7":
             img6.source = "../Pictogram/elektr/0_akb.png"
             img7.source = "../Pictogram/elektr/1_vzb.png"
             img8.source = "../Pictogram/elektr/0_ted.png"
             img9.source = "../Pictogram/elektr/0_rgm.png"
-
-            switchEl_Vozbugdenie();
+            cripts.opacityNul();
+            kdr_Vzb.opacity = 1;
             break;
         case "8":
             img6.source = "../Pictogram/elektr/0_akb.png"
             img7.source = "../Pictogram/elektr/0_vzb.png"
             img8.source = "../Pictogram/elektr/1_ted.png"
             img9.source = "../Pictogram/elektr/0_rgm.png"
-
-            switchEl_Tagovie();
+            Scripts.opacityNul();
+            kdr_TED.opacity = 1;
             break;
         case "9":
             img6.source = "../Pictogram/elektr/0_akb.png"
             img7.source = "../Pictogram/elektr/0_vzb.png"
             img8.source = "../Pictogram/elektr/0_ted.png"
             img9.source = "../Pictogram/elektr/1_rgm.png"
-
-            switchEl_Motores();
+            Scripts.opacityNul();
+            kdr_Mot.opacity = 1;
             break;
         case "I":  //67 :
             kdr_Foot.doTrMessList();
-            knopai(); // сигнал о нажатии клавиши ДМ "i"
+//            knopai(); // сигнал о нажатии клавиши ДМ "i"
             break;
         case "V>0":  //68 :
-            knopaSt(); // сигнал о нажатии клавиши ДМ "St"
+            Scripts.opacityNul();
+            kdr_Reostat.opacity = 1;
             break;
         case "UD":  //73 :
-            knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
+            Scripts.opacityNul();
+            kdr_Svz.opacity = 1;
+            kdr_FootUso.opacity = 1;
+            kdr_FootUso.focus = true;
             break;
         case "V=0":
             main_window.saveToUSB();

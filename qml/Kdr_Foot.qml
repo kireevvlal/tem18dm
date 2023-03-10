@@ -14,29 +14,21 @@ Rectangle {
     property string cltxt:"white";         // штатный цвет текста всех кнопок
     property int start_counter: 0;
 
-    signal switchFootDizel();  // переход на меню ДИЗЕЛЬ
-    signal switchFootElektr(); // переход на меню ЭЛЕКТРООБОРУДОВАНИЕ
-    signal switchFoot_Exit();    // переход в начало
-
-    signal knopaS();  // сигнал о нажатии клавиши ДМ "S"
-    signal knopai();  // сигнал о нажатии клавиши ДМ "i"
-    signal knopaSt(); // сигнал о нажатии клавиши ДМ "St"
-    signal knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
-    signal saveToUSB(); // сигнал о необходимости записи на USB (для отработки под Windows)
-
     //** переключение
     Keys.onPressed: {
         var key = Scripts.getKey(event.key)
-        if (key === "3" || key === "4"|| key === "5"|| key === "6"|| key === "7") {
-            main_window.passwordstr += key
-            if (main_window.passwordstr == "45764576")
-                Qt.quit();
-            else if (main_window.passwordstr == "35746") {
-                knopaS() // settings
-                main_window.current_system = 4
-            }
-        } else if (key !== "SPECIAL")
+        if (!kdr_TrLs.opacity && !kdr_Nastroika.opacity && !kdr_Develop.opacity) {
+            if (key === "3" || key === "4"|| key === "5"|| key === "6"|| key === "7") {
+                main_window.passwordstr += key
+                if (main_window.passwordstr == "45764576")
+                    Qt.quit();
+                else if (main_window.passwordstr == "35746") {
+                    doNastroyki() // settings
+                    main_window.current_system = 4
+                }
+            } else if (key !== "SPECIAL")
                 main_window.passwordstr = ""
+        }
 
         switch(key) {
 
@@ -49,7 +41,7 @@ Rectangle {
             img9.opacity = 0; err.vz9 = 0;
             txt_1.color = txt_2.color = cltxt;
             kdr_TrLs.opacity = kdr_Nastroika.opacity = kdr_Develop.opacity = 0;
-            switchFoot_Exit();
+            main_window.go_Exit(kdr_TrLs.opacity || kdr_Nastroika.opacity || kdr_Develop.opacity || kdr_Svz)
             break;
         case "1":
             if (Scripts.setSection(1)) {
@@ -77,23 +69,15 @@ Rectangle {
                 txt_1.color = cltxt;
             }
             break;
-        case "3":
-            break;
-        case "4":
-            break;
-        case "5":
-            break;
-        case "6":
-            break;
-        case "7":
-            break;
+
         case "8":
             if (kdr_TrLs.opacity)  // кадр тревожных сообщений
                 trListUp();
             else {
                 if (img8.opacity == 1)  // будем переключаться на меню ДИЗЕЛЬ
                 {
-                    switchFootDizel();
+                    kdr_FootDizel.opacity = 1;
+                    kdr_FootDizel.focus = true;
                     current_system = 1;
                 }
             }
@@ -101,74 +85,151 @@ Rectangle {
         case "9":
             if (kdr_TrLs.opacity)   // кадр тревожных сообщений
                 trListDown();
-            else {
+            else if (kdr_Nastroika.opacity) {
+                ioBf.saveSettings(kdr_Nastroika.number, kdr_Nastroika.psensors, kdr_Nastroika.elinj, kdr_Nastroika.svolume)
+                main_window.lcm_number =qsTr("ТЭМ18ДМ  №" + kdr_Nastroika.number)
+                main_window.sound_volume = kdr_Nastroika.svolume
+            } else {
                 if (img9.opacity == 1) // будем переключаться на меню ЭЛЕКТРООБОРУДОВАНИЕ
                 {
-                    switchFootElektr();
+                    kdr_FootElektrooborud.opacity = 1;
+                    kdr_FootElektrooborud.focus = true;
                     current_system = 2;
                 }
             }
             break;
-            // *** ! кодировка на ТПК может отличаться
-//        case Qt.Key_B:  //66 :
-//            knopaS(); // сигнал о нажатии клавиши ДМ "S"
-//            main_window.current_system = 4;
-//            break;
 
         case "I":  //67 :
             doTrMessList();
-            knopai(); // сигнал о нажатии клавиши ДМ "i"
             current_system = 5;
             break;
 
         case "V>0": //Qt.Key_D:  //68 :
-            img0.opacity = 1;
-            knopaSt(); // сигнал о нажатии клавиши ДМ "St"
+            Scripts.opacityNul();
+            kdr_Reostat.opacity = 1;
             current_system = 6;
+            img0.opacity = 1;
             break;
 
         case "UD":  //73 :
-            knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
+            Scripts.opacityNul();
+            kdr_Svz.opacity = 1;
+            kdr_FootUso.opacity = 1;
+            kdr_FootUso.focus = true;
             current_system = 3;
             break;
 
         case "V=0":
-//            main_window.current_system = 7;
-            saveToUSB();
+            main_window.saveToUSB();
             break;
 
         case "DOWN":
             if (kdr_TrLs.opacity)
                 trListDown();
+            else if (kdr_Nastroika.opacity) {
+                if (kdr_Nastroika.active < 3)
+                    kdr_Nastroika.active++
+                kdr_Nastroika.pos = 0;
+            }
             break;
 
         case "UP":
             if (kdr_TrLs.opacity)
                 trListUp();
+            else if (kdr_Nastroika.opacity) {
+                if (kdr_Nastroika.active > 0)
+                    kdr_Nastroika.active--
+                kdr_Nastroika.pos = 0;
+            }
             break;
+
+        case "E":
+            if (kdr_Nastroika.opacity) {
+                if (!kdr_Nastroika.active) {
+                    var digit = parseInt(kdr_Nastroika.number.charAt(kdr_Nastroika.pos))
+                    if (digit > 0) {
+                        digit--;
+                        kdr_Nastroika.number = kdr_Nastroika.number.substring(0, kdr_Nastroika.pos) + digit.toString(10)
+                                + kdr_Nastroika.number.substring(kdr_Nastroika.pos + 1)
+                    }
+                }
+            }
+            break;
+
         case "C":
-            kdr_Privet.opacity = 1;
+            if (kdr_Nastroika.opacity) {
+                if (!kdr_Nastroika.active) {
+                    var dig = parseInt(kdr_Nastroika.number.charAt(kdr_Nastroika.pos))
+                    if (dig < 9)
+                        dig++;
+                    kdr_Nastroika.number = kdr_Nastroika.number.substring(0, kdr_Nastroika.pos) + dig.toString(10)
+                            + kdr_Nastroika.number.substring(kdr_Nastroika.pos + 1)
+                }
+            } else
+                kdr_Privet.opacity = 1;
             break;
         case "CONTRAST":
             kdr_Develop.opacity = 1;
             break;
+
+        case "LEFT":
+            if (kdr_Nastroika.opacity) {
+                switch (kdr_Nastroika.active) {
+                case 0:
+                    if (kdr_Nastroika.pos > 0)
+                        kdr_Nastroika.pos--
+                    break;
+                case 1: kdr_Nastroika.elinj = (kdr_Nastroika.elinj) ? false : true
+                    break;
+                case 2: kdr_Nastroika.psensors = (kdr_Nastroika.psensors == 16) ? 6 : 16
+                    break;
+                case 3:
+                    if (kdr_Nastroika.svolume - 10 >= 10)
+                        kdr_Nastroika.svolume -= 10;
+                    else
+                        kdr_Nastroika.svolume = 10;
+                    break;
+                }
+            }
+            break;
+        case "RIGHT":
+            if (kdr_Nastroika.opacity) {
+                switch (kdr_Nastroika.active) {
+                case 0:
+                    if (kdr_Nastroika.pos < 3)
+                        kdr_Nastroika.pos++
+                    break;
+                case 1: kdr_Nastroika.elinj = (kdr_Nastroika.elinj) ? false : true
+                    break;
+                case 2: kdr_Nastroika.psensors = (kdr_Nastroika.psensors == 16) ? 6 : 16
+                    break;
+                case 3:
+                    if (kdr_Nastroika.svolume + 10 <= 100)
+                        kdr_Nastroika.svolume += 10;
+                    else
+                        kdr_Nastroika.svolume = 100;
+                    break;
+                }
+            }
+            break;
         }
+
     }
 
     function trListUp() {
-        if (kdr_TrLs.first - 15 >= 0)
-            kdr_TrLs.first -= 15;
+        if (kdr_TrLs.first - 13 >= 0)
+            kdr_TrLs.first -= 13;
         else
             kdr_TrLs.first = 0;
     }
 
     function trListDown() {
-        if (kdr_TrLs.first < kdr_TrLs.count - 29) {
-            kdr_TrLs.first += 15;
+        if (kdr_TrLs.first < kdr_TrLs.count - 25) {
+            kdr_TrLs.first += 13;
         }
         else
-            if (kdr_TrLs.count > 15)
-                kdr_TrLs.first = kdr_TrLs.count - 16;
+            if (kdr_TrLs.count > 13)
+                kdr_TrLs.first = kdr_TrLs.count - 14;
     }
 
     Text {
@@ -189,7 +250,7 @@ Rectangle {
         y: 27
         width: 64
         height: 37
-        color: "#ffffff"
+        color: cltxt
         text: qsTr("1")
         z: 3
         font.italic: false
@@ -207,7 +268,7 @@ Rectangle {
         y: 27
         width: 64
         height: 37
-        color: "#ffffff"
+        color: cltxt
         text: qsTr("2")
         z: 8
         wrapMode: Text.NoWrap
@@ -321,15 +382,11 @@ Rectangle {
             err.tr9 = trs[3]; // 8
             if (current_section == 2 && !is_slave) {
                 Scripts.setSection(1);
-                switchFoot_Exit();
+                main_window.go_Exit(kdr_TrLs.opacity || kdr_Nastroika.opacity || kdr_Develop.opacity || kdr_Svz)
             }
             if (current_section == 1 && !is_links && start_counter >= 4) {
                 Scripts.setSection(2);
-//                if (kdr_TrLs.opacity || kdr_Nastroika.opacity || kdr_Develop.opacity) {
-//                    switchFoot_Exit();
-//                    kdr_TrLs.opacity = 1; // restore
-//                } else
-                    switchFoot_Exit();
+                main_window.go_Exit(kdr_TrLs.opacity || kdr_Nastroika.opacity || kdr_Develop.opacity || kdr_Svz)
             }
         }
 
@@ -339,7 +396,7 @@ Rectangle {
         Scripts.setSection(1);
         current_system = 0;
         btn1.border.color = btn2.border.color = "black"
-        if (!kdr_TrLs.opacity)
+//        if (!kdr_TrLs.opacity)
         img0.opacity = img8.opacity = img9.opacity = 0;
         err.vz8 = err.vz9 = 0;
         txt_1.color = txt_2.color = cltxt;
@@ -349,15 +406,27 @@ Rectangle {
         Scripts.opacityNul();
         Scripts.setSection(1);
         current_system = 0;
-        btn1.border.color = btn2.border.color = "black"
-        img8.opacity = img9.opacity = 0;
+//        img8.opacity = img9.opacity = 0;
         img0.opacity = 1;
         err.vz8 = err.vz9 = 0;
-        txt_1.color = txt_2.color = cltxt;
         img8.source = "../Pictogram/0_up.png";
         img9.source = "../Pictogram/0_dn.png";
         img8.opacity = img9.opacity = 1;
         kdr_TrLs.opacity = 1;
+        kdr_Foot.opacity = 1;
+        kdr_Foot.focus = true;
+    }
+
+    function doNastroyki() {
+        Scripts.opacityNul();
+        Scripts.setSection(1);
+        current_system = 0;
+        img8.opacity = 0;
+        img0.opacity = 1;
+        err.vz8 = err.vz9 = 0;
+        img9.source = "../Pictogram/save.png";
+        img9.opacity = 1;
+        kdr_Nastroika.opacity = 1;
         kdr_Foot.opacity = 1;
         kdr_Foot.focus = true;
     }

@@ -12,18 +12,6 @@ Rectangle {
     property string cltxtSelect:"#1bb7e4"; // цвет текста нажатой кнопки
     property string cltxt:"white";         // штатный цвет текста всех кнопок
 
-
-    signal switchDzl_Cilindr(); // kdr_Dizl цилиндры
-    signal switchDzl_Maslo();   // масляная система
-    signal switchDzl_Toplivo(); // топливная система
-    signal switchDzl_Holod();   // система охлаждения
-    signal switchDzl_Exit();    // переход на уровень вверх
-
-    signal knopaS(); // сигнал о нажатии клавиши ДМ "S"
-    signal knopai(); // сигнал о нажатии клавиши ДМ "i"
-    signal knopaSt(); // сигнал о нажатии клавиши ДМ "St"
-    signal knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
-
     Keys.onPressed: {
         var key = Scripts.getKey(event.key)
 
@@ -35,10 +23,9 @@ Rectangle {
             img8.source = "../Pictogram/disel/0_tpl.png"
             img9.source = "../Pictogram/disel/0_oxl.png"
 
-            switchDzl_Exit();
+            main_window.go_Exit()
             break;
         case "1":
-            // ?? надо подать сигнал о смене секций, а может и не надо?
             if (Scripts.setSection(1)) {
                 btn1.border.color = "silver"
                 btn2.border.color = "black"
@@ -48,7 +35,6 @@ Rectangle {
             }
             break;
         case "2":
-            // ?? надо подать сигнал о смене секций или не надо?
             if (Scripts.setSection(2)) {
                 btn1.border.color = "black"
                 btn2.border.color = "silver"
@@ -62,41 +48,45 @@ Rectangle {
             img7.source = "../Pictogram/disel/0_msl.png"
             img8.source = "../Pictogram/disel/0_tpl.png"
             img9.source = "../Pictogram/disel/0_oxl.png"
-            switchDzl_Cilindr();
+            Scripts.opacityNul();
+            kdr_Dizl.opacity = 1;
             break;
         case "7":
             img6.source = "../Pictogram/disel/0_zil.png"
             img7.source = "../Pictogram/disel/1_msl.png"
             img8.source = "../Pictogram/disel/0_tpl.png"
             img9.source = "../Pictogram/disel/0_oxl.png"
-
-            switchDzl_Maslo();
+            Scripts.opacityNul();
+            kdr_Masl.opacity = 1;
              break;
         case "8":
             img6.source = "../Pictogram/disel/0_zil.png"
             img7.source = "../Pictogram/disel/0_msl.png"
             img8.source = "../Pictogram/disel/1_tpl.png"
             img9.source = "../Pictogram/disel/0_oxl.png"
-
-            switchDzl_Toplivo();
+            Scripts.opacityNul();
+            kdr_Toplivo.opacity = 1;
             break;
         case "9":
             img6.source = "../Pictogram/disel/0_zil.png"
             img7.source = "../Pictogram/disel/0_msl.png"
             img8.source = "../Pictogram/disel/0_tpl.png"
             img9.source = "../Pictogram/disel/1_oxl.png"
-
-            switchDzl_Holod();
+            Scripts.opacityNul();
+            kdr_Ohl.opacity = 1;
             break;
         case "I":  //67 :
             kdr_Foot.doTrMessList();
-            knopai(); // сигнал о нажатии клавиши ДМ "i"
             break;
         case "V>0":  //68 :
-             knopaSt(); // сигнал о нажатии клавиши ДМ "St"
+            Scripts.opacityNul();
+            kdr_Reostat.opacity = 1;
             break;
         case "UD":  //73 :
-            knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
+            Scripts.opacityNul();
+            kdr_Svz.opacity = 1;
+            kdr_FootUso.opacity = 1;
+            kdr_FootUso.focus = true;
             break;
         case "V=0":
             main_window.saveToUSB();

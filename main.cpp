@@ -14,7 +14,7 @@
 #define LOGPATH QString("D:/CF")
 #endif
 #ifdef Q_OS_UNIX
-#define LOGPATH QString("/media/user/cf_sda_1")
+#define LOGPATH QString("/var/volatile/usr")
 #endif
 //--------------------------------------------------------------------------------
 Processor *pProcessor;
@@ -22,21 +22,21 @@ Processor *pProcessor;
 void handleExitSignals(int signal) {
     switch (signal) {
     case SIGABRT:
-        qDebug("SIGABRT");
+//        qDebug("SIGABRT");
 //        break;
     case SIGTERM:
-        qDebug("SIGTERM");
+//        qDebug("SIGTERM");
 //        break;
 #ifndef Q_OS_WIN
-    case SIGHUP:
-        qDebug("SIGHUP");
+//    case SIGHUP:
+//        qDebug("SIGHUP");
 //        break;
     case SIGQUIT:
-        qDebug("SIGQUIT");
+//        qDebug("SIGQUIT");
 //        break;
 #endif
     case SIGINT:
-        qDebug("SIGINT");
+//        qDebug("SIGINT");
         pProcessor->Stop();
         exit(0);
         break;
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 
     Processor ioBf(&app);
     pProcessor = &ioBf;
-    qmlRegisterType<Processor>("ConnectorModule", 1, 0, "Connector");
+//    qmlRegisterType<Processor>("ConnectorModule", 1, 0, "Connector");
     apppath = qApp->applicationDirPath();
     if (ioBf.Load(apppath, "config.xml")) {
         ioBf.Run();

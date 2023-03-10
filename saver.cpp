@@ -88,13 +88,11 @@ void Saver::MediaChange() {
     if (devs.length() != _devices.length()) {
         if (devs.length() > _devices.length()) {
             _media_inserted = true;
-//#ifndef TPK
             QString dev = devs.last();
             if (dev[dev.length() - 1] == '1')
                 _media_inserted = true;
             else
                 _media_inserted = false;
-//#endif
         } else
             _media_inserted = false;
         if (!_media_inserted && _state)

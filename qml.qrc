@@ -102,7 +102,6 @@
         <file>error.wav</file>
         <file>qml/scripts.js</file>
         <file>Pictogram/m_lok.png</file>
-        <file>qml/Kdr_FtNstr.qml</file>
         <file>Pictogram/save.png</file>
     </qresource>
 </RCC>

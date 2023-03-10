@@ -86,11 +86,11 @@ Rectangle {
             tr_mess_list_model.clear();
             count = par.length;
             if (first < 0) {
-                first = count - 16;
+                first = count - 14;
                 if (first < 0)
                     first = 0;
             }
-            for (var i = first; i < first + 16 && i < count; i++) {
+            for (var i = first; i < first + 14 && i < count; i++) {
                 tr_mess_list_model.append({ message: qsTr(par[i]) });
             }
 //            ind_i.value = par.length

@@ -10,16 +10,6 @@ Rectangle {
     property string cltxtSelect:"#1bb7e4"; // цвет текста нажатой кнопки
     property string cltxt:"white";         // штатный цвет текста всех кнопок
 
-    signal switchUso_USTA_DisVih();    // переход на меню
-    signal switchUso_USTA_DisVhod();  //
-    signal switchUso_USTA_Analogi(/*int offset*/);   //
-    signal switchUso_Exit();    // переход на уровень ввех
-
-    signal knopaS();  // сигнал о нажатии клавиши ДМ "S"
-    signal knopai();  // сигнал о нажатии клавиши ДМ "i"
-    signal knopaSt(); // сигнал о нажатии клавиши ДМ "St"
-    signal knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
-
     Keys.onPressed: {
         var key = Scripts.getKey(event.key)
 
@@ -33,7 +23,7 @@ Rectangle {
             img9.source =  "../Pictogram/uso/0_a.png"
 
 
-            switchUso_Exit();
+            main_window.go_Exit()
             break;
         case "1":
             if (Scripts.setSection(1)) {
@@ -57,31 +47,46 @@ Rectangle {
             img7.source =  "../Pictogram/uso/1_dot.png"
             img8.source =  "../Pictogram/uso/0_din.png"
             img9.source =  "../Pictogram/uso/0_a.png"
-
-            switchUso_USTA_DisVih();
+            Scripts.opacityNul()
+            kdr_USTA_DskrVihodi.opacity = 1
             break;
         case "8":
             img7.source =  "../Pictogram/uso/0_dot.png"
             img8.source =  "../Pictogram/uso/1_din.png"
             img9.source =  "../Pictogram/uso/0_a.png"
-
-            switchUso_USTA_DisVhod();
+            Scripts.opacityNul()
+            kdr_USTA_DskrVh.opacity = 1
             break;
         case "9":
-                switchUso_USTA_Analogi(/*1*/);
-                img7.source = "../Pictogram/uso/0_dot.png"
-                img8.source = "../Pictogram/uso/0_din.png"
-                img9.source = "../Pictogram/uso/1_aud.png"
+            if (kdr_USTA_Analog.opacity) {
+                if (kdr_USTA_Analog.offset == 30) {
+                    kdr_USTA_Analog.offset = 0;
+                    kdr_USTA_Analog.numPage = 1;
+                }
+                else {
+                    kdr_USTA_Analog.offset += 10;
+                    kdr_USTA_Analog.numPage++;
+                }
+            } else
+                kdr_USTA_Analog.offset = 0;
+            Scripts.opacityNul();
+            kdr_USTA_Analog.opacity = 1;
+            img7.source = "../Pictogram/uso/0_dot.png"
+            img8.source = "../Pictogram/uso/0_din.png"
+            img9.source = "../Pictogram/uso/1_aud.png"
             break;
         case "I":  //67 :
             kdr_Foot.doTrMessList();
-            knopai(); // сигнал о нажатии клавиши ДМ "i"
             break;
         case "V>0":  //68 :
-            knopaSt(); // сигнал о нажатии клавиши ДМ "St"
+            Scripts.opacityNul();
+            kdr_Reostat.opacity = 1;
             break;
         case "UD":  //73 :
-           knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
+            Scripts.opacityNul();
+            kdr_Svz.opacity = 1;
+            kdr_FootUso.opacity = 1;
+            kdr_FootUso.focus = true;
             break;
         case "V=0":
             main_window.saveToUSB();

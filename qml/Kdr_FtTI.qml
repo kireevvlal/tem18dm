@@ -10,16 +10,6 @@ Rectangle {
     property string cltxtSelect:"#1bb7e4"; // цвет текста нажатой кнопки
     property string cltxt:"white";         // штатный цвет текста всех кнопок
 
-    signal switchUso_TI_TXA(int offset);  // переход на меню
-    signal switchUso_TI_TCM(int offset);  //
-    signal switchUso_Exit();    // переход на уровень ввех
-
-    signal knopaS();  // сигнал о нажатии клавиши ДМ "S"
-    signal knopai();  // сигнал о нажатии клавиши ДМ "i"
-    signal knopaSt(); // сигнал о нажатии клавиши ДМ "St"
-    signal knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
-
-
     Keys.onPressed: {
         var key = Scripts.getKey(event.key)
 
@@ -30,7 +20,7 @@ Rectangle {
             img8.source = "../Pictogram/uso/0_TXA.png"
             img9.source = "../Pictogram/uso/0_TSM.png"
 
-            switchUso_Exit();
+            main_window.go_Exit()
             break;
         case "1":
             if (Scripts.setSection(1)) {
@@ -51,36 +41,56 @@ Rectangle {
             }
             break;
         case "8":
-            if (kdr_TI_TXA.opacity == 1) {
-                switchUso_TI_TXA(1);
+            if (kdr_TI_TXA.opacity) {
+                if (kdr_TI_TXA.offset == 100) {
+                    kdr_TI_TXA.offset = 80;
+                    kdr_TI_TXA.numPage = 1;
+                }
+                else {
+                    kdr_TI_TXA.offset += 10;
+                    kdr_TI_TXA.numPage++;
+                }
             } else {
                 img8.source =  "../Pictogram/uso/1_TXA.png"
                 img9.source =  "../Pictogram/uso/0_TSM.png"
-                switchUso_TI_TXA(0);
             }
+            Scripts.opacityNul();
+            kdr_TI_TXA.opacity = 1;
             break;
         case "9":
             if (kdr_TI_TCM.opacity == 1) {
-                switchUso_TI_TCM(1);
+                if (kdr_TI_TCM.offset == 70) {
+                    kdr_TI_TCM.offset = 50;
+                    kdr_TI_TCM.numPage = 1;
+                }
+                else {
+                    kdr_TI_TCM.offset += 10;
+                    kdr_TI_TCM.numPage++;
+                }
             } else {
                 img8.source = "../Pictogram/uso/0_TXA.png"
                 img9.source = "../Pictogram/uso/1_TSM.png"
-                switchUso_TI_TCM(0);
             }
+            Scripts.opacityNul();
+            kdr_TI_TCM.opacity = 1;
             break;
         // *** ! кодировка на ТПК может отличаться
-        case "S":  //66 :
-            knopaS(); // сигнал о нажатии клавиши ДМ "S"
-            break;
+//        case "S":  //66 :
+//            knopaS(); // сигнал о нажатии клавиши ДМ "S"
+//            break;
         case "I":  //67 :
             kdr_Foot.doTrMessList();
-            knopai(); // сигнал о нажатии клавиши ДМ "i"
+//            knopai(); // сигнал о нажатии клавиши ДМ "i"
             break;
         case "V>0":  //68 :
-            knopaSt(); // сигнал о нажатии клавиши ДМ "St"
+            Scripts.opacityNul();
+            kdr_Reostat.opacity = 1;
             break;
         case "UD":  //73 :
-            knopaUD(); // сигнал о нажатии клавиши ДМ "UD"
+            Scripts.opacityNul();
+            kdr_Svz.opacity = 1;
+            kdr_FootUso.opacity = 1;
+            kdr_FootUso.focus = true;
             break;
         case "V=0":
             main_window.saveToUSB();

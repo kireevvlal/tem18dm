@@ -5,11 +5,6 @@
 #include <QBitArray>
 #include "extserialport.h"
 
-// Тип дисплейногот модуля (по необходимости)
-//#define ATRONIC
-//#define ATRONIC_UNIX
-#define TPK
-
 //#define NO_CONNECTIONS
 
 // номера индексов в словарях битовых массивов
@@ -44,12 +39,15 @@
 #define USTA_INPUTS_OBTM  14 //  обрыв ТМ (РУ15)
 #define USTA_INPUTS_OTPT  15 // пуск дизеля (КМ1)
 
+enum DisplayType { Atronic, TPK };
+
 struct LcmSettings {
     QString Number; // номер локомотива
     int PressureSensors; // номинал двух датчиков давления
     bool ElInjection; // электронный впрыск
     int SoundVolume; // громкость звука (%)
-    LcmSettings() { Number = "0000"; PressureSensors = 16; ElInjection = false; SoundVolume = 100; }
+    DisplayType DmType; // тип дисплейного модуля
+    LcmSettings() { Number = "0000"; PressureSensors = 16; ElInjection = false; SoundVolume = 100; DmType = DisplayType::Atronic; }
 };
 
 #endif // TEM18DM_H
