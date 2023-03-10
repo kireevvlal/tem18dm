@@ -217,19 +217,19 @@ Rectangle {
     }
 
     function trListUp() {
-        if (kdr_TrLs.first - 15 >= 0)
-            kdr_TrLs.first -= 15;
+        if (kdr_TrLs.first - 13 >= 0)
+            kdr_TrLs.first -= 13;
         else
             kdr_TrLs.first = 0;
     }
 
     function trListDown() {
-        if (kdr_TrLs.first < kdr_TrLs.count - 29) {
-            kdr_TrLs.first += 15;
+        if (kdr_TrLs.first < kdr_TrLs.count - 25) {
+            kdr_TrLs.first += 13;
         }
         else
-            if (kdr_TrLs.count > 15)
-                kdr_TrLs.first = kdr_TrLs.count - 16;
+            if (kdr_TrLs.count > 13)
+                kdr_TrLs.first = kdr_TrLs.count - 14;
     }
 
     Text {

@@ -132,16 +132,7 @@ void Processor::Run()
     // start serial ports
     for (QMap<QString, ExtSerialPort*>::iterator i = _serial_ports.begin(); i != _serial_ports.end(); i++) {
         connect(i.value(), SIGNAL(DecodeSignal(QString)), this, SLOT(Unpack(QString)));
-//        connect(i.value(), SIGNAL(LostExchangeSignal(QString)), this, SLOT(LostConnection(QString)));
-//        connect(i.value(), SIGNAL(RestoreExchangeSignal(QString)), this, SLOT(RestoreConnection(QString)));
-//        connect(&_sp_thread[j], SIGNAL(started()), i.value(), SLOT(Process()));
-//        if (j < NUM_SERIAL_PORTS) {
-//            i.value()->moveToThread(this->thread());//&_sp_thread[j]);
-            i.value()->Start();
-//            i.value()->Process();
-//            _sp_thread[j].start();
-//        }
-//        j++;
+        i.value()->Start();
     }
     // start registration
     _registrator->moveToThread(_reg_thread);
@@ -169,7 +160,7 @@ void Processor::Run()
     if (_tr_strings.count() >= 300)
         _tr_strings.removeFirst();
     _tr_strings.append(_diagnostics->Date().toString("dd/MM/yy") + " " + _diagnostics->Time().toString("hh:mm:ss") + " Начало работы");
-//    SaveMessagesList();
+    SaveMessagesList(&_trmess_file);
 
     _is_active = true;
 
@@ -373,7 +364,8 @@ void Processor::DiagTimerStep() {
                     _tr_strings.append(_diagnostics->Date().toString("dd/MM/yy") + " " + _diagnostics->Time().toString("hh:mm:ss") + " " +
                                        FormMessage(_virtual_section, it.value()->system) + " " + it.value()->text);
                     // save tr messages list to file
-//                    SaveMessagesList();
+                    if (_settings.DmType == DisplayType::TPK)
+                        SaveMessagesList(&_trmess_file);
                 }
                 // banner output
                 if (!_tr_states[_virtual_section][it.key()]->status.testBit(2)) { // init
