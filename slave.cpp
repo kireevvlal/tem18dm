@@ -94,14 +94,14 @@ void SlaveLcm::GetSpData(ExtSerialPort *port, QByteArray data, int index) {
 }
 //--------------------------------------------------------------------------------
 bool SlaveLcm::UpdatePacket(uint position, uint length, QByteArray buffer) {
-    if (position + length > _outdata.length())
+    if (position + length > (uint)_outdata.length())
         return false;
     _outdata.replace(position, length, buffer);
     return true;
 }
 //--------------------------------------------------------------------------------
 bool SlaveLcm::SetBytePacket(uint position, quint8 value) {
-    if (position > _outdata.length())
+    if (position > (uint)_outdata.length())
         return false;
     _outdata[position] = value;
     return true;
@@ -109,7 +109,7 @@ bool SlaveLcm::SetBytePacket(uint position, quint8 value) {
 //--------------------------------------------------------------------------------
 bool SlaveLcm::SetWordPacket(uint position, quint16 value) {
     UnionUInt16 un;
-    if (position + 1 > _outdata.length())
+    if (position + 1 > (uint)_outdata.length())
         return false;
     un.Value = value;
     _outdata[position] = un.Array[0];
@@ -119,7 +119,7 @@ bool SlaveLcm::SetWordPacket(uint position, quint16 value) {
 //--------------------------------------------------------------------------------
 bool SlaveLcm::SetDoubleWordPacket(uint position, quint32 value) {
     UnionUInt32 un;
-    if (position + 3 > _outdata.length())
+    if (position + 3 > (uint)_outdata.length())
         return false;
     un.Value = value;
     _outdata[position] = un.Array[0];

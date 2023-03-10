@@ -165,7 +165,7 @@ void Registrator::Prepare() {
 }
 //--------------------------------------------------------------------------------
 bool Registrator::UpdateRecord(uint position, uint length, QByteArray buffer) {
-    if (position + length > _record.length())
+    if (position + length > (uint)_record.length())
         return false;
     _record.replace(position, length, buffer);
 //    qDebug() << QString::number(position) + " "  + QString::number(length) + " " + QString::number(_record.length());
@@ -173,7 +173,7 @@ bool Registrator::UpdateRecord(uint position, uint length, QByteArray buffer) {
 }
 //--------------------------------------------------------------------------------
 bool Registrator::SetByteRecord(uint position, quint8 value) {
-    if (position > _record.length())
+    if (position > (uint)_record.length())
         return false;
     _record[position] = value;
     return true;
@@ -181,7 +181,7 @@ bool Registrator::SetByteRecord(uint position, quint8 value) {
 //--------------------------------------------------------------------------------
 bool Registrator::SetWordRecord(uint position, quint16 value) {
     UnionUInt16 un;
-    if (position + 1 > _record.length())
+    if (position + 1 > (uint)_record.length())
         return false;
     un.Value = value;
     _record[position] = un.Array[0];
@@ -191,7 +191,7 @@ bool Registrator::SetWordRecord(uint position, quint16 value) {
 //--------------------------------------------------------------------------------
 bool Registrator::SetDoubleWordRecord(uint position, quint32 value) {
     UnionUInt32 un;
-    if (position + 3 > _record.length())
+    if (position + 3 > (uint)_record.length())
         return false;
     un.Value = value;
     _record[position] = un.Array[0];
