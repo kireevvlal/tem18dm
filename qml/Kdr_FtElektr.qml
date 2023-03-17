@@ -58,7 +58,7 @@ Rectangle {
             img7.source = "../Pictogram/elektr/1_vzb.png"
             img8.source = "../Pictogram/elektr/0_ted.png"
             img9.source = "../Pictogram/elektr/0_rgm.png"
-            cripts.opacityNul();
+            Scripts.opacityNul();
             kdr_Vzb.opacity = 1;
             break;
         case "8":
