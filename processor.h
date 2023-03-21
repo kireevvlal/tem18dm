@@ -71,14 +71,14 @@ private:
     bool _is_active;
     QFile _mtr_file; // имя и путь файла моторесурса
     QFile _trmess_file; // имя и путь файла тревожных сообщений
-    QThread *_reg_thread;
+//    QThread *_reg_thread;
     QTimer *_reg_timer;
     //QThread *_diag_thread;
     QTimer *_diag_timer;
     int _diag_interval;
     Registrator *_registrator;
     Saver *_saver;
-    QThread *_saver_thread;
+//    QThread *_saver_thread;
     QString _start_path;
     QStringList _files;
     TreeXML _tree;

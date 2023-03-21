@@ -29,7 +29,7 @@ Processor::Processor(QObject *parent) : QObject(parent)
     _section = 0;
     _virtual_section = 0;
     _reg_timer = new QTimer();
-    _reg_thread = new QThread();
+//    _reg_thread = new QThread();
     _registrator = new Registrator(&_settings);
     _diag_timer = new QTimer();
     _diag_interval = 200;
@@ -37,7 +37,7 @@ Processor::Processor(QObject *parent) : QObject(parent)
     _is_active = false;
     _fswatcher = new QFileSystemWatcher;
     _saver =  new Saver(&_settings);
-    _saver_thread = new QThread();
+//    _saver_thread = new QThread();
     _control = new Control(&_mainstore, _slave.Storage());
     _storage[0] = &_mainstore;
     _storage[1] = _slave.Storage();
@@ -135,9 +135,9 @@ void Processor::Run()
         i.value()->Start();
     }
     // start registration
-    _registrator->moveToThread(_reg_thread);
+//    _registrator->moveToThread(_reg_thread);
     connect(this, SIGNAL(AddRecordSignal()), _registrator, SLOT(AddRecord()));
-    _reg_thread->start();
+//    _reg_thread->start();
     connect(_reg_timer, SIGNAL(timeout()), this, SLOT(RegTimerStep()));
     _reg_timer->start(_registrator->Interval());
     connect(_diag_timer, SIGNAL(timeout()), this, SLOT(DiagTimerStep()));
@@ -145,10 +145,10 @@ void Processor::Run()
 
     connect(_fswatcher, SIGNAL(directoryChanged(QString)), this, SLOT(ChangeMediaDir(QString)));
 
-    _saver->moveToThread(_saver_thread);
+//    _saver->moveToThread(_saver_thread);
     connect(this, SIGNAL(SaveFilesSignal()), _saver, SLOT(Save()));
     connect(this, SIGNAL(ChangeMediaDirSignal()), _saver, SLOT(MediaChange()));
-    _saver_thread->start();
+//    _saver_thread->start();
     _saver->Run();
 
     // read tr meaasges
@@ -322,6 +322,7 @@ void Processor::RegTimerStep() {
 //        _registrator->SetByteRecord(347 + i, byte);
 //    }
     _registrator->UpdateRecord(347, 5, _mainstore.BitArrayToByteArray("PROG_TrSoob"));
+
     AddRecordSignal();
 }
 //--------------------------------------------------------------------------------
