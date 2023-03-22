@@ -29,7 +29,6 @@ Processor::Processor(QObject *parent) : QObject(parent)
     _section = 0;
     _virtual_section = 0;
     _reg_timer = new QTimer();
-    _reg_thread = new QThread();
     _registrator = new Registrator(&_settings);
     _diag_timer = new QTimer();
     _diag_interval = 200;
@@ -37,11 +36,9 @@ Processor::Processor(QObject *parent) : QObject(parent)
     _is_active = false;
     _fswatcher = new QFileSystemWatcher;
     _saver =  new Saver(&_settings);
-    _saver_thread = new QThread();
     _control = new Control(&_mainstore, _slave.Storage());
     _storage[0] = &_mainstore;
     _storage[1] = _slave.Storage();
-    //_diag_thread = new QThread();
 }
 //--------------------------------------------------------------------------------
 Processor::~Processor() {
@@ -135,9 +132,7 @@ void Processor::Run()
         i.value()->Start();
     }
     // start registration
-    _registrator->moveToThread(_reg_thread);
     connect(this, SIGNAL(AddRecordSignal()), _registrator, SLOT(AddRecord()));
-    _reg_thread->start();
     connect(_reg_timer, SIGNAL(timeout()), this, SLOT(RegTimerStep()));
     _reg_timer->start(_registrator->Interval());
     connect(_diag_timer, SIGNAL(timeout()), this, SLOT(DiagTimerStep()));
@@ -145,10 +140,8 @@ void Processor::Run()
 
     connect(_fswatcher, SIGNAL(directoryChanged(QString)), this, SLOT(ChangeMediaDir(QString)));
 
-    _saver->moveToThread(_saver_thread);
     connect(this, SIGNAL(SaveFilesSignal()), _saver, SLOT(Save()));
     connect(this, SIGNAL(ChangeMediaDirSignal()), _saver, SLOT(MediaChange()));
-    _saver_thread->start();
     _saver->Run();
 
     // read tr meaasges
@@ -322,6 +315,7 @@ void Processor::RegTimerStep() {
 //        _registrator->SetByteRecord(347 + i, byte);
 //    }
     _registrator->UpdateRecord(347, 5, _mainstore.BitArrayToByteArray("PROG_TrSoob"));
+
     AddRecordSignal();
 }
 //--------------------------------------------------------------------------------
@@ -736,6 +730,7 @@ void Processor::ParseRegistration(NodeXML* node) {
     QString path, alias, extention, drive;
     RegistrationType regtype = RegistrationType::Record;
     int quantity = 0, recordsize = 0, interval = 0, save_interval = 0, sector_size = 0;
+    bool compress = false;
     if (node->Child != nullptr) {
         node = node->Child;
         while (node != nullptr) {
@@ -752,6 +747,9 @@ void Processor::ParseRegistration(NodeXML* node) {
                                   ((attr->Value.toLower() == "sector") ? RegistrationType::Sector : RegistrationType::Record));
                     if (attr->Name == "sector")
                         sector_size = attr->Value.toInt();
+                    if (attr->Name == "compress") {
+                        compress = (attr->Value.toLower() == "on") ? true : false;
+                    }
                 }
             }
             else if (node->Name == "records") {
@@ -775,7 +773,7 @@ void Processor::ParseRegistration(NodeXML* node) {
             node = node->Next;
         }
     }
-    _registrator->SetParameters(path, alias, extention, regtype, quantity, recordsize, interval, sector_size);
+    _registrator->SetParameters(path, alias, extention, regtype, quantity, recordsize, interval, sector_size, compress);
     _saver->SetParameters(drive, path, save_interval);
 }
 //------------------------------------------------------------------------------

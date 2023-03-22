@@ -21,10 +21,11 @@ private:
     QByteArray _record;  // буфер данных (запись) для регистрации
     QFile _file;
     RegistrationType _reg_type;
-    int _counter;
+    int _counter;       // счетчик принятых записей в текущий файл
     int _record_size;   // длина записи
     int _position;      // позиция в буфере при записи секторами
     int _sector_size;   // физический размер сектора
+    bool _need_compression; // необходимо сжатие файла после окончания записи
     QByteArray _banks[2];
     int _bank;
     void Prepare();
@@ -34,7 +35,7 @@ public:
     explicit Registrator(LcmSettings*, QObject *parent = nullptr);
     void Stop();
     int Interval() { return _interval; }
-    void SetParameters( QString,  QString,  QString, RegistrationType, int, int, int, int);
+    void SetParameters(QString,  QString,  QString, RegistrationType, int, int, int, int, bool);
     //void Parse(NodeXML*);           // разбор ветви дерава XML с параметрами объекта
     bool UpdateRecord(uint, uint, QByteArray);
     bool SetByteRecord(uint, quint8);

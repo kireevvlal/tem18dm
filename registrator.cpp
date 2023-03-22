@@ -16,11 +16,26 @@ Registrator::Registrator(LcmSettings *settings, QObject *parent) : QObject(paren
     _reg_type = RegistrationType::Record;
     _sector_size = 512;
     _position = 0;
+    _need_compression = false;
 }
 //--------------------------------------------------------------------------------
 void  Registrator::CloseFile() {
     _file.flush();
     _file.close();
+    if (_need_compression) {
+        QFileInfo info(_file.fileName());
+        if (_file.open(QIODevice::ReadOnly)) {
+            QByteArray compressed = qCompress(_file.readAll());
+            if (compressed.length() > 0) {
+                QFile outfile(info.path() + "/" + info.completeBaseName() + ".rcd"); // res  compressed data
+                if (outfile.open(QIODevice::WriteOnly)) {
+                    outfile.write(compressed);
+                    outfile.close();
+                    _file.remove();
+                }
+            }
+        }
+    }
 #ifdef Q_OS_WIN
     Sleep(uint(10));
 #endif
@@ -98,12 +113,12 @@ void  Registrator::Stop() {
     // файлы регистрации
     switch (_reg_type) {
     case RegistrationType::Record:
-        _file.close();
+//        _file.close();
         break;
     case RegistrationType::Bulk:
         if (_file.open(QIODevice::WriteOnly)) {
             _file.write(_banks[_bank].data(), _record_size * _counter);
-            _file.close();
+//            _file.close();
         }
         break;
     case RegistrationType::Sector:
@@ -114,14 +129,15 @@ void  Registrator::Stop() {
             } else
                 _file.write(_banks[0].data(), _position);
         }
-        _file.close();
+//        _file.close();
         break;
     case RegistrationType::Archive:
         break;
     }
+    CloseFile();
 }
 //--------------------------------------------------------------------------------
-void Registrator::SetParameters(QString path, QString alias, QString extention, RegistrationType regtype, int quantity, int recordsize, int interval, int sector) {
+void Registrator::SetParameters(QString path, QString alias, QString extention, RegistrationType regtype, int quantity, int recordsize, int interval, int sector, bool compress) {
     _path = path;
     _alias = alias;
     _extention = extention;
@@ -136,7 +152,8 @@ void Registrator::SetParameters(QString path, QString alias, QString extention, 
         _interval = interval;
     if (sector)
         _sector_size = sector;
-
+    if (compress)
+        _need_compression = true;
     if (_reg_type == RegistrationType::Bulk) {
         _banks[0].resize(_quantity * _record_size);
         _banks[1].resize(_quantity * _record_size);

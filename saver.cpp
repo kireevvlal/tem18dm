@@ -33,7 +33,7 @@ void Saver::TaskTimerStep() {
                     QDateTime dt(QDateTime::currentDateTime());
                     _current_dir = "tm18" + _settings->Number + dt.toString("yyMMddhhmmss");
                     if (_directory.mkdir(_current_dir)) {
-                        _files = QDir(_reg_path).entryInfoList(QStringList() << "*.rez", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time);
+                        _files = QDir(_reg_path).entryInfoList(QStringList() << "*.rez" << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time);
                         _index = 1;
                         _state = 2;
                         _quantity = _files.size();
