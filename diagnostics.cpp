@@ -13,7 +13,6 @@ Diagnostics::Diagnostics(DataStore* storage, LcmSettings *settings)
     _date_time = QDateTime::currentDateTime();
     _msec = _date_time.toMSecsSinceEpoch();
     _it_packs = 0;
-//    _sp_thread_running.resize(4);
     _sp_is_bytes.resize(4);
 }
 //--------------------------------------------------------------------------------
@@ -193,7 +192,6 @@ void Diagnostics::Connections(QMap<QString, ExtSerialPort*> serialPorts, Registr
                 _storage->SetBit("DIAG_Portstates", CONN_BEL, 1);
             else _storage->SetBit("DIAG_Portstates", CONN_BEL, 0);
             _sp_error_counters[0] = port->ErrorsCount();
-//            _sp_thread_running.setBit(0, i.value().ThreadRunning());
             _sp_is_bytes.setBit(0, port->IsBytes());
         } else
             if (i.key() == "USTA") {
@@ -201,7 +199,6 @@ void Diagnostics::Connections(QMap<QString, ExtSerialPort*> serialPorts, Registr
                     _storage->SetBit("DIAG_Portstates", CONN_USTA, 1);
                 else _storage->SetBit("DIAG_Portstates", CONN_USTA, 0);
                 _sp_error_counters[1] = port->ErrorsCount();
-//                _sp_thread_running.setBit(1, i.value()->ThreadRunning());
                 _sp_is_bytes.setBit(1, port->IsBytes());
             } else
                 if (i.key() == "IT") {
@@ -209,7 +206,6 @@ void Diagnostics::Connections(QMap<QString, ExtSerialPort*> serialPorts, Registr
                         _storage->SetBit("DIAG_Portstates", CONN_IT, 1);
                     else _storage->SetBit("DIAG_Portstates", CONN_IT, 0);
                     _sp_error_counters[2] = port->ErrorsCount();
-//                    _sp_thread_running.setBit(2, i.value()->ThreadRunning());
                     _sp_is_bytes.setBit(2, port->IsBytes());
                 } else
                     if (i.key() == "MSS") {
@@ -217,7 +213,6 @@ void Diagnostics::Connections(QMap<QString, ExtSerialPort*> serialPorts, Registr
                             _storage->SetBit("DIAG_Portstates", CONN_MSS, 1);
                         else _storage->SetBit("DIAG_Portstates", CONN_MSS, 0);
                         _sp_error_counters[3] = port->ErrorsCount();
-//                        _sp_thread_running.setBit(3, i.value()->ThreadRunning());
                         _sp_is_bytes.setBit(3, port->IsBytes());
                     }
         // connections state

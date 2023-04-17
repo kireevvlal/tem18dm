@@ -86,20 +86,14 @@ bool Processor:: Load(QString startPath, QString cfgfile)
 }
 //--------------------------------------------------------------------------------
 bool Processor::ReadMotoresurs(QFile *file) {
-    int i;
-    char data[12];
     UnionUInt32 par;
     if (file->open(QIODevice::ReadOnly)) {
-        file->read(data, 12);
-        for (i = 0; i < 4; i++)
-            par.Array[i] = data[i];
+        file->read(par.Array, 4);
         _mainstore.SetUInt32("DIAG_Motoresurs", par.Value);
-        for (i = 0; i < 4; i++)
-            par.Array[i] = data[i + 4];
+        file->read(par.Array, 4);
         _mainstore.SetUInt32("DIAG_Adiz", par.Value);
         _diagnostics->Adiz((float)par.Value / 10);
-        for (i = 0; i < 4; i++)
-            par.Array[i] = data[i + 8];
+        file->read(par.Array, 4);
         _mainstore.SetUInt32("DIAG_Tt", par.Value);
         file->close();
         return true;
@@ -223,15 +217,15 @@ void Processor::saveSettings(QString number, int psensors, bool elinj, int svolu
 void Processor::Stop() {
     QFile appmrfile, apptrlfile;
     SaveMotoresurs(&_mtr_file);
-    if (_settings.DmType == DisplayType::Atronic) {
+//    if (_settings.DmType == DisplayType::Atronic) {
         appmrfile.setFileName(_start_path + "/mot.re");
         SaveMotoresurs(&appmrfile);
-    }
+//    }
     SaveMessagesList(&_trmess_file);
-    if (_settings.DmType == DisplayType::Atronic) {
+//    if (_settings.DmType == DisplayType::Atronic) {
         apptrlfile.setFileName(_start_path + "/messages.txt");
         SaveMessagesList(&apptrlfile);
-    }
+//    }
     _registrator->Stop();
     _is_active = false;
 }
@@ -314,7 +308,7 @@ void Processor::RegTimerStep() {
 //            byte +=  ba->testBit(i * 8 + j) ? (1 << j) : 0;
 //        _registrator->SetByteRecord(347 + i, byte);
 //    }
-    _registrator->UpdateRecord(347, 5, _mainstore.BitArrayToByteArray("PROG_TrSoob"));
+    _registrator->UpdateRecord(347, 5, _mainstore.BitArrayToByteArray("PROG_TrSoob").mid(0, 5));
 
     AddRecordSignal();
 }
@@ -347,7 +341,7 @@ void Processor::DiagTimerStep() {
                     if (!_tr_states[0][it.key()]->status.testBit(0)) {
                         _tr_states[0][it.key()]->status.setBit(0);
                         _tr_reg_queue.append(TrRec(_diagnostics->Time().hour(), _diagnostics->Time().minute(),
-                                                   _diagnostics->Time().second(), i));
+                                                   _diagnostics->Time().second(), it.key() /*i*/)); // ????????????????????
                     }
                 }
                 // string list queue
@@ -483,7 +477,7 @@ void Processor::SetSlaveData()
 //                           + (_mainstore.Bit("DIAG_Connections", CONN_IT) ? 4 : 0) + (_mainstore.Bit("DIAG_Connections", CONN_MSS) ? 8 : 0));
     _slave.SetBytePacket(192, _mainstore.BitArrayToByte("DIAG_Connections"));
 //    _slave.UpdatePacket(193, 7, ts); // trev. soob.
-    _slave.UpdatePacket(193, 7, _mainstore.BitArrayToByteArray("PROG_TrSoob")); // trev. soob.
+    _slave.UpdatePacket(193, 7, _mainstore.BitArrayToByteArray("PROG_TrSoob").mid(0, 7)); // trev. soob.
     _slave.SetBytePacket(204, _mainstore.Byte("DIAG_CQ_BEL"));
     _slave.SetBytePacket(205, _mainstore.Byte("DIAG_CQ_USTA"));
     _slave.SetBytePacket(206, _mainstore.Byte("DIAG_CQ_IT"));
@@ -1275,8 +1269,6 @@ QJsonArray Processor::getKdrDevelop() {
         QJsonArray { _storage[_section]->Byte("DIAG_CQ_BEL"), _storage[_section]->Byte("DIAG_CQ_USTA"),
                     _storage[_section]->Byte("DIAG_CQ_IT"), _storage[_section]->Byte("DIAG_CQ_MSS")},
         QJsonArray { _diagnostics->SpErrorsCounter(0), _diagnostics->SpErrorsCounter(1), _diagnostics->SpErrorsCounter(2), _diagnostics->SpErrorsCounter(3) },
-//        QJsonArray { _diagnostics->SpThreadRunning()->testBit(0), _diagnostics->SpThreadRunning()->testBit(1), _diagnostics->SpThreadRunning()->testBit(2),
-//                    _diagnostics->SpThreadRunning()->testBit(3) },
         QJsonArray { _diagnostics->SpIsBytes()->testBit(0), _diagnostics->SpIsBytes()->testBit(1), _diagnostics->SpIsBytes()->testBit(2),
                     _diagnostics->SpIsBytes()->testBit(3) }
     };

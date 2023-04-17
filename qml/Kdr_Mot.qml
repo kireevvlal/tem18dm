@@ -25,13 +25,17 @@ Rectangle {
         running: kdr_Mot.opacity
         onTriggered: {
             var par = ioBf.getParamKdrMot();
-            ind_MotC.value =Math.round(par[0] / 3600);
-            ind_MotM.value = Math.round((par[0] % 3600) / 60);
-            ind_MotS.value = Math.round(par[0] % 60);
-            ind_TagC.value = Math.round(par[1] / 3600);
-            ind_TagM.value = Math.round((par[1] % 3600) / 60);
-            ind_TagS.value = Math.round(par[1] % 60);
-            ind_Rab.value = par[2].toFixed(1);
+            var sec = par[0] % 60
+            var min = (par[0] % 3600 - sec) / 60
+            ind_MotC.value = (par[0] - min * 60 - sec) / 3600
+            ind_MotM.value = min
+            ind_MotS.value = sec
+            sec = par[1] % 60
+            min = (par[1] % 3600 - sec) / 60
+            ind_TagC.value = (par[1] - min * 60 - sec) / 3600
+            ind_TagM.value = min
+            ind_TagS.value = sec
+            ind_Rab.value = par[2].toFixed(1)
             ind_Fd.value = par[3];
         }
     }

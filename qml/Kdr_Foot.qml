@@ -385,7 +385,8 @@ Rectangle {
                 main_window.go_Exit(kdr_TrLs.opacity || kdr_Nastroika.opacity || kdr_Develop.opacity || kdr_Svz)
             }
             if (current_section == 1 && !is_links && start_counter >= 4) {
-                Scripts.setSection(2);
+                if (!Scripts.setSection(2))
+                    doExit()
                 main_window.go_Exit(kdr_TrLs.opacity || kdr_Nastroika.opacity || kdr_Develop.opacity || kdr_Svz)
             }
         }

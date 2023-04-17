@@ -55,7 +55,6 @@ class Processor : public QObject
 {
     Q_OBJECT
 private:
-//    QThread _sp_thread[NUM_SERIAL_PORTS];
     LcmSettings _settings;
     int _virtual_section; // переключение номера секции (0, 1) в циклах диагностики
     QMap<int, TrBanner> _tr_banner_queue; // очередь на вывод в баннер
@@ -71,14 +70,11 @@ private:
     bool _is_active;
     QFile _mtr_file; // имя и путь файла моторесурса
     QFile _trmess_file; // имя и путь файла тревожных сообщений
-//    QThread *_reg_thread;
     QTimer *_reg_timer;
-    //QThread *_diag_thread;
     QTimer *_diag_timer;
     int _diag_interval;
     Registrator *_registrator;
     Saver *_saver;
-//    QThread *_saver_thread;
     QString _start_path;
     QStringList _files;
     TreeXML _tree;
