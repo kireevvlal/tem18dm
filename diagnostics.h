@@ -27,12 +27,15 @@ private:
     DataStore* _storage;
 //    qint8 _ports_state;  // состояние портов. побитно: 1- открыт, 0 - что-то не так
     qint64 _msec; // системное время в миллисекундах
+    qint64 _motoresurs; // моторесурс в миллисекундах
+    qint64 _time_propulsion; // время работы в тяге в миллисекундах
     float _a_diz; // полезная работа дизеля
     void OnLostBel(ExtSerialPort*, Registrator* reg, SlaveLcm* slave);
     void OnLostUsta(ExtSerialPort*, Registrator* reg, SlaveLcm* slave);
     void OnLostIt(ExtSerialPort*, Registrator* reg, SlaveLcm* slave);
 //    void OnLostMss(ExtSerialPort*);
 public:
+    void Init();
     QBitArray* SpIsBytes() { return &_sp_is_bytes; }
     int SpErrorsCounter(int index) { return _sp_error_counters[index]; }
     void IncrementITPacks();

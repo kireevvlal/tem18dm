@@ -12,8 +12,14 @@ Diagnostics::Diagnostics(DataStore* storage, LcmSettings *settings)
 //    _ports_state = 0;
     _date_time = QDateTime::currentDateTime();
     _msec = _date_time.toMSecsSinceEpoch();
+    _motoresurs = _time_propulsion = 0;
     _it_packs = 0;
     _sp_is_bytes.resize(4);
+}
+//--------------------------------------------------------------------------------
+void Diagnostics::Init() {
+    _motoresurs = _storage->UInt32("DIAG_Motoresurs") * 1000;
+    _time_propulsion = _storage->UInt32("DIAG_Tt") * 1000;
 }
 //--------------------------------------------------------------------------------
 void Diagnostics::IncrementITPacks() {
@@ -173,9 +179,11 @@ void Diagnostics::Motoresurs() {
         diff = currtime - _msec;
         if (diff >= 1000) {
             _msec = currtime;
-            _storage->SetUInt32("DIAG_Motoresurs", _storage->UInt32("DIAG_Motoresurs") + 1); // increment motoresurs
+            _motoresurs += diff;
+            _storage->SetUInt32("DIAG_Motoresurs", _motoresurs / 1000); // set motoresurs
             if (_storage->Bit("USTA_Inputs", USTA_INPUTS_KV)) { // КВ контроль возбуждения
-                _storage->SetUInt32("DIAG_Tt", _storage->UInt32("DIAG_Tt") + 1); // increment время работы в тяге
+                _time_propulsion += diff;
+                _storage->SetUInt32("DIAG_Tt", _time_propulsion / 1000); // set время работы в тяге
                 _a_diz += (float)_storage->Int16("DIAG_Pg") / 3600;
                 _storage->SetUInt32("DIAG_Adiz", _a_diz * 10); // полезная работа
             }

@@ -73,6 +73,7 @@ bool Processor:: Load(QString startPath, QString cfgfile)
         appdirfile.setFileName(_start_path + "/mot.re");
         ReadMotoresurs(&appdirfile);
     }
+    _diagnostics->Init();
 //#ifdef Q_OS_WIN
 //    _fswatcher->addPath("D:/_USB");
 //#endif
