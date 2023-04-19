@@ -188,7 +188,8 @@ void Diagnostics::Motoresurs() {
                 _storage->SetUInt32("DIAG_Adiz", _a_diz * 10); // полезная работа
             }
         }
-    }
+    } else
+        _msec = currtime;
 }
 //--------------------------------------------------------------------------------
 void Diagnostics::Connections(QMap<QString, ExtSerialPort*> serialPorts, Registrator* reg, SlaveLcm* slave) {
