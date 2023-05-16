@@ -52,7 +52,10 @@ void Saver::TaskTimerStep() {
             if (available > 2600000) {
                 if (_index < _quantity) {
                     QFile file(_files[_index].filePath());
-                    file.copy(_save_path + "/" + _current_dir + "/" + _files[_index].fileName());
+                    if (_files[_index].suffix() == "rcd")
+                        DecompressFile(_files[_index]);
+                    else
+                        file.copy(_save_path + "/" + _current_dir + "/" + _files[_index].fileName());
                     _index++;
 
                 } else
@@ -62,6 +65,21 @@ void Saver::TaskTimerStep() {
             _is_running = false;
         }
         break;
+    }
+}
+//--------------------------------------------------------------------------------
+void Saver::DecompressFile(QFileInfo compr_fi) {
+    QFile file(compr_fi.filePath());
+    if (file.open(QIODevice::ReadOnly)) {
+        QByteArray uncompressed = qUncompress(file.readAll());
+        QFile outfile(compr_fi.path() + "/" + compr_fi.completeBaseName() + ".rez"); // res uncompressed data
+        if (outfile.open(QIODevice::WriteOnly)) {
+            outfile.write(uncompressed);
+            outfile.close();
+            QFileInfo info(outfile.fileName());
+            outfile.copy(_save_path + "/" + _current_dir + "/" + info.fileName());
+            outfile.remove();
+        }
     }
 }
 //--------------------------------------------------------------------------------

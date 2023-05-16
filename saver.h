@@ -28,6 +28,7 @@ private:
     int _quantity; // колоичество файлов для записи
     void Reset(); // сброс в состояние "нет записи"
     QStringList ScanDev();
+    void DecompressFile(QFileInfo);
 public:
     Saver(LcmSettings*, QObject *parent = nullptr);
     void Run();

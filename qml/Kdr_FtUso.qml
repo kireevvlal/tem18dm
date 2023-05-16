@@ -68,7 +68,10 @@ Rectangle {
             break;
         case "V>0":  //68 :
             Scripts.opacityNul();
+            kdr_FootUso.opacity = 0
             kdr_Reostat.opacity = 1;
+            img0.opacity = 1;
+            kdr_Foot.opacity = 1;
             break;
         case "UD":  //73 :
             Scripts.opacityNul();

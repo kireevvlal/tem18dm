@@ -405,6 +405,7 @@ Rectangle {
 
     function doTrMessList() {
         Scripts.opacityNul();
+        kdr_FootUso.opacity = 0
         Scripts.setSection(1);
         current_system = 0;
 //        img8.opacity = img9.opacity = 0;
@@ -420,6 +421,7 @@ Rectangle {
 
     function doNastroyki() {
         Scripts.opacityNul();
+        kdr_FootUso.opacity = 0
         Scripts.setSection(1);
         current_system = 0;
         img8.opacity = 0;
