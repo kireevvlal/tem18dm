@@ -169,10 +169,10 @@ void Registrator::Prepare() {
         QStorageInfo si = QStorageInfo(directory);
         qint64 available = si.bytesAvailable();
         while (available <= (_quantity + 100) * _record_size) { // + 100 - доп размер на 100 записей
-
             QStringList files = directory.entryList(QStringList() << "*.rez", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time | QDir::Reversed);
             if (files.size())
                 directory.remove(files[0]);
+            si = QStorageInfo(directory);
             available = si.bytesAvailable();
         }
     }
