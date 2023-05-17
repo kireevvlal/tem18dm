@@ -20,7 +20,7 @@ Rectangle {
         if (!kdr_TrLs.opacity && !kdr_Nastroika.opacity && !kdr_Develop.opacity) {
             if (key === "3" || key === "4"|| key === "5"|| key === "6"|| key === "7") {
                 main_window.passwordstr += key
-                if (main_window.passwordstr == "35746")
+                if (main_window.passwordstr == "75364")
                     Qt.quit();
                 else if (main_window.passwordstr == "357") {
                     doNastroyki() // settings
