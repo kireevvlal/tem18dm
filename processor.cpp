@@ -769,7 +769,7 @@ void Processor::ParseRegistration(NodeXML* node) {
         }
     }
     _registrator->SetParameters(path, alias, extention, regtype, quantity, recordsize, interval, sector_size, compress);
-    _saver->SetParameters(drive, path, save_interval);
+    _saver->SetParameters(drive, path, save_interval, extention);
 }
 //------------------------------------------------------------------------------
 QJsonArray Processor::getSettings() {

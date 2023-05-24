@@ -33,7 +33,7 @@ void Saver::TaskTimerStep() {
                     QDateTime dt(QDateTime::currentDateTime());
                     _current_dir = "tm18" + _settings->Number + dt.toString("yyMMddhhmmss");
                     if (_directory.mkdir(_current_dir)) {
-                        _files = QDir(_reg_path).entryInfoList(QStringList() << "*.rez" << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time);
+                        _files = QDir(_reg_path).entryInfoList(QStringList() << ("*." + _extention) << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time);
                         _index = 1;
                         _state = 2;
                         _quantity = _files.size();
@@ -72,7 +72,7 @@ void Saver::DecompressFile(QFileInfo compr_fi) {
     QFile file(compr_fi.filePath());
     if (file.open(QIODevice::ReadOnly)) {
         QByteArray uncompressed = qUncompress(file.readAll());
-        QFile outfile(compr_fi.path() + "/" + compr_fi.completeBaseName() + ".rez"); // res uncompressed data
+        QFile outfile(compr_fi.path() + "/" + compr_fi.completeBaseName() + "." + _extention); // res uncompressed data
         if (outfile.open(QIODevice::WriteOnly)) {
             outfile.write(uncompressed);
             outfile.close();
@@ -153,9 +153,10 @@ QStringList Saver::ScanDev() {
     return res;
 }
 //--------------------------------------------------------------------------------
-void Saver::SetParameters(QString mpath, QString rpath, int interval) {
+void Saver::SetParameters(QString mpath, QString rpath, int interval, QString extention) {
     _media_path = mpath;
     _reg_path = rpath;
     _task_interval = interval;
     _devices = ScanDev();
+    _extention = extention;
 }

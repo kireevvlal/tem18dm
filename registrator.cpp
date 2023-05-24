@@ -164,16 +164,30 @@ void Registrator::SetParameters(QString path, QString alias, QString extention, 
 }
 //--------------------------------------------------------------------------------
 void Registrator::Prepare() {
+    int i;
     QDir directory(_path);
-    if (_settings->DmType == DisplayType::Atronic) {
+    if (_path != "/var/volatile/usr") {
         QStorageInfo si = QStorageInfo(directory);
         qint64 available = si.bytesAvailable();
-        while (available <= (_quantity + 100) * _record_size) { // + 100 - доп размер на 100 записей
-            QStringList files = directory.entryList(QStringList() << "*.rez", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time | QDir::Reversed);
-            if (files.size())
+        qint64 needvalue = (_settings->DmType == DisplayType::Atronic) ? ((_quantity + 100) * _record_size) : 105000000; //Atronic: + 100 - доп размер на 100 записей // ~100MB for TPK
+        if (available >= 0) {
+            QStringList files = directory.entryList(QStringList() << ("*." + _extention) << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time | QDir::Reversed);
+            while (available <= needvalue && files.size()) { // + 100 - доп размер на 100 записей
                 directory.remove(files[0]);
-            si = QStorageInfo(directory);
-            available = si.bytesAvailable();
+                si = QStorageInfo(directory);
+                available = si.bytesAvailable();
+                files = directory.entryList(QStringList() << ("*." + _extention) << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time | QDir::Reversed);
+            }
+        }
+    } else { // _path == "/var/volatile/usr" - TPK, RAM drive
+        qint64 allocated = 0;
+        QFileInfoList filesinfo = directory.entryInfoList(QStringList() << ("*." + _extention) << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time | QDir::Reversed);
+        for (i = 0; i < filesinfo.size(); i++) // summ onr time
+            allocated += filesinfo[i].size();
+        while (allocated > 400000000 && filesinfo.size()) {
+            directory.remove(filesinfo[0].absoluteFilePath());
+            allocated -= filesinfo[0].size();
+            filesinfo = directory.entryInfoList(QStringList() << ("*." + _extention) << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time | QDir::Reversed);
         }
     }
     QDateTime dt = QDateTime::currentDateTime();
