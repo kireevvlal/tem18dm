@@ -32,6 +32,9 @@ private:
     void CloseFile();
 public:
     //int RecordSize() { return _record_size; }
+    QString Path() { return _path; }
+    int RecordSize() { return _record_size; }
+    QString Extention() { return _extention; }
     explicit Registrator(LcmSettings*, QObject *parent = nullptr);
     void Stop();
     int Interval() { return _interval; }

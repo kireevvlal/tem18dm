@@ -68,11 +68,14 @@ bool Processor:: Load(QString startPath, QString cfgfile)
         _mainstore.FillMaps(i.value());
     _slave.FillStore(&_mainstore);
     // read motoresurs
-    if (!ReadMotoresurs(&_mtr_file)) { // not on card => read from app folder
-        QFile appdirfile;
-        appdirfile.setFileName(_start_path + "/mot.re");
-        ReadMotoresurs(&appdirfile);
-    }
+    if (!ReadMotoresurs())
+        if (!ReadMotoresurs(&_mtr_file)) { // not on card => read from app folder
+            QFile appdirfile;
+            appdirfile.setFileName(_start_path + "/mot.re");
+            ReadMotoresurs(&appdirfile);
+        }
+    // Read motoresurs from registration file
+
     _diagnostics->Init();
 //#ifdef Q_OS_WIN
 //    _fswatcher->addPath("D:/_USB");
@@ -84,6 +87,39 @@ bool Processor:: Load(QString startPath, QString cfgfile)
 //#endif
 
     return true;
+}
+//--------------------------------------------------------------------------------
+bool Processor::ReadMotoresurs() {
+    int i = 0;
+    QFileInfo info;
+    QByteArray record;
+    qint64 size = 0, bytenum;
+    UnionUInt32 par;
+    QDir directory(_registrator->Path());
+    QFileInfoList files = directory.entryInfoList(QStringList() << ("*." + _registrator->Extention()) << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time);
+    if (i < files.size()) {
+        if (_registrator->Path() != "/var/volatile/usr") { //
+            if (files.size()) {
+                while ((size = files[i].size()) < _registrator->RecordSize())
+                    i++;
+                bytenum = (size / _registrator->RecordSize() - 1) * _registrator->RecordSize() + 206;
+                QFile regfile(files[0].filePath());
+                if (regfile.open(QIODevice::ReadOnly)) {
+                    regfile.seek(bytenum);
+                    regfile.read(par.Array, 4);
+                    _mainstore.SetUInt32("DIAG_Motoresurs", par.Value);
+                    regfile.read(par.Array, 4);
+                    _mainstore.SetUInt32("DIAG_Adiz", par.Value);
+                    _diagnostics->Adiz((float)par.Value / 10);
+                    regfile.read(par.Array, 4);
+                    _mainstore.SetUInt32("DIAG_Tt", par.Value);
+                    regfile.close();
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
 //--------------------------------------------------------------------------------
 bool Processor::ReadMotoresurs(QFile *file) {
@@ -328,7 +364,9 @@ void Processor::DiagTimerStep() {
                                                                                    : _mainstore.Bit("BEL_Diagn", 2) + 1) : 0); // 3 - XX
     _virtual_section = (_virtual_section == 1) ? 0 : 1;
     _diagnostics->RefreshDT();
-    _diagnostics->Motoresurs();
+    if (_diagnostics->Motoresurs())
+        if (_registrator->Path() == "/var/volatile/usr") // on RAM drive save motoresurs every second
+            SaveMotoresurs(&_mtr_file);
     _diagnostics->Connections(_serial_ports, _registrator, &_slave);
     _diagnostics->RizCU(_mainstore.Byte("PROG_PKM"));
     _diagnostics->APSignalization(_mainstore.Byte("PROG_PKM"));

@@ -171,7 +171,7 @@ void Diagnostics::RizCU(int pkm) {
         _storage->SetBit("PROG_TrSoob", 35, 0);
 }
 //--------------------------------------------------------------------------------
-void Diagnostics::Motoresurs() {
+bool Diagnostics::Motoresurs() {
     qint64 currtime = QDateTime::currentDateTime().toMSecsSinceEpoch();
     qint64 diff;
     int n = _storage->Int16("USTA_N");
@@ -187,9 +187,11 @@ void Diagnostics::Motoresurs() {
                 _a_diz += (float)_storage->Int16("DIAG_Pg") / 3600;
                 _storage->SetUInt32("DIAG_Adiz", _a_diz * 10); // полезная работа
             }
+            return true;
         }
     } else
         _msec = currtime;
+    return false;
 }
 //--------------------------------------------------------------------------------
 void Diagnostics::Connections(QMap<QString, ExtSerialPort*> serialPorts, Registrator* reg, SlaveLcm* slave) {

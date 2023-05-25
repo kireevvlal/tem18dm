@@ -46,7 +46,7 @@ public:
     float Adiz() { return _a_diz; }
     void Adiz(float value) { _a_diz = value; }
     Diagnostics(DataStore*, LcmSettings*);
-    void Motoresurs();
+    bool Motoresurs();
     void Connections(QMap<QString, ExtSerialPort*>, Registrator* reg, SlaveLcm* slave);
     void RizCU(int);
     void APSignalization(int);

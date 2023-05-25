@@ -97,7 +97,8 @@ private:
     void SaveMessagesList(QFile*);
      bool ReadMessagesList(QFile*);
     void SaveMotoresurs(QFile*);
-    bool ReadMotoresurs(QFile*);
+    bool ReadMotoresurs(QFile*); // special file
+    bool ReadMotoresurs(); // registration file
 #ifdef Q_OS_LINUX
     void GPIO();
 #endif
