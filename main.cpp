@@ -10,12 +10,12 @@
 #include "processor.h"
 #include <iostream>
 #include <exception>
-#ifdef Q_OS_WIN
-#define LOGPATH QString("D:/CF")
-#endif
-#ifdef Q_OS_UNIX
-#define LOGPATH QString("/var/volatile/usr")
-#endif
+//#ifdef Q_OS_WIN
+//#define LOGPATH QString("D:/CF")
+//#endif
+//#ifdef Q_OS_UNIX
+//#define LOGPATH QString("/var/volatile/usr")
+//#endif
 //--------------------------------------------------------------------------------
 Processor *pProcessor;
 //--------------------------------------------------------------------------------
@@ -43,29 +43,29 @@ void handleExitSignals(int signal) {
     }
 }
 //--------------------------------------------------------------------------------
-void handleErrorsSignals(int signal) {
-    QFile file;
-    file.setFileName(LOGPATH + "/errors_"  + QDate::currentDate().toString("ddMMyy") + ".txt");
-    if (file.open(QIODevice::Append)) {
-        QTextStream stream(&file);
-        stream.setCodec("UTF-8");
-        QString error;
-        switch (signal) {
-        case SIGSEGV:
-            error =  "Error Segmentation fault"; break;
-        case SIGFPE:
-            error = "Error Floating point exception"; break;
-#ifndef Q_OS_WIN
-        case SIGBUS:
-            error = "Bus error (bad memory access)"; break;
-#endif
-        }
-        stream << QTime::currentTime().toString("hh:mm:ss") + " " + error << endl;
-        file.close();
-    }
-    pProcessor->Stop();
-    exit(EXIT_FAILURE);
-}
+//void handleErrorsSignals(int signal) {
+//    QFile file;
+//    file.setFileName(LOGPATH + "/errors_"  + QDate::currentDate().toString("ddMMyy") + ".txt");
+//    if (file.open(QIODevice::Append)) {
+//        QTextStream stream(&file);
+//        stream.setCodec("UTF-8");
+//        QString error;
+//        switch (signal) {
+//        case SIGSEGV:
+//            error =  "Error Segmentation fault"; break;
+//        case SIGFPE:
+//            error = "Error Floating point exception"; break;
+//#ifndef Q_OS_WIN
+//        case SIGBUS:
+//            error = "Bus error (bad memory access)"; break;
+//#endif
+//        }
+//        stream << QTime::currentTime().toString("hh:mm:ss") + " " + error << endl;
+//        file.close();
+//    }
+//    pProcessor->Stop();
+//    exit(EXIT_FAILURE);
+//}
 //--------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
@@ -111,11 +111,11 @@ int main(int argc, char *argv[])
 #endif
     signal(SIGINT, handleExitSignals);
     // errors signals
-    signal(SIGSEGV, handleErrorsSignals);
-    signal(SIGFPE, handleErrorsSignals);
-#ifndef Q_OS_WIN
-    signal(SIGBUS, handleErrorsSignals);
-#endif
+//    signal(SIGSEGV, handleErrorsSignals);
+//    signal(SIGFPE, handleErrorsSignals);
+//#ifndef Q_OS_WIN
+//    signal(SIGBUS, handleErrorsSignals);
+//#endif
 
 //    QFont fon("Gigi");
 //    app.setFont(fon);

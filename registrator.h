@@ -13,8 +13,8 @@ class Registrator : public QObject
     Q_OBJECT
 private:
     LcmSettings *_settings;
+    bool _used_ram;     // запись RAM-диск
     QString _path;      // каталог для записи файлов
-    QString _extention; // расширение файла результатов
     QString _alias;     // алиас локомотива для имени файла
     int _quantity;      // записей в файле
     int _interval;      // время между записями регистрации (мс)
@@ -31,14 +31,13 @@ private:
     void Prepare();
     void CloseFile();
 public:
-    //int RecordSize() { return _record_size; }
+    bool UsedRAM() { return _used_ram; }
     QString Path() { return _path; }
     int RecordSize() { return _record_size; }
-    QString Extention() { return _extention; }
     explicit Registrator(LcmSettings*, QObject *parent = nullptr);
     void Stop();
     int Interval() { return _interval; }
-    void SetParameters(QString,  QString,  QString, RegistrationType, int, int, int, int, bool);
+    void SetParameters(QString,  QString, RegistrationType, int, int, int, int, bool, bool);
     //void Parse(NodeXML*);           // разбор ветви дерава XML с параметрами объекта
     bool UpdateRecord(uint, uint, QByteArray);
     bool SetByteRecord(uint, quint8);

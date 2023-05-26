@@ -7,7 +7,8 @@
 
 Registrator::Registrator(LcmSettings *settings, QObject *parent) : QObject(parent) {
     _settings = settings;
-    _path = _extention = _alias = "";
+    _used_ram = false;
+    _path = _alias = "";
     _quantity = 3600;
     _interval = 1000;
     _counter = 0;
@@ -137,10 +138,9 @@ void  Registrator::Stop() {
     CloseFile();
 }
 //--------------------------------------------------------------------------------
-void Registrator::SetParameters(QString path, QString alias, QString extention, RegistrationType regtype, int quantity, int recordsize, int interval, int sector, bool compress) {
+void Registrator::SetParameters(QString path, QString alias, RegistrationType regtype, int quantity, int recordsize, int interval, int sector, bool compress, bool ram) {
     _path = path;
     _alias = alias;
-    _extention = extention;
     _reg_type = regtype;
     if (quantity)
         _quantity = quantity;
@@ -154,6 +154,8 @@ void Registrator::SetParameters(QString path, QString alias, QString extention, 
         _sector_size = sector;
     if (compress)
         _need_compression = true;
+    if (ram)
+        _used_ram = true;
     if (_reg_type == RegistrationType::Bulk) {
         _banks[0].resize(_quantity * _record_size);
         _banks[1].resize(_quantity * _record_size);
@@ -166,32 +168,32 @@ void Registrator::SetParameters(QString path, QString alias, QString extention, 
 void Registrator::Prepare() {
     int i;
     QDir directory(_path);
-    if (_path != "/var/volatile/usr") {
+    if (!_used_ram) {
         QStorageInfo si = QStorageInfo(directory);
         qint64 available = si.bytesAvailable();
         qint64 needvalue = (_settings->DmType == DisplayType::Atronic) ? ((_quantity + 100) * _record_size) : 105000000; //Atronic: + 100 - доп размер на 100 записей // ~100MB for TPK
         if (available >= 0) {
-            QStringList files = directory.entryList(QStringList() << ("*." + _extention) << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time | QDir::Reversed);
+            QStringList files = directory.entryList(QStringList() << "*.rez" << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time | QDir::Reversed);
             while (available <= needvalue && files.size()) { // + 100 - доп размер на 100 записей
                 directory.remove(files[0]);
                 si = QStorageInfo(directory);
                 available = si.bytesAvailable();
-                files = directory.entryList(QStringList() << ("*." + _extention) << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time | QDir::Reversed);
+                files = directory.entryList(QStringList() << "*.rez" << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time | QDir::Reversed);
             }
         }
-    } else { // _path == "/var/volatile/usr" - TPK, RAM drive
+    } else { // - TPK, RAM drive
         qint64 allocated = 0;
-        QFileInfoList filesinfo = directory.entryInfoList(QStringList() << ("*." + _extention) << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time | QDir::Reversed);
+        QFileInfoList filesinfo = directory.entryInfoList(QStringList() << "*.rez" << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time | QDir::Reversed);
         for (i = 0; i < filesinfo.size(); i++) // summ onr time
             allocated += filesinfo[i].size();
         while (allocated > 400000000 && filesinfo.size()) {
             directory.remove(filesinfo[0].absoluteFilePath());
             allocated -= filesinfo[0].size();
-            filesinfo = directory.entryInfoList(QStringList() << ("*." + _extention) << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time | QDir::Reversed);
+            filesinfo = directory.entryInfoList(QStringList() << "*.rez" << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time | QDir::Reversed);
         }
     }
     QDateTime dt = QDateTime::currentDateTime();
-    QString name = _path + "/" + _alias + "_" + _settings->Number + "_" + dt.date().toString("yyMMdd") + dt.time().toString("hhmmss") + "." + _extention;
+    QString name = _path + "/" + _alias + "_" + _settings->Number + "_" + dt.date().toString("yyMMdd") + dt.time().toString("hhmmss") + ".rez";
     _file.setFileName(name);
 }
 //--------------------------------------------------------------------------------

@@ -96,9 +96,9 @@ bool Processor::ReadMotoresurs() {
     qint64 size = 0, bytenum;
     UnionUInt32 par;
     QDir directory(_registrator->Path());
-    QFileInfoList files = directory.entryInfoList(QStringList() << ("*." + _registrator->Extention()) << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time);
+    QFileInfoList files = directory.entryInfoList(QStringList() << "*.rez" << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time);
     if (i < files.size()) {
-        if (_registrator->Path() != "/var/volatile/usr") { //
+        if (!_registrator->UsedRAM()) { //
             if (files.size()) {
                 while ((size = files[i].size()) < _registrator->RecordSize())
                     i++;
@@ -365,7 +365,7 @@ void Processor::DiagTimerStep() {
     _virtual_section = (_virtual_section == 1) ? 0 : 1;
     _diagnostics->RefreshDT();
     if (_diagnostics->Motoresurs())
-        if (_registrator->Path() == "/var/volatile/usr") // on RAM drive save motoresurs every second
+        if (_registrator->UsedRAM()) // on RAM drive save motoresurs every second
             SaveMotoresurs(&_mtr_file);
     _diagnostics->Connections(_serial_ports, _registrator, &_slave);
     _diagnostics->RizCU(_mainstore.Byte("PROG_PKM"));
@@ -760,21 +760,26 @@ void Processor::ParseSerialPorts(NodeXML *node)
 //--------------------------------------------------------------------------------
 void Processor::ParseRegistration(NodeXML* node) {
     int i;
-    QString path, alias, extention, drive;
+    QString path, alias, drive;
     RegistrationType regtype = RegistrationType::Record;
     int quantity = 0, recordsize = 0, interval = 0, save_interval = 0, sector_size = 0;
+    bool ram = false;
     bool compress = false;
     if (node->Child != nullptr) {
         node = node->Child;
         while (node != nullptr) {
-            if (node->Name == "path")
+            if (node->Name == "path") {
                 path = node->Text;
+                for (i = 0; i < node->Attributes.count(); i++) {
+                    AttributeXML *attr = node->Attributes[i];
+                    if (attr->Name == "ram")
+                        ram = (attr->Value.toLower() == "on") ? true : false;
+                }
+            }
             else if (node->Name == "file") {
                 alias = node->Text;
                 for (i = 0; i < node->Attributes.count(); i++) {
                     AttributeXML *attr = node->Attributes[i];
-                    if (attr->Name == "ext")
-                        extention = attr->Value.toLower();
                     if (attr->Name == "type")
                         regtype = (attr->Value.toLower() == "bulk") ? RegistrationType::Bulk : ((attr->Value.toLower() == "archive") ? RegistrationType::Archive :
                                   ((attr->Value.toLower() == "sector") ? RegistrationType::Sector : RegistrationType::Record));
@@ -806,8 +811,8 @@ void Processor::ParseRegistration(NodeXML* node) {
             node = node->Next;
         }
     }
-    _registrator->SetParameters(path, alias, extention, regtype, quantity, recordsize, interval, sector_size, compress);
-    _saver->SetParameters(drive, path, save_interval, extention);
+    _registrator->SetParameters(path, alias, regtype, quantity, recordsize, interval, sector_size, compress, ram);
+    _saver->SetParameters(drive, path, save_interval);
 }
 //------------------------------------------------------------------------------
 QJsonArray Processor::getSettings() {
