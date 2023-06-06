@@ -330,7 +330,7 @@ Rectangle {
             height: 62
             source: "../Pictogram/m_lok.png"
         }
-        visible: is_links
+        visible: is_slave
     }
 
     Image {
