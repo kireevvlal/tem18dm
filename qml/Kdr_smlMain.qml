@@ -38,7 +38,7 @@ Rectangle {
             stb_Tvd.barColor = (par[3] < 10) ? "red" : (par[3] < 45) ? "yellow" : (par[3] < 87) ? "#00d7d7" : "red";
 
             stb_Tms.value = stb_Tms.digitalvalue = par[4];
-            stb_Tms.barColor = (par[4] < 20) ? "red" : (par[4] < 45) ? "yellow" : (par[4] < 70) ? "#00d7d7" : "red";
+            stb_Tms.barColor = (par[4] < 20) ? "red" : (par[4] < 45) ? "yellow" : (par[4] < 69) ? "#00d7d7" : "red";
 
             vh1.visible = (par[7] & 1) && par[0][0]; // ??? добавил наличие связи в условии
             vh2.visible = (par[7] & 2) && par[0][0]; // ??? добавил наличие связи в условии

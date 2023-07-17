@@ -241,6 +241,7 @@ void Diagnostics::Connections(QMap<QString, ExtSerialPort*> serialPorts, Registr
             }
         }
         else if (i.key() == "USTA") {
+            port->OutData.SetByteParameter("USTA_RSI", _storage->Bit("DIAG_Connections", CONN_BEL) ? 1 : 0);
             port->OutData.SetByteParameter("USTA_SIGNALIZATION", (_storage->Bit("PROG_TrSoob", 17) ? 1 : 0) + (_storage->Bit("PROG_TrSoob", 16) ? 2 : 0));
             if (_storage->Bit("DIAG_Connections", CONN_USTA)) {
                 if (!port->IsExchange())
