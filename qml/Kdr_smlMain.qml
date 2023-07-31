@@ -34,10 +34,12 @@ Rectangle {
                 indUg.finish = finish;
                 indUg.repaint = true;
             }
-            stb_Tvd.value = stb_Tvd.digitalvalue =  par[3];
+            stb_Tvd.value = par[3]
+            stb_Tvd.digitalvalue = Math.round(par[3])
             stb_Tvd.barColor = (par[3] < 10) ? "red" : (par[3] < 45) ? "yellow" : (par[3] < 87) ? "#00d7d7" : "red";
 
-            stb_Tms.value = stb_Tms.digitalvalue = par[4];
+            stb_Tms.value = par[4]
+            stb_Tms.digitalvalue = Math.round(par[4])
             stb_Tms.barColor = (par[4] < 20) ? "red" : (par[4] < 45) ? "yellow" : (par[4] < 69) ? "#00d7d7" : "red";
 
             vh1.visible = (par[7] & 1) && par[0][0]; // ??? добавил наличие связи в условии

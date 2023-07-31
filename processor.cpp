@@ -983,8 +983,8 @@ QJsonArray Processor::getParamKdrDizl() // Разобраться с цвето�
     _storage[_section]->Int16("USTA_N"), _storage[_section]->Float("IT_TSM1"), // N, темп хол спая
     QJsonArray { _storage[_section]->Int16("IT_THA19"), _storage[_section]->Int16("IT_THA21"), _storage[_section]->Int16("IT_THA23"),
     _storage[_section]->Int16("IT_THA12"), _storage[_section]->Int16("IT_THA10"), _storage[_section]->Int16("IT_THA8") }, // ТЦ
-    QJsonArray { _storage[_section]->Int16("IT_THA11"), _storage[_section]->Int16("IT_THA2") }, // ТК
-    _control->MinTC[_section], _control->MaxTC[_section], _control->AvgTC[_section],
+    QJsonArray { _storage[_section]->Int16("IT_THA2"), _storage[_section]->Int16("IT_THA11") }, // ТК
+    _control->MaxTC[_section], _control->MinTC[_section], _control->AvgTC[_section],
     QJsonArray { _control->DeltaTC[_section][0], _control->DeltaTC[_section][1], _control->DeltaTC[_section][2],
     _control->DeltaTC[_section][3], _control->DeltaTC[_section][4], _control->DeltaTC[_section][5] } };
 }
@@ -997,7 +997,7 @@ QJsonArray Processor::getParamKdrMasl()
 //------------------------------------------------------------------------------
 QJsonArray Processor::getParamKdrTpl() { // первые два параметра: объем и масса
     float PiF = _storage[_section]->Float("USTA_Pf_ftot") / 10, PiD = _storage[_section]->Float("USTA_Pf_tnvd") / 10;
-    return { 0, 0, PiF, PiF - PiD, PiD, _storage[_section]->Float("IT_TSM6"), _storage[_section]->Int16("USTA_N"), _control->KdrTpl(_section) };
+    return { 0, 0, PiF, PiF - PiD, PiD, _storage[_section]->Float("IT_TSM2"), _storage[_section]->Int16("USTA_N"), _control->KdrTpl(_section) };
 }
 //------------------------------------------------------------------------------
 QJsonArray Processor::getParamKdrOhl()

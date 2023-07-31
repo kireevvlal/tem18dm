@@ -107,10 +107,21 @@ Rectangle {
             break;
 
         case "V>0": //Qt.Key_D:  //68 :
-            Scripts.opacityNul();
-            kdr_Reostat.opacity = 1;
-            current_system = 6;
-            img0.opacity = 1;
+            if (moduleType == 1) {
+                Scripts.opacityNul();
+                kdr_Reostat.opacity = 1;
+                current_system = 6;
+                img0.opacity = 1;
+            }
+            break;
+
+        case "St": //Qt.Key_D:  //68 :
+            if (moduleType == 2) {
+                Scripts.opacityNul();
+                kdr_Reostat.opacity = 1;
+                current_system = 6;
+                img0.opacity = 1;
+            }
             break;
 
         case "UD":  //73 :

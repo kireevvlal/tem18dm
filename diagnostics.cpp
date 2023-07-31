@@ -83,7 +83,7 @@ void Diagnostics::APSignalization(int pkm) {
 //--------------------------------------------------------------------------------
 void Diagnostics::RizCU(int pkm) {
     float r, u;
-    u = _storage->Float("USTA_Ubs_filtr");
+    u = fabs(_storage->Float("USTA_Ubs_filtr"));
     if (u < 40 || !_storage->Bit("DIAG_Connections", CONN_USTA) || !((pkm == 1) || (pkm == 2))) { // add PKM not position
         _riz_cu.tp = _riz_cu.tm = 0;
         _riz_cu.Up = _riz_cu.Um = 0;
@@ -102,8 +102,7 @@ void Diagnostics::RizCU(int pkm) {
             _riz_cu.rss = _storage->Bit("USTA_Outputs", USTA_OUTPUTS_RSI);
             return;
         }
-        _riz_cu.rss = _storage->Bit("USTA_Outputs", USTA_OUTPUTS_RSI);
-        if (_riz_cu.rss)
+        if (_riz_cu.rss == _storage->Bit("USTA_Outputs", USTA_OUTPUTS_RSI))
             return;
         _riz_cu.snh = true;
     }
@@ -119,7 +118,7 @@ void Diagnostics::RizCU(int pkm) {
         _riz_cu.Up = abs(_storage->Int16("USTA_Ucu"));
         if (_riz_cu.Up < 1 || _riz_cu.Um < 1)
             return;
-    } else  {// RSI - 0
+    } else  {       // RSI - 0
         _riz_cu.tp = 0;
         if (_riz_cu.tm == 0) {
             _riz_cu.tm = QDateTime::currentDateTime().toMSecsSinceEpoch();
@@ -132,19 +131,24 @@ void Diagnostics::RizCU(int pkm) {
         if (_riz_cu.Up < 1 || _riz_cu.Um < 1)
             return;
     }
+
     if (_riz_cu.Um > u - 1) { // Зем+
         _storage->SetInt16("DIAG_Rplus", 1);
-         _storage->SetBit("PROG_TrSoob", 32, 1);
+        _storage->SetBit("PROG_TrSoob", 32, 1);
     } else
-         _storage->SetBit("PROG_TrSoob", 32, 0);
+        _storage->SetBit("PROG_TrSoob", 32, 0);
+
     if (_riz_cu.Up > u - 1) { // Зем -
         _storage->SetInt16("DIAG_Rminus", 1);
-         _storage->SetBit("PROG_TrSoob", 33, 1);
+        _storage->SetBit("PROG_TrSoob", 33, 1);
     } else
-         _storage->SetBit("PROG_TrSoob", 33, 0);
+        _storage->SetBit("PROG_TrSoob", 33, 0);
+
     if (_storage->Bit("PROG_TrSoob", 32) || _storage->Bit("PROG_TrSoob", 33))
         return;
+
     u = 666 * (u - _riz_cu.Up - _riz_cu.Um);
+
     r = u / _riz_cu.Up;
     if (r < 2)
         _storage->SetInt16("DIAG_Rminus", 1);
@@ -153,6 +157,7 @@ void Diagnostics::RizCU(int pkm) {
             _storage->SetInt16("DIAG_Rminus", 998);
         else
             _storage->SetInt16("DIAG_Rminus", r);
+
     r = u / _riz_cu.Um;
     if (r < 2)
         _storage->SetInt16("DIAG_Rplus", 1);
@@ -161,10 +166,12 @@ void Diagnostics::RizCU(int pkm) {
             _storage->SetInt16("DIAG_Rplus", 998);
         else
             _storage->SetInt16("DIAG_Rplus", r);
+
     if (_storage->Int16("DIAG_Rplus") < 250)
         _storage->SetBit("PROG_TrSoob", 34, 1);
     else
         _storage->SetBit("PROG_TrSoob", 34, 0);
+
     if (_storage->Int16("DIAG_Rminus") < 250)
         _storage->SetBit("PROG_TrSoob", 35, 1);
     else

@@ -12,9 +12,9 @@ Rectangle {
         running: kdr_Masl.opacity
         onTriggered: {
             var par = ioBf.getParamKdrMasl();
-            ind_PiD.value = par[0].toFixed(1);
+            ind_PiD.value = par[0].toFixed(2);
             ind_TiD.value = par[1];
-            ind_PoD.value = par[2].toFixed(1);
+            ind_PoD.value = par[2].toFixed(2);
             ind_ToD.value = par[3];
             ind_Fd.value = par[4];
             zPm.visible = par[5] & 1;

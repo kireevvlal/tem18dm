@@ -14,8 +14,20 @@ Rectangle {
         onTriggered: {
             var par = ioBf.getParamKdrBos();
             ind_Ubs.value = par[0].toFixed(0);
-            ind_Rp.value = par[1];
-            ind_Rm.value = par[2];
+            var rp = Math.round(par[1])
+            if (rp < 1)
+                ind_Rp.value = "т"
+            else if (rp > 997)
+                ind_Rp.value = ">1М"
+            else
+                ind_Rp.value = rp
+            var rm = Math.round(par[2])
+            if (rm < 1)
+                ind_Rm.value = "т"
+            else if (rm > 997)
+                ind_Rm.value = ">1М"
+            else
+                ind_Rm.value = rm
             ind_Iz.value = par[3].toFixed(0);
             ind_Uzu.value = par[4];
             ind_Ivst.value = par[5].toFixed(0);
