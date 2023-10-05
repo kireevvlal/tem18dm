@@ -367,7 +367,7 @@ Window {
             y: 8
             color: "#d2e8fb"
             text: qsTr("время")
-            horizontalAlignment: Text.AlignRight
+            //horizontalAlignment: Text.AlignRight
             font.pointSize: 12
             font.bold: true
             font.family: deffntfam
@@ -1016,6 +1016,14 @@ Window {
 
     Kdr_Nstr {
         id: kdr_Nastroika
+        x: 128
+        y: 219
+        opacity: 0
+        z: 300
+    }
+
+    Kdr_DateTime {
+        id: kdr_DateTime
         x: 128
         y: 219
         opacity: 0

@@ -22,6 +22,7 @@ using namespace std;
 #endif
 #include <QSound>
 #include <QTextStream>
+#include <QDebug>
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 Processor::Processor(QObject *parent) : QObject(parent)
@@ -249,6 +250,23 @@ void Processor::saveSettings(QString number, int psensors, bool elinj, int svolu
     _settings.ElInjection = elinj;
     _settings.SoundVolume = svolume;
     SaveSettings();
+}
+//--------------------------------------------------------------------------------
+void Processor::saveDateTime(int year, int month, int day, int hour, int minute, int second) {
+    QDateTime datetime;
+    datetime.setDate(QDate(year,month,day));
+    datetime.setTime(QTime(hour, minute, second));
+    QString string = "date -s '" + datetime.toString("yyyy-MM-dd hh:mm:ss") + "'";
+    int systemDateTimeStatus = system(string.toStdString().c_str());
+    if (systemDateTimeStatus ==-1)
+    {
+        qDebug() << "Failed to change date time";
+    }
+    int systemHwClockStatus = system("hwclock -w -u");
+    if (systemHwClockStatus == -1)
+    {
+        qDebug()  << "Failed to sync hardware clock";
+    }
 }
 //--------------------------------------------------------------------------------
 void Processor::Stop() {
@@ -1321,4 +1339,11 @@ QJsonArray Processor::getKdrDevelop() {
 QJsonArray Processor::getKdrNastroyka() {
     return { _settings.Number, _settings.ElInjection, _settings.PressureSensors, _settings.SoundVolume };
 }
+//------------------------------------------------------------------------------
+QJsonArray Processor::getKdrDateTime() {
+    QDate date = _diagnostics->Date();
+    QTime time = _diagnostics->Time();
+    return { date.year(), date.month(), date.day(), time.hour(), time.minute(), time.second() };
+}
+
 

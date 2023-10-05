@@ -122,6 +122,7 @@ public slots:
     void ChangeMediaDir(QString);
     void querySaveToUSB();
     void saveSettings(QString, int, bool, int);
+    void saveDateTime(int, int, int, int, int, int);
     void kvitTrBanner();
     void setSection(int);
 //    void playSoundOnShowBanner();
@@ -150,6 +151,7 @@ public slots:
     QStringList getKdrPrivet();
     QJsonArray getKdrDevelop();
     QJsonArray getKdrNastroyka();
+    QJsonArray getKdrDateTime();
 };
 
 #endif // PROCESSOR_H

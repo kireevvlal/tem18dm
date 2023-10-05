@@ -83,6 +83,7 @@ function opacityNul()  {
 
     kdr_Reostat.opacity = 0;
     kdr_Nastroika.opacity = 0;
+    kdr_DateTime.opacity = 0;
 
     kdr_TI_TXA.opacity = 0;
     kdr_TI_TCM.opacity = 0;

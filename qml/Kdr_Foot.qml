@@ -13,11 +13,13 @@ Rectangle {
     property string cltxtSelect:"#1bb7e4"; // цвет текста нажатой кнопки
     property string cltxt:"white";         // штатный цвет текста всех кнопок
     property int start_counter: 0;
+    property int maxday: 31
+
 
     //** переключение
     Keys.onPressed: {
         var key = Scripts.getKey(event.key)
-        if (!kdr_TrLs.opacity && !kdr_Nastroika.opacity && !kdr_Develop.opacity) {
+        if (!kdr_TrLs.opacity && !kdr_Nastroika.opacity && !kdr_Develop.opacity&& !kdr_DateTime.opacity) {
             if (key === "3" || key === "4"|| key === "5"|| key === "6"|| key === "7") {
                 main_window.passwordstr += key
                 if (main_window.passwordstr == "75364")
@@ -42,8 +44,8 @@ Rectangle {
             img8.opacity = 0; err.vz8 = 0;
             img9.opacity = 0; err.vz9 = 0;
             txt_1.color = txt_2.color = cltxt;
-            kdr_TrLs.opacity = kdr_Nastroika.opacity = kdr_Develop.opacity = 0;
-            main_window.go_Exit(kdr_TrLs.opacity || kdr_Nastroika.opacity || kdr_Develop.opacity || kdr_Svz)
+            kdr_TrLs.opacity = kdr_Nastroika.opacity = kdr_Develop.opacity = kdr_DateTime.opacity = 0;
+            main_window.go_Exit(kdr_TrLs.opacity || kdr_Nastroika.opacity || kdr_Develop.opacity || kdr_DateTime.opacity || kdr_Svz)
             break;
         case "1":
             if (Scripts.setSection(1)) {
@@ -91,6 +93,8 @@ Rectangle {
                 ioBf.saveSettings(kdr_Nastroika.number, kdr_Nastroika.psensors, kdr_Nastroika.elinj, kdr_Nastroika.svolume)
                 main_window.lcm_number =qsTr("ТЭМ18ДМ  №" + kdr_Nastroika.number)
                 main_window.sound_volume = kdr_Nastroika.svolume
+            } else if (kdr_DateTime.opacity) {
+                ioBf.saveDateTime(kdr_DateTime.year, kdr_DateTime.month, kdr_DateTime.day, kdr_DateTime.hour, kdr_DateTime.minute, kdr_DateTime.second)
             } else {
                 if (img9.opacity == 1) // будем переключаться на меню ЭЛЕКТРООБОРУДОВАНИЕ
                 {
@@ -99,6 +103,11 @@ Rectangle {
                     current_system = 2;
                 }
             }
+            break;
+
+        case "S":
+            doSettingsDT()
+            current_system = 5;
             break;
 
         case "I":  //67 :
@@ -143,6 +152,9 @@ Rectangle {
                 if (kdr_Nastroika.active < 3)
                     kdr_Nastroika.active++
                 kdr_Nastroika.pos = 0;
+            } else if (kdr_DateTime.opacity) {
+                if (kdr_DateTime.active < 5)
+                    kdr_DateTime.active++
             }
             break;
 
@@ -153,6 +165,9 @@ Rectangle {
                 if (kdr_Nastroika.active > 0)
                     kdr_Nastroika.active--
                 kdr_Nastroika.pos = 0;
+            } else if (kdr_DateTime.opacity) {
+                if (kdr_DateTime.active > 0)
+                    kdr_DateTime.active--
             }
             break;
 
@@ -203,7 +218,35 @@ Rectangle {
                         kdr_Nastroika.svolume = 10;
                     break;
                 }
-            }
+            } else
+                if (kdr_DateTime.opacity) {
+                    switch (kdr_DateTime.active) {
+                    case 0:
+                        if (kdr_DateTime.year > 2023) {
+                            kdr_DateTime.year--
+                            correctDate()
+                        }
+                        break;
+                    case 1:
+                        if (kdr_DateTime.month > 1) {
+                            kdr_DateTime.month--
+                            correctDate()
+                        }
+                        break;
+                    case 2:
+                        if (kdr_DateTime.day > 1) kdr_DateTime.day--
+                        break;
+                    case 3:
+                        if (kdr_DateTime.hour > 0) kdr_DateTime.hour--
+                        break;
+                    case 4:
+                        if (kdr_DateTime.minute > 0) kdr_DateTime.minute--
+                        break;
+                    case 5:
+                        if (kdr_DateTime.second > 0) kdr_DateTime.second--
+                        break;
+                    }
+                }
             break;
         case "RIGHT":
             if (kdr_Nastroika.opacity) {
@@ -223,7 +266,35 @@ Rectangle {
                         kdr_Nastroika.svolume = 100;
                     break;
                 }
-            }
+            } else
+                if (kdr_DateTime.opacity) {
+                    switch (kdr_DateTime.active) {
+                    case 0:
+                        if (kdr_DateTime.year < 2100) {
+                            kdr_DateTime.year++
+                            correctDate()
+                        }
+                        break;
+                    case 1:
+                        if (kdr_DateTime.month < 12) {
+                            kdr_DateTime.month++
+                            correctDate()
+                        }
+                        break;
+                    case 2:
+                        if (kdr_DateTime.day < maxday) kdr_DateTime.day++
+                        break;
+                    case 3:
+                        if (kdr_DateTime.hour < 24) kdr_DateTime.hour++
+                        break;
+                    case 4:
+                        if (kdr_DateTime.minute < 60) kdr_DateTime.minute++
+                        break;
+                    case 5:
+                        if (kdr_DateTime.second < 60) kdr_DateTime.second++
+                        break;
+                    }
+                }
             break;
         }
 
@@ -395,12 +466,12 @@ Rectangle {
             err.tr9 = trs[3]; // 8
             if (current_section == 2 && !is_slave) {
                 Scripts.setSection(1);
-                main_window.go_Exit(kdr_TrLs.opacity || kdr_Nastroika.opacity || kdr_Develop.opacity || kdr_Svz)
+                main_window.go_Exit(kdr_TrLs.opacity || kdr_Nastroika.opacity || kdr_Develop.opacity || kdr_DateTime.opacity || kdr_Svz)
             }
             if (current_section == 1 && !is_links && start_counter >= 4) {
                 if (!Scripts.setSection(2))
                     doExit()
-                main_window.go_Exit(kdr_TrLs.opacity || kdr_Nastroika.opacity || kdr_Develop.opacity || kdr_Svz)
+                main_window.go_Exit(kdr_TrLs.opacity || kdr_Nastroika.opacity || kdr_Develop.opacity || kdr_DateTime.opacity || kdr_Svz)
             }
         }
 
@@ -445,6 +516,33 @@ Rectangle {
         kdr_Nastroika.opacity = 1;
         kdr_Foot.opacity = 1;
         kdr_Foot.focus = true;
+    }
+
+    function doSettingsDT() {
+        Scripts.opacityNul();
+        kdr_FootUso.opacity = 0
+        Scripts.setSection(1);
+        current_system = 0;
+        img8.opacity = 0;
+        img0.opacity = 1;
+        err.vz8 = err.vz9 = 0;
+        img9.source = "../Pictogram/save.png";
+        img9.opacity = 1;
+        kdr_DateTime.opacity = 1;
+        kdr_Foot.opacity = 1;
+        kdr_Foot.focus = true;
+    }
+
+    function correctDate() {
+        if (kdr_DateTime.month == 1 || kdr_DateTime.month == 3 || kdr_DateTime.month == 5 || kdr_DateTime.month == 7 ||
+                kdr_DateTime.month == 8 || kdr_DateTime.month == 10 || kdr_DateTime.month == 12)
+            maxday = 31
+        else if (kdr_DateTime.month == 2)
+                maxday = (kdr_DateTime.year % 4 == 0) ? 29 : 28
+        else
+            maxday = 30
+        if (kdr_DateTime.day > maxday)
+            kdr_DateTime.day = maxday
     }
 
 }

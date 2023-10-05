@@ -103,5 +103,6 @@
         <file>qml/scripts.js</file>
         <file>Pictogram/m_lok.png</file>
         <file>Pictogram/save.png</file>
+        <file>qml/Kdr_DateTime.qml</file>
     </qresource>
 </RCC>
