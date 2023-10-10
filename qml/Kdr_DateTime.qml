@@ -184,7 +184,7 @@ Rectangle {
         x: 10
         y: 180
         color: (active == 5) ? "yellow" : "silver"
-        text: qsTr("Час")
+        text: qsTr("Секунда")
         textFormat: Text.AutoText
         font.bold: true
         font.pixelSize: 14
