@@ -33,7 +33,7 @@ void Diagnostics::RefreshDT() {
 //--------------------------------------------------------------------------------
 void Diagnostics::APSignalization(int pkm) {
     float pt_min = _settings->ElInjection ? 4.0 : 0.5;
-    int uu[9] = { 0, 210, 335, 430, 525, 630, 755, 850, 945 };
+    int uu[9] = { 0, 335, 430, 525, 630, 755, 850, 945, 945 }; // { 0, 210, 335, 430, 525, 630, 755, 850, 945 };
     int ii[9] = { 0, 735, 1272, 1575, 1985, 1995, 1995, 1995, 1995 };
     _storage->SetBit("PROG_TrSoob", 16, (_storage->Float("IT_TSM3") > 68.9) ? true : false);
     _storage->SetBit("PROG_TrSoob", 17, (_storage->Float("IT_TSM6") > 86.9) ? true : false);

@@ -332,7 +332,7 @@ void Processor::RegTimerStep() {
     _registrator->SetDoubleWordRecord(214, _mainstore.UInt32("DIAG_Tt"));
     // message params
     if (_tr_reg_queue.empty()) { // not tr soob
-        for (i = 0; i < 4; i++)
+        for (i = 0; i < 5; i++)
             _registrator->SetByteRecord(318 + i, 0);
     } else {
         _registrator->SetByteRecord(318, _tr_reg_queue[0].hour); // hour
