@@ -270,7 +270,7 @@ Rectangle {
                 if (kdr_DateTime.opacity) {
                     switch (kdr_DateTime.active) {
                     case 0:
-                        if (kdr_DateTime.year < 2100) {
+                        if (kdr_DateTime.year < 2038) {
                             kdr_DateTime.year++
                             correctDate()
                         }

@@ -95,7 +95,7 @@ private:
     void SetSlaveData();
     QString FormMessage(int, int);
     void SaveMessagesList(QFile*);
-     bool ReadMessagesList(QFile*);
+    bool ReadMessagesList(QFile*);
     void SaveMotoresurs(QFile*);
     bool ReadMotoresurs(QFile*); // special file
     bool ReadMotoresurs(); // registration file

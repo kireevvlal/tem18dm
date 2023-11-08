@@ -69,13 +69,12 @@ bool Processor:: Load(QString startPath, QString cfgfile)
         _mainstore.FillMaps(i.value());
     _slave.FillStore(&_mainstore);
     // read motoresurs
-    if (!ReadMotoresurs())
-        if (!ReadMotoresurs(&_mtr_file)) { // not on card => read from app folder
-            QFile appdirfile;
-            appdirfile.setFileName(_start_path + "/mot.re");
-            ReadMotoresurs(&appdirfile);
-        }
-    // Read motoresurs from registration file
+    if (!ReadMotoresurs(&_mtr_file)) { // not on card (or RAM) => read from app folder
+        QFile appdirfile;
+        appdirfile.setFileName(_start_path + "/mot.re");
+        if (!ReadMotoresurs(&appdirfile))
+            ReadMotoresurs(); // read from registration file
+    }
 
     _diagnostics->Init();
 //#ifdef Q_OS_WIN
@@ -97,14 +96,14 @@ bool Processor::ReadMotoresurs() {
     qint64 size = 0, bytenum;
     UnionUInt32 par;
     QDir directory(_registrator->Path());
-    QFileInfoList files = directory.entryInfoList(QStringList() << "*.rez" << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time);
+    QFileInfoList files = directory.entryInfoList(QStringList() << "*.rez", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time);
     if (i < files.size()) {
         if (!_registrator->UsedRAM()) { //
             if (files.size()) {
-                while ((size = files[i].size()) < _registrator->RecordSize())
+                while ((size = files[i].size()) < _registrator->RecordSize() || files[i].fileTime(QFileDevice::FileModificationTime) > QDateTime::currentDateTime())
                     i++;
                 bytenum = (size / _registrator->RecordSize() - 1) * _registrator->RecordSize() + 206;
-                QFile regfile(files[0].filePath());
+                QFile regfile(files[i].filePath());
                 if (regfile.open(QIODevice::ReadOnly)) {
                     regfile.seek(bytenum);
                     regfile.read(par.Array, 4);
@@ -349,20 +348,7 @@ void Processor::RegTimerStep() {
     _registrator->SetByteRecord(330, dt.time().minute());
     _registrator->SetByteRecord(331, dt.time().second());
     // discret diagnostic
-//    quint8 byte = 0;
-//    QBitArray* ba = _mainstore.Bits("DIAG_Connections");
-//    for (j = 0; j < 8; j++ )
-//        byte +=  ba->testBit(j) ? (1 << j) : 0;
-//    _registrator->SetByteRecord(346, byte);
     _registrator->SetByteRecord(346, _mainstore.BitArrayToByte("DIAG_Connections"));
-
-//    ba = _mainstore.Bits("PROG_TrSoob");
-//    for (i = 0; i < 5; i++) {
-//        byte = 0;
-//        for (j = 0; j < 8; j++ )
-//            byte +=  ba->testBit(i * 8 + j) ? (1 << j) : 0;
-//        _registrator->SetByteRecord(347 + i, byte);
-//    }
     _registrator->UpdateRecord(347, 5, _mainstore.BitArrayToByteArray("PROG_TrSoob").mid(0, 5));
 
     AddRecordSignal();
@@ -383,7 +369,7 @@ void Processor::DiagTimerStep() {
     _virtual_section = (_virtual_section == 1) ? 0 : 1;
     _diagnostics->RefreshDT();
     if (_diagnostics->Motoresurs())
-        if (_registrator->UsedRAM()) // on RAM drive save motoresurs every second
+        if (_settings.DmType == DisplayType::TPK) // on RAM drive save motoresurs every second
             SaveMotoresurs(&_mtr_file);
     _diagnostics->Connections(_serial_ports, _registrator, &_slave);
     _diagnostics->RizCU(_mainstore.Byte("PROG_PKM"));

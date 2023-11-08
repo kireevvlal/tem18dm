@@ -169,7 +169,7 @@ Rectangle {
         x: 8
         y: 132
         color: "silver"
-        text: qsTr("v.Gs 01/11/22")
+        text: qsTr("v.1.11 01/11/23")
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
         font.bold: true

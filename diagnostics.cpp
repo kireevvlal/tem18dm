@@ -65,7 +65,8 @@ void Diagnostics::APSignalization(int pkm) {
             if (_storage->Float("USTA_Pf_tnvd") < pt_min ||  _storage->Float("USTA_Pf_ftot") < pt_min)
                 _storage->SetBit("PROG_TrSoob", 40, true); // Давление масла ниже нормы
             if (_storage->Bit("USTA_Inputs", USTA_INPUTS_KV) && pkm >= 3) {
-                if (_storage->Float("USTA_Ug_filtr") > uu[pkm - 1] || _storage->Float("USTA_Ig_filtr") > ii[pkm - 1])
+//                if (_storage->Float("USTA_Ug_filtr") > uu[pkm - 1] || _storage->Float("USTA_Ig_filtr") > ii[pkm - 1])
+                if ((_storage->Float("USTA_Ug_filtr") > (float)_storage->Int16("USTA_N") * 1.3) || (_storage->Float("USTA_Ig_filtr") > ii[pkm - 1]))
                     _storage->SetBit("PROG_TrSoob", 24, true);
                 else {
                     if (_storage->Float("USTA_Ug_filtr") < 1 || _storage->Float("USTA_Ig_filtr") < 1)
@@ -186,15 +187,17 @@ bool Diagnostics::Motoresurs() {
         diff = currtime - _msec;
         if (diff >= 1000) {
             _msec = currtime;
-            _motoresurs += diff;
-            _storage->SetUInt32("DIAG_Motoresurs", _motoresurs / 1000); // set motoresurs
-            if (_storage->Bit("USTA_Inputs", USTA_INPUTS_KV)) { // КВ контроль возбуждения
-                _time_propulsion += diff;
-                _storage->SetUInt32("DIAG_Tt", _time_propulsion / 1000); // set время работы в тяге
-                _a_diz += (float)_storage->Int16("DIAG_Pg") / 3600;
-                _storage->SetUInt32("DIAG_Adiz", _a_diz * 10); // полезная работа
+            if (diff < 2000) {
+                _motoresurs += diff;
+                _storage->SetUInt32("DIAG_Motoresurs", _motoresurs / 1000); // set motoresurs
+                if (_storage->Bit("USTA_Inputs", USTA_INPUTS_KV)) { // КВ контроль возбуждения
+                    _time_propulsion += diff;
+                    _storage->SetUInt32("DIAG_Tt", _time_propulsion / 1000); // set время работы в тяге
+                    _a_diz += (float)_storage->Int16("DIAG_Pg") / 3600;
+                    _storage->SetUInt32("DIAG_Adiz", _a_diz * 10); // полезная работа
+                }
+                return true;
             }
-            return true;
         }
     } else
         _msec = currtime;
