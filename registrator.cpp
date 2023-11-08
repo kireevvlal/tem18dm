@@ -193,7 +193,8 @@ void Registrator::Prepare() {
         }
     }
     QDateTime dt = QDateTime::currentDateTime();
-    QString name = _path + "/" + _alias + "_" + _settings->Number + "_" + dt.date().toString("yyMMdd") + dt.time().toString("hhmmss") + ".rez";
+    QString name = _path + "/" + _alias + "_" + _settings->Number + "_" + dt.date().toString("yyMMdd") + dt.time().toString("hhmmss")
+            + ((_settings->DmType == DisplayType::TPK) ? "tpk" : ((_settings->DmType == DisplayType::Atronic) ? "atr" : "")) + ".rez";
     _file.setFileName(name);
 }
 //--------------------------------------------------------------------------------
