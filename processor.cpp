@@ -102,8 +102,13 @@ bool Processor::ReadMotoresurs() {
     if (i < files.size()) {
         if (!_registrator->UsedRAM()) { //
             if (files.size()) {
+#if QT_VERSION < QT_VERSION_CHECK(5, 12, 0)
+                while ((size = files[i].size()) < _registrator->RecordSize())
+                    i++;
+#else
                 while ((size = files[i].size()) < _registrator->RecordSize() || files[i].fileTime(QFileDevice::FileModificationTime) > QDateTime::currentDateTime())
                     i++;
+#endif
                 bytenum = (size / _registrator->RecordSize() - 1) * _registrator->RecordSize() + 206;
                 QFile regfile(files[i].filePath());
                 if (regfile.open(QIODevice::ReadOnly)) {
