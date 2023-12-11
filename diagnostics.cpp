@@ -204,6 +204,14 @@ bool Diagnostics::Motoresurs() {
     return false;
 }
 //--------------------------------------------------------------------------------
+void Diagnostics::ResetMotoresurs() {
+    _motoresurs = _time_propulsion = 0;
+    _a_diz = 0;
+    _storage->SetUInt32("DIAG_Motoresurs", 0); // reset motoresurs
+    _storage->SetUInt32("DIAG_Tt", 0); // set время работы в тяге
+    _storage->SetUInt32("DIAG_Adiz", 0); // reset полезная работа
+}
+//--------------------------------------------------------------------------------
 void Diagnostics::Connections(QMap<QString, ExtSerialPort*> serialPorts, Registrator* reg, SlaveLcm* slave) {
     for (QMap<QString, ExtSerialPort*>::iterator i = serialPorts.begin(); i != serialPorts.end(); i++) {
         ExtSerialPort* port = i.value();

@@ -31,7 +31,7 @@ void Saver::TaskTimerStep() {
                 available = _storage_info.bytesAvailable();
                 if (available > 2600000) {
                     QDateTime dt(QDateTime::currentDateTime());
-                    _current_dir = "tm18" + _settings->Number + dt.toString("yyMMddhhmmss");
+                    _current_dir = _alias + _settings->Number + dt.toString("yyMMddhhmmss");
                     if (_directory.mkdir(_current_dir)) {
                         _files = QDir(_reg_path).entryInfoList(QStringList() << "*.rez" << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time);
                         _index = 1;
@@ -153,7 +153,8 @@ QStringList Saver::ScanDev() {
     return res;
 }
 //--------------------------------------------------------------------------------
-void Saver::SetParameters(QString mpath, QString rpath, int interval) {
+void Saver::SetParameters(QString alias, QString mpath, QString rpath, int interval) {
+    _alias = alias;
     _media_path = mpath;
     _reg_path = rpath;
     _task_interval = interval;

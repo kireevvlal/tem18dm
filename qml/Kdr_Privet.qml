@@ -21,9 +21,10 @@ Rectangle {
 //            if (counter > 10) {
             if (triggeredOnStart) {
                 triggeredOnStart = false;
-                var par = ioBf.getKdrPrivet();
-                text_sensor.text = par[0];
-                text_injection.text = par[1];
+                var par = ioBf.getKdrPrivet()
+                text_sensor.text = par[0]
+                text_injection.text = par[1]
+                text_version.text = "Version: " + par[2]
             }
             else
                 kdr_Privet.opacity = 0;
@@ -87,7 +88,7 @@ Rectangle {
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
         font.bold: true
-        font.pixelSize: 7
+        font.pixelSize: 10
         font.family: main_window.deffntfam
     }
 
@@ -100,7 +101,7 @@ Rectangle {
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
         font.bold: true
-        font.pixelSize: 7
+        font.pixelSize: 10
         font.family: main_window.deffntfam
     }
 
@@ -169,11 +170,11 @@ Rectangle {
         x: 8
         y: 132
         color: "silver"
-        text: qsTr("v.1.11 01/11/23")
+        text: qsTr("Version: 0.0")
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
         font.bold: true
-        font.pixelSize: 7
+        font.pixelSize: 10
         font.family: main_window.deffntfam
     }
 
@@ -186,7 +187,7 @@ Rectangle {
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
         font.bold: true
-        font.pixelSize: 7
+        font.pixelSize: 10
         font.family: main_window.deffntfam
     }
 }

@@ -23,6 +23,8 @@ using namespace std;
 #include <QSound>
 #include <QTextStream>
 #include <QDebug>
+
+#define VERSION "1.12 08/11/23"
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 Processor::Processor(QObject *parent) : QObject(parent)
@@ -244,6 +246,8 @@ void Processor::querySaveToUSB() {
 }
 //--------------------------------------------------------------------------------
 void Processor::saveSettings(QString number, int psensors, bool elinj, int svolume) {
+    if (_settings.Number != number)
+        _diagnostics->ResetMotoresurs();
     _settings.Number = number;
     _settings.PressureSensors = psensors;
     _settings.ElInjection = elinj;
@@ -816,7 +820,7 @@ void Processor::ParseRegistration(NodeXML* node) {
         }
     }
     _registrator->SetParameters(path, alias, regtype, quantity, recordsize, interval, sector_size, compress, ram);
-    _saver->SetParameters(drive, path, save_interval);
+    _saver->SetParameters(alias, drive, path, save_interval);
 }
 //------------------------------------------------------------------------------
 QJsonArray Processor::getSettings() {
@@ -1298,6 +1302,7 @@ QStringList Processor::getKdrPrivet() {
     QStringList list;
     list.append(QString::number(_settings.PressureSensors));
     list.append((_settings.ElInjection) ? "El vp" : "no Elvp");
+    list.append(VERSION);
     return list;
 }
 //------------------------------------------------------------------------------

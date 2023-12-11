@@ -15,6 +15,7 @@ private:
     bool _media_inserted;
     QTimer *_task_timer;
     int _task_interval;
+    QString _alias;     // алиас локомотива для имени файла и каталога
     QString _media_path; // путь к каталогу (диску) для записи (без имени устройства)
     QString _save_path; // путь к каталогу (диску) для записи (с именем устройства)
     QString _reg_path; // путь к каталогу регистрации
@@ -32,7 +33,7 @@ private:
 public:
     Saver(LcmSettings*, QObject *parent = nullptr);
     void Run();
-    void SetParameters(QString, QString, int);
+    void SetParameters(QString, QString, QString, int);
     bool MediaInserted() { return _media_inserted; }
     bool Recording() { return _state; }
     int PercentRecorded();

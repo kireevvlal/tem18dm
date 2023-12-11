@@ -171,10 +171,10 @@ void Registrator::Prepare() {
     if (!_used_ram) {
         QStorageInfo si = QStorageInfo(directory);
         qint64 available = si.bytesAvailable();
-        qint64 needvalue = (_settings->DmType == DisplayType::Atronic) ? ((_quantity + 100) * _record_size) : 105000000; //Atronic: + 100 - доп размер на 100 записей // ~100MB for TPK
+        //qint64 needvalue = (_settings->DmType == DisplayType::Atronic) ? ((_quantity + 100) * _record_size) : 105000000; //Atronic: + 100 - доп размер на 100 записей // ~100MB for TPK
         if (available >= 0) {
             QStringList files = directory.entryList(QStringList() << "*.rez" << "*.rcd", QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Time | QDir::Reversed);
-            while (available <= needvalue && files.size()) { // + 100 - доп размер на 100 записей
+            while (available <= NEEDVALUE && files.size()) { // + 100 - доп размер на 100 записей
                 directory.remove(files[0]);
                 si = QStorageInfo(directory);
                 available = si.bytesAvailable();
@@ -194,7 +194,7 @@ void Registrator::Prepare() {
     }
     QDateTime dt = QDateTime::currentDateTime();
     QString name = _path + "/" + _alias + "_" + _settings->Number + "_" + dt.date().toString("yyMMdd") + dt.time().toString("hhmmss")
-            + ((_settings->DmType == DisplayType::TPK) ? "tpk" : ((_settings->DmType == DisplayType::Atronic) ? "atr" : "")) + ".rez";
+            + ((_settings->DmType == DisplayType::TPK) ? "k" : ((_settings->DmType == DisplayType::Atronic) ? "a" : "")) + ".rez"; // k - kontinent, a - atronic
     _file.setFileName(name);
 }
 //--------------------------------------------------------------------------------

@@ -8,6 +8,8 @@
 #include "vktoolstypes.h"
 #include "tem18dm.h"
 
+#define NEEDVALUE 104857600 // min free disk space
+
 class Registrator : public QObject
 {
     Q_OBJECT
